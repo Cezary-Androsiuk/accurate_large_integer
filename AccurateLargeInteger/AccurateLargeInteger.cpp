@@ -1,12 +1,15 @@
 #include "AccurateLargeInteger.h"
 
+//   fold all Ctrl + K,  Ctrl + 0
 
+//   fold 1st Ctrl + K,  Ctrl + 1
+
+// unfold all Ctrl + K,  Ctrl + J
 
 /**
  * @brief Construct a new ALi object
  */
 ALi::ALi(){
-    // this->initialize();
     this->length = 1;
     this->globalHandle.L = &this->globalHandle;
     this->globalHandle.R = &this->globalHandle;
@@ -142,15 +145,19 @@ const bool ALi::delCell(){
 
 
 
-
+//! WITHOUT OPTYMALIZE METHOD
 
 /**
  * @brief finding an index of the most significant bit
  * @return const _ULL: index of the most significant bit
  */
-const unsigned long long ALi::MSB() const{
+unsigned char ALi::MSB() const{
     printf("MSB is not finished\n");
+    exit(0);
     return -1;
+
+
+
     // if(this->globalHandle.R->var >= 0x80){ // is negative
 
     // }
@@ -164,6 +171,17 @@ const unsigned long long ALi::MSB() const{
     //     index++;
     // }
     // return index;
+}
+
+/**
+ * @brief 
+ * 
+ * @return true 
+ * @return false 
+ */
+bool ALi::isPositive() const{
+    if(this->globalHandle.R->var & 128) return false;
+    else return true; 
 }
 
 /**
@@ -196,8 +214,6 @@ void ALi::SHR(){
         buffer[1] = buffer[0]; // hold bit to next cell
         handle = handle->R;
     } while (handle != this->globalHandle.R);
-    
-
 }
 
 /**
@@ -238,6 +254,15 @@ void ALi::SHL(){
         else 
             this->newCell(0b00000000); // was positive
     }
+}
+
+/**
+ * @brief push least significant bit
+ * @param bit if 0, 0 will be pushed if 1, 1 will be pushed on lsb
+ */
+void ALi::PLSB(const unsigned char& bit){
+    this->SHL();
+    this->globalHandle.var |= (bit == 0 ? 0 : 1);
 }
 
 
@@ -286,33 +311,8 @@ void ALi::negate(){
  * @brief inverting value from (3) to (-3) and from (-10) to (10) ...
  */
 void ALi::invert(){
-    printf("invert is not finished\n");
-    return;
-    // this->negate();
-    // if(this->globalHandle.var != 0b11111111){ // if is not full then add 1 and go on
-    //     // now avoid changing this 0b01111111(127) to this 0b10000000(-128)
-    //     if(this->globalHandle.R != &this->globalHandle) // there are more cells 
-    //         this->globalHandle.var++;
-    //     else{ // there no more cells
-    //         if()
-    //     }
-    //     return;
-    // }
-    // else{
-    //     Cell* handle = &this->globalHandle;
-    //     // while is not the end and is 0b11111111
-    //     do{
-    //         handle->var = 0; // pretend adding was executed
-    //         handle = handle->L;
-    //     } while (handle != &this->globalHandle && handle->var == 0b11111111);
-        
-    //     if(handle != &this->globalHandle){ // cell with non full variable was foud 
-    //         handle->var++;
-    //     }
-    //     else{
-
-    //     }
-    // }
+    this->negate();
+    this->increment();
 }
 
 /**
@@ -352,8 +352,71 @@ void ALi::printBinary(const char* additionText) const{
  * @param additionText default is "" text what will be printed at the end of variable
  */
 void ALi::printDecimal(const char* additionText) const{
-    printf("printDecimal is not finished\n");
-    return;
+    // if it is negative invert and print '-' sign
+    if(!this->isPositive()){
+        printf("(-");
+        ALi tmp(*this);
+        tmp.invert();
+        tmp.printDecimal("");
+
+        printf(")%s",additionText);
+        return;
+    }
+
+    if(this->globalHandle.var == 0 && this->length == 1){
+        printf("0");
+        printf("%s",additionText);
+        return;
+    }
+
+    ALi slider(*this);
+slider.setSeparator(' ');
+    // std::stack <unsigned char> decimal;
+    std::string decimal = "";
+// slider.printBinary(" start\n");
+    // slider.optymize(); // tight fit
+    unsigned long long bitlength = 8;
+    while(slider.globalHandle.var != 0 || slider.length != 1){ // iterate through each decimal digit
+        slider.optymize(); // to keep as short as can
+        slider.newCell(0); // as a buffer
+        bitlength = (slider.length-1) * 8;//sizeof(Cell::var);
+// slider.printBinary(" while\n");
+        for(int i=0; i<bitlength; i++){ // iterate through each SHL using PLSB
+            if(slider.globalHandle.R->var >= 10){
+                slider.globalHandle.R->var -= 10;
+                slider.PLSB(1);
+            }
+            else{
+                slider.PLSB(0);
+            }
+// slider.printBinary(" for-end\n");
+        }
+        // printf("\n");
+
+
+        if(slider.globalHandle.R->var >= 10){
+            // decimal.push(slider.globalHandle.R->var - 10);
+            decimal += (char)(slider.globalHandle.R->var - 10);
+            slider.PLSB(1);
+        } 
+        else{
+            // decimal.push(slider.globalHandle.R->var);
+            decimal += (char)(slider.globalHandle.R->var);
+            slider.PLSB(0);
+        }
+
+        slider.delCell();
+    }
+    // for(int i=0; i<decimal.size()+1; i++){
+    //     printf("%d",decimal.top());
+    //     decimal.pop();
+    // }
+    
+    for(int i=decimal.length()-1; i>=0; i--){
+        printf("%d",decimal[i]);
+    }
+    
+
     printf("%s",additionText);
 }
 
@@ -555,6 +618,100 @@ void ALi::assignment(const signed long long& source){
 
 
 
+
+
+
+
+
+
+
+/**
+ * @brief increment ALi by one
+ * 
+ */
+void ALi::increment(){
+    // 0x00 0b00000000
+    // 0xFF 0b11111111
+    // 0x7f 0b01111111
+    // 0x80 0b10000000
+    
+
+    if(this->isPositive()){
+        Cell *handle = &this->globalHandle;
+        while(handle->var == 0xFF && handle != this->globalHandle.R){
+            handle->var = 0x00; // 11111111 -> (1)00000000
+            handle = handle->L;
+        }
+        // handle is pointing at first not full cell
+
+        if(handle->var == 0x7F && handle == this->globalHandle.R){ 
+            // is the last cell and looks like 0b01111111 (on msb contains sign bit)
+            this->newCell(0x00); // keep sign bit
+            handle->var++;
+        }
+        else{ // is the casual cell or last cell with variable less than 0b01111111
+            handle->var ++;
+        }
+    }
+    else{
+        Cell *handle = &this->globalHandle;
+        while(handle->var == 0x00 && handle != this->globalHandle.R){
+            handle->var = 0xFF; // 00000000 -> (-1)11111111
+            handle = handle->L;
+        }
+        // handle is pointing at first not full cell
+
+        if(handle->var == 0x80 && handle == this->globalHandle.R){ 
+            // is the last cell and looks like 0b10000000 (on msb contains sign bit)
+            this->newCell(0xFF); // keep sign bit
+            handle->var = 127;
+        }
+        else{ // is the casual cell or last cell with variable greater than 0b10000000
+            handle->var ++;
+        }
+    }
+}
+
+/**
+ * @brief 
+ * @param right 
+ * @return ALi 
+ */
+ALi ALi::addition(const ALi& right){
+    ALi result;
+
+
+
+    return result;
+}
+
+/**
+ * @brief 
+ * @param right 
+ */
+void ALi::addition_assign(const ALi& right){
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /**
  * @brief print variable as a binary or decimal
  * @param type type of file, decimal('d') or binary('b')
@@ -594,6 +751,6 @@ void ALi::setSeparator(const char& separator){
  * @brief returns separator sign which should shown every 8 bits (byte)
  * @return const char separator sign
  */
-const char ALi::getSeparator() const{
-    return this->separator;
-}
+// const char ALi::getSeparator() const{
+//     return this->separator;
+// }

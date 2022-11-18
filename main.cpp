@@ -34,10 +34,26 @@ int main(){
     // x.readFileR("output1.txt");
     // x.printBinary("\n");
 
-    printf("%s\n",toBin(-1145445431126454566).c_str());
-    ALi x(-1145445431126454566);
-    x.setSeparator(' ');
-    x.print('b',"\n");
+    // printf("%s\n",toBin(-1145445431126454566).c_str());
+    // ALi x(-1145445431126454566);
+    // x.setSeparator(' ');
+    // x.print('b',"\n");
+
+        // ALi v(-129);
+        // v.print('b',": ");
+        // v.invert();
+        // v.print('d',"\n");
+    // TODO max unsigned long long value and signed long long values compare to ALi
+    // TODO test few bits larger values than max long long container 
+    // todo this will proof that ALi is working and can be rebuilded 
+    for(size_t i=0; i<257; i++){
+        ALi v(i*(-1));
+        v.print('b',": ");
+        v.print('d',"\n");
+    }
+
+    // v.invert();
+    // v.print('b',"\n");
 
     // x.setSeparator(' ');
     // x.print('b',"\n");
