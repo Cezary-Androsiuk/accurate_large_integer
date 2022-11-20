@@ -8,8 +8,6 @@
     accurate large integer
     is negative if first bit from right is 1  
 
-    todo decimal
-    todo push bit on right
     todo addition
     todo subtraction
 
@@ -37,6 +35,7 @@ protected:
 
     unsigned long long length;
     char separator;
+    bool approximation;
 public:
     ALi();
     ALi(const ALi& source);
@@ -84,10 +83,13 @@ protected:
 
 
 public:
+    void print(const char& type, const char* additionText = "") const;
+    void printApproximation(const char& type, const char* additionText) const;
+    void file(const char* path, const char& action, const char& type);
+
     void setSeparator(const char& separatorSign = '\0');
     // const char getSeparator() const;
 
-    void print(const char& type, const char* additionText = "") const;
-    void file(const char* path, const char& action, const char& type);
+    const bool isEmpty() const;
 };
 

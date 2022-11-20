@@ -1,11 +1,14 @@
 #pragma once
 
-#include <iostream>
-// #include <fstream>
-#include <stack>
-#include <stdio.h>
-// #include <stdlib.h>
-#include <string>
+#include "Stacker/Stacker.h"
 
+#include <iostream>
+#include <stdio.h>
+#include <optional>
+// #include <fstream>
+// #include <stdlib.h>
+// #include <string>
+
+#define BITS_PER_BYTE 8
 
 const std::string toByte(const unsigned char&);

@@ -1,4 +1,5 @@
 #include "AccurateLargeInteger/AccurateLargeInteger.cpp"
+// #include "Stacker/Stacker.cpp"
 
 
 // return single bit of char as a int, depends from weight (1,2,4,8,16,32,64,128)
@@ -20,6 +21,7 @@
 //     return byte;
 // }
 
+// #include <string>
 const std::string toByte(const unsigned char& source){
     // 1*8 bits
     std::string byte("00000000"); 

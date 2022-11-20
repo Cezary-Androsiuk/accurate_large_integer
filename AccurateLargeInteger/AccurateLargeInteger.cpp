@@ -354,12 +354,10 @@ void ALi::printBinary(const char* additionText) const{
 void ALi::printDecimal(const char* additionText) const{
     // if it is negative invert and print '-' sign
     if(!this->isPositive()){
-        printf("(-");
+        printf("-");
         ALi tmp(*this);
         tmp.invert();
-        tmp.printDecimal("");
-
-        printf(")%s",additionText);
+        tmp.printDecimal(additionText);
         return;
     }
 
@@ -370,52 +368,36 @@ void ALi::printDecimal(const char* additionText) const{
     }
 
     ALi slider(*this);
-slider.setSeparator(' ');
-    // std::stack <unsigned char> decimal;
-    std::string decimal = "";
-// slider.printBinary(" start\n");
-    // slider.optymize(); // tight fit
-    unsigned long long bitlength = 8;
+    Stacker<char> decimal(new char('!'));
+    unsigned long long sliderBits = 0;
     while(slider.globalHandle.var != 0 || slider.length != 1){ // iterate through each decimal digit
-        slider.optymize(); // to keep as short as can
-        slider.newCell(0); // as a buffer
-        bitlength = (slider.length-1) * 8;//sizeof(Cell::var);
-// slider.printBinary(" while\n");
-        for(int i=0; i<bitlength; i++){ // iterate through each SHL using PLSB
-            if(slider.globalHandle.R->var >= 10){
-                slider.globalHandle.R->var -= 10;
-                slider.PLSB(1);
+        slider.optymize(); // to keep as short as possible
+        if(slider.globalHandle.L != &slider.globalHandle || slider.globalHandle.var >= 10){
+            sliderBits = BITS_PER_BYTE * (slider.length) * sizeof(Cell::var);
+            slider.newCell(0); // as a buffer
+            for(int i=0; i<sliderBits; i++){ // iterate through each SHL using PLSB
+                if(slider.globalHandle.R->var >= 10){
+                    slider.globalHandle.R->var -= 10;
+                    slider.PLSB(1);
+                }
+                else slider.PLSB(0);
             }
-            else{
-                slider.PLSB(0);
-            }
-// slider.printBinary(" for-end\n");
         }
-        // printf("\n");
-
-
         if(slider.globalHandle.R->var >= 10){
-            // decimal.push(slider.globalHandle.R->var - 10);
-            decimal += (char)(slider.globalHandle.R->var - 10);
+            decimal.push(slider.globalHandle.R->var - 10);
             slider.PLSB(1);
         } 
         else{
-            // decimal.push(slider.globalHandle.R->var);
-            decimal += (char)(slider.globalHandle.R->var);
+            decimal.push(slider.globalHandle.R->var);
             slider.PLSB(0);
         }
-
         slider.delCell();
     }
-    // for(int i=0; i<decimal.size()+1; i++){
-    //     printf("%d",decimal.top());
-    //     decimal.pop();
-    // }
-    
-    for(int i=decimal.length()-1; i>=0; i--){
-        printf("%d",decimal[i]);
+
+    while(!decimal.isEmpty()){
+        printf("%d",*decimal.top());
+        decimal.pop();
     }
-    
 
     printf("%s",additionText);
 }
@@ -726,6 +708,36 @@ void ALi::print(const char& type, const char* additionText) const{
 }
 
 /**
+ * @brief 
+ * @param type 
+ * @param additionText 
+ */
+void ALi::printApproximation(const char& type, const char* additionText) const{
+    // approximation is possible only for numbers greater or equal 4722366482869645213696+1 (256^9 +1)
+    if(this->length < 10){
+        if(type == 'd') this->printDecimal(additionText);
+        else if (type == 'b') this->printBinary(additionText);
+        else{
+
+        }
+        return;
+    }
+
+    if(this->isPositive())
+        // (2^(bits in cell))^(cells amount)
+        printf("%d*(2^%d)^%d +-(2^%d)^%d",
+        sizeof(Cell::var)*BITS_PER_BYTE,this->length,sizeof(Cell::var)*BITS_PER_BYTE,this->length-1);
+        // printf("%lld*2^(%lld)",this->globalHandle.R->var,(this->length-1)*BITS_PER_BYTE);
+        // // printf("%d*2^(",)
+    printf("%s",additionText);
+    // if(type == 'd'){
+    // }
+    // else if(type == 'b'){
+
+    // }
+}
+
+/**
  * @brief actions on files around variable
  * @param path path to file or direction
  * @param action type of action write('w') or read('r')
@@ -754,3 +766,15 @@ void ALi::setSeparator(const char& separator){
 // const char ALi::getSeparator() const{
 //     return this->separator;
 // }
+
+
+/**
+ * @brief check if is empty
+ * @return true ALi is empty
+ * @return false ALi containing something
+ */
+const bool ALi::isEmpty() const{
+    // if(this->globalHandle.L == &this->globalHandle && this->globalHandle.var == 0) return true;
+    if(this->length == 1 && this->globalHandle.var == 0) return true;
+    else return false;
+}
