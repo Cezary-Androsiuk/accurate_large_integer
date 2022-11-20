@@ -1,6 +1,6 @@
 #ifndef Stacker_h
 #define Stacker_h
-// Seams best one
+
 template <class type>
 struct node{
     type* data; // stored type data

@@ -27,14 +27,19 @@ public:
     unsigned char var;
     Cell* L;
     Cell* R;
+    
+    Cell();
+    Cell(unsigned char variable,Cell* left, Cell* right);
+    ~Cell();
+    
 };
 
 class ALi{
 protected:
-    Cell globalHandle; //   [...11010001] <-
-
+    Cell *globalHandle; //   [...11010001] <-
+    // Cell ptrhdl; // pointer handle
     unsigned long long length;
-    char separator;
+    char separator; // '/0' means no separator others are printed in print method
     bool approximation;
 public:
     ALi();
@@ -57,6 +62,7 @@ protected: public:
     void PLSB(const unsigned char& bit);
 
     void optymize();
+    bool need_opt() const;
     void negate();
     void invert();
     void clear();

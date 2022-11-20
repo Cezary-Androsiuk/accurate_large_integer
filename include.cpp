@@ -36,3 +36,12 @@ const std::string toByte(const unsigned char& source){
     }
     return byte;
 }
+
+
+long long pow_long(const long long& base, const unsigned char& power){
+    // not the best but simple
+    long long result = 1;
+    for (size_t i = 0; i < power; i++)
+        result *= base;
+    return result;
+}
