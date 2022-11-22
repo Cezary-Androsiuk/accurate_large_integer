@@ -43,6 +43,7 @@ int main(){
         // v.print('b',": ");
         // v.invert();
         // v.print('d',"\n");
+    // TODO describe thouse methods which do not have optymization method
     // TODO max unsigned long long value and signed long long values compare to ALi
     // TODO test few bits larger values than max long long container 
     // todo this will proof that ALi is working and can be rebuilded 
@@ -67,15 +68,38 @@ int main(){
     // printf("...\n");
     // decltype(nullptr);
 
+    // printf("%s\n",toBin(1).c_str());
+    // printf("%s\n",toBin(1ull).c_str());
+
+    // printf("%s\n",toBin(-1).c_str());
+    // printf("%s\n",toBin(-1u).c_str());
+    // printf("%s\n",toBin(-1ull).c_str());
+    // printf("%s\n",toBin((-1ULL)).c_str());
+    // printf("%s\n",toBin((-1LL)).c_str());
+    // printf("-1LL  SHR %s\n\n",toBin((-1LL >> 1)).c_str());
+
+    // printf("%s -1ULL \n",toBin((-1ULL)).c_str());
+    // printf("%s -1ULL SHR \n",toBin((-1ULL >> 1)).c_str());
+    // printf("%s -1ULL SHR NG \n",toBin(~(-1ULL >> 1)).c_str());
+    // printf("%s -1ULL SHR NG \n",toBin((1U << 7)).c_str());
+    // printf("%s -1ULL SHR NG \n",toBin((~(1ULL << 7))).c_str());
+    ALi x(-1000);
+    x.print('b',"\n");
+    x.print('d',"\n");
+    printf("%llu\n",x.MSCell());
+    
+    
+    // printf("%c",-128);
+
 
     // ALi v(298);
     // v.print('b',"\n");
     // v.print('d',"\n");
-    ALi v(100000);
-    v.setSeparator(' ');
-    v.print('b',"\n");
-    v.print('d',"\n");
-    v.printApproximation('d',"\n");
+    // ALi v(100000);
+    // v.setSeparator(' ');
+    // v.print('b',"\n");
+    // v.print('d',"\n");
+    // v.printApproximation('d',"\n");
 
     // for(int i=0; i<300; i++){
     //     ALi v(i);

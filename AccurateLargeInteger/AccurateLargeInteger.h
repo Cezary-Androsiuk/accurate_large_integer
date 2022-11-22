@@ -55,7 +55,8 @@ protected:
     // const bool delCellRight();  // only for readFileReadable
 
 protected: public:
-    unsigned char MSB() const;
+    // unsigned long long MSCell() const;
+    // unsigned long long MSB() const;
     bool isPositive() const;
     void SHR();
     void SHL();
@@ -79,6 +80,11 @@ protected:
     void readFileBinary(const char* path);
     void readFile(const char* path, const char& type);
     
+
+    const bool equal(const ALi& right) const;
+    const bool greaterThan(const ALi& right) const;
+    const bool smallerThan(const ALi& right) const;
+
     void assignment(const ALi& source);
     void assignment(const signed long long& source);
 
@@ -94,7 +100,7 @@ public:
     void file(const char* path, const char& action, const char& type);
 
     void setSeparator(const char& separatorSign = '\0');
-    // const char getSeparator() const;
+    const char getSeparator() const;
 
     const bool isEmpty() const;
 };
