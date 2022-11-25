@@ -83,10 +83,14 @@ int main(){
     // printf("%s -1ULL SHR NG \n",toBin(~(-1ULL >> 1)).c_str());
     // printf("%s -1ULL SHR NG \n",toBin((1U << 7)).c_str());
     // printf("%s -1ULL SHR NG \n",toBin((~(1ULL << 7))).c_str());
-    ALi x(-1000);
+    ALi x(323), y(324),z;
     x.print('b',"\n");
     x.print('d',"\n");
-    printf("%llu\n",x.MSCell());
+    z.assignment(x.addition(y));
+    z.print('d',"\n");
+    z.assignment(y.addition(x));
+    z.print('d',"\n");
+    // printf("%llu\n",x.MSCell());
     
     
     // printf("%c",-128);

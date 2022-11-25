@@ -80,7 +80,7 @@ protected:
     void readFileBinary(const char* path);
     void readFile(const char* path, const char& type);
     
-
+public:
     const bool equal(const ALi& right) const;
     const bool greaterThan(const ALi& right) const;
     const bool smallerThan(const ALi& right) const;

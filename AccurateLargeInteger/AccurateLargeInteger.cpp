@@ -840,7 +840,64 @@ ALi ALi::addition(const ALi& right){
     if(right.isEmpty()) return *this; // both are 0 or right is 0
     if(this->isEmpty()) return right; // left is 0
     
+    //     132 034 250
+    //   + 200 190 240
+    // ---------------
+    // 001 076 225 234
 
+    //                                  8 659 706
+    //                  132        034        250
+    //            1000 0100  0010 0010  1111 1010
+    
+    //                                 13 156 080
+    //                  200        190        240
+    //          + 1100 1000  1011 1110  1111 0000
+
+    //----------------------------------------------
+    
+    //                                 21 815 786
+    //       001        076        225        234
+    // 0000 0001  0100 1100  1110 0001  1110 1010
+
+    
+
+    // so add each cell and if overflow will occur, add 1 to next cell 
+    // but how to check if overflow has occured
+    // overflow has occured for [a + b = c] when [c < a] and [c < b]
+
+    unsigned char carry = 0;
+    const bool sign = isPositive();
+    
+    // iterate for the longer one
+    // expect 1234+123 but not 123+1234
+    ALi const* greater = this; // not const pointer to obj but pointer to const obj
+    ALi const* smaller = &right; // not const pointer to obj but pointer to const obj
+    if(this->smallerThan(right)){ // protect from case 123 + 1234 but accidently also protect from 1234 + 9876, not hardly needed, but it's fine
+        greater = &right;
+        smaller = this;
+    }
+    Cell* grHandle = greater->globalHandle;
+    Cell* smHandle = smaller->globalHandle;
+    
+    // special case that i can not include to while loop
+    result.globalHandle->var = grHandle->var + smHandle->var + carry;
+    if(result.globalHandle->var < grHandle->var && result.globalHandle->var < smHandle->var)
+        carry = 1;
+    grHandle = grHandle->L;
+    smHandle = smHandle->L;
+    
+    while(grHandle != greater->globalHandle){
+        if(result.isEmpty())
+            result.globalHandle->var = grHandle->var + smHandle->var + carry;
+        else
+            result.newCell(grHandle->var + smHandle->var + carry);
+        if(result.globalHandle->R->var < grHandle->var && result.globalHandle->R->var < smHandle->var)
+            carry = 1;
+        grHandle = grHandle->L;
+        smHandle = smHandle->L;
+    }
+
+    if(carry == 1) result.newCell(carry);
 
     return result;
 }
