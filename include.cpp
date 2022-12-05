@@ -1,10 +1,5 @@
 #include "AccurateLargeInteger/AccurateLargeInteger.cpp"
-// #include "Stacker/Stacker.cpp"
 
-
-// return single bit of char as a int, depends from weight (1,2,4,8,16,32,64,128)
-// printf("%d",bit(65,64));
-// #define bit(src,weight) (src%256 & (weight) ? '1':'0')
 
 const std::string toBin(const long long& source){
     // 8*8 bits +7 space signs
@@ -35,13 +30,4 @@ const std::string toByte(const unsigned char& source){
         }
     }
     return byte;
-}
-
-
-long long pow_long(const long long& base, const unsigned char& power){
-    // not the best but simple
-    long long result = 1;
-    for (size_t i = 0; i < power; i++)
-        result *= base;
-    return result;
 }

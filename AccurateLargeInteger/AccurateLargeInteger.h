@@ -11,27 +11,6 @@
     todo subtraction
 
 */
-
-/**
- * @brief single cell containing:
- * var (unsigned char) store byte of information
- *      soon unsigned char will be changed to unsigned long long to save space like:
- *      if one cell can contain 8 times more bits(64 instead 8) then less cell are needed. 
- *      Cause every single cell one contains two pointers reduce 8 cells to just one remove 14 to Cell* saving a lot of space 
- * L (Cell*) pointer to cell on the left side 
- * R (Cell*) pointer to cell on the right side
- */
-class Cell{
-public:
-    unsigned char var;
-    Cell* L;
-    Cell* R;
-    
-    // Cell();
-    // Cell(unsigned char variable,Cell* left, Cell* right);
-    // ~Cell();
-};
-
 class ALi{
 protected:
     Cell *globalHandle; //   [...11010001] <-

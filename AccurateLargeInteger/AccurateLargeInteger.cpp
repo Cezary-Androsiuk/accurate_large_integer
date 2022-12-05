@@ -7,15 +7,6 @@
 // unfold all Ctrl + K,  Ctrl + J
 
 
-// Cell::Cell(){}
-// Cell::Cell(unsigned char variable, Cell* left, Cell* right){
-//     this->var = variable;
-//     this->L = left;
-//     this->R = right;
-// }
-// Cell::~Cell(){}
-
-
 
 
 /**
