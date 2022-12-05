@@ -7,13 +7,13 @@
 // unfold all Ctrl + K,  Ctrl + J
 
 
-Cell::Cell(){}
-Cell::Cell(unsigned char variable, Cell* left, Cell* right){
-    this->var = variable;
-    this->L = left;
-    this->R = right;
-}
-Cell::~Cell(){}
+// Cell::Cell(){}
+// Cell::Cell(unsigned char variable, Cell* left, Cell* right){
+//     this->var = variable;
+//     this->L = left;
+//     this->R = right;
+// }
+// Cell::~Cell(){}
 
 
 
@@ -320,6 +320,17 @@ void ALi::optymize(){
         // should remove left cells untill patern ^00000000 0xxxxxxx xxxxxxxx* is repeating \
         and variable is not an ^00000000 number
     }
+
+/*  methods using optimization 04.12.2022
+    # ALi(const ALi& source);
+    # ALi(const signed long long& source);
+    # ALi(const char* sourcePath,const char& type);
+    readFileBinary(const char* path);
+    readFileReadable(const char* path);
+    # readFile(const char* path, const char& type);
+    assignment(const ALi& source);
+    assignment(const signed long long& source);
+*/
 }
 
 /**
@@ -376,7 +387,7 @@ void ALi::clear(){
  * @brief print each byte of variable seperated by separator sign and adding after all addition text
  * @param additionText default is "" text what will be printed at the end of variable
  */
-void ALi::printBinary(const char* additionText) const{
+void ALi::printBinary() const{
     Cell* handle = this->globalHandle->R;
     do{
         printf("%s",toByte(handle->var).c_str());
@@ -384,26 +395,23 @@ void ALi::printBinary(const char* additionText) const{
         if(handle != this->globalHandle->R && this->separator != '\0') // slower but accurate and skips separator at the end
             printf("%c",this->separator);
     }while(handle != this->globalHandle->R);
-    printf("%s",additionText);
 }
 
 /**
  * @brief print digit of variable seperated by separator sign every 3 digits and adding after all addition text
  * @param additionText default is "" text what will be printed at the end of variable
  */
-void ALi::printDecimal(const char* additionText) const{
+void ALi::printDecimal() const{
     // if it is negative invert and print '-' sign
     if(!this->isPositive()){
         printf("-");
         ALi tmp(*this);
         tmp.invert();
-        tmp.printDecimal(additionText);
         return;
     }
 
     if(this->isEmpty()){
         printf("0");
-        printf("%s",additionText);
         return;
     }
 
@@ -440,17 +448,41 @@ void ALi::printDecimal(const char* additionText) const{
         printf("%d",*decimal.top());
         decimal.pop();
     }
+}
 
-    printf("%s",additionText);
+
+/**
+ * @brief printing binary variable in scientific notation format
+ * @param appPrec simply how many digits (counting from left and without variable sign) will be printed
+ */
+void ALi::printBinaryApproximation(unsigned long long appPrec) const{
+    // appPrec is not 0
+    // print variable in scientific notation format
+    // precision is in default 2 result will be xx * 
+    // 
+    printf("printBinaryApproximation is not finished yet\n");
+}
+
+/**
+ * @brief printing decimal variable in scientific notation format
+ * @param appPrec simply how many digits (counting from left and without variable sign) will be printed
+ */
+void ALi::printDecimalApproximation(unsigned long long appPrec) const{
+    // appPrec is not 0
+    // print variable in scientific notation format
+    // precision is in default 2 result will be xx * 
+    // 
+    printf("printDecimalApproximation is not finished yet\n");
 }
 
 
 /**
  * @brief save variable to file in binary form
  * @param path path to file where variable should be stored
+ * @param append append or overwrite file if exist 
  */
-void ALi::writeFileBinary(const char* path) const{
-    FILE* file = fopen(path,"wb");
+void ALi::writeFileBinary(const char* path, const bool& append) const{
+    FILE* file = fopen(path,(append ? "ab" : "wb"));
     if(file == NULL){
         printf("File \"%s\" not found!\n",path);
         return;
@@ -466,8 +498,9 @@ void ALi::writeFileBinary(const char* path) const{
 /**
  * @brief save variable to file in readable form allowing to add separator sign every 8 bits 
  * @param path path to file where variable should be stored
+ * @param append append or overwrite file if exist 
  */
-void ALi::writeFileReadable(const char* path) const{
+void ALi::writeFileReadable(const char* path, const bool& append) const{
     FILE* file = fopen(path,"w");
     if(file == NULL){
         printf("File \"%s\" not found!\n",path);
@@ -487,11 +520,12 @@ void ALi::writeFileReadable(const char* path) const{
  * @brief save variable to file 
  * @param path path to file where variable should be stored
  * @param type type of file, readable('r') or binary('b')
+ * @param append append or overwrite file if exist 
  */
-void ALi::writeFile(const char* path, const char& type) const{
+void ALi::writeFile(const char* path, const char& type, const bool& append) const{
     switch (type){
-        case 'b': this->writeFileBinary(path); break;
-        case 'r': this->writeFileReadable(path); break;
+        case 'b': this->writeFileBinary(path,append); break;
+        case 'r': this->writeFileReadable(path,append); break;
         default: printf("unknown type!\nnot attempted to create file\n"); return;
     }
 }
@@ -839,65 +873,72 @@ ALi ALi::addition(const ALi& right){
     ALi result;
     if(right.isEmpty()) return *this; // both are 0 or right is 0
     if(this->isEmpty()) return right; // left is 0
+    CELL_TYPE carry = 0;
     
-    //     132 034 250
-    //   + 200 190 240
-    // ---------------
-    // 001 076 225 234
+    // iterate always for the longer one so expect 1234+123 but not 123+1234
+    // it is easier to just on begine know which is which
+    // not "const pointers to objects" but "pointers to const objects"
+    ALi const* greater = this; 
+    ALi const* smaller = &right;
 
-    //                                  8 659 706
-    //                  132        034        250
-    //            1000 0100  0010 0010  1111 1010
-    
-    //                                 13 156 080
-    //                  200        190        240
-    //          + 1100 1000  1011 1110  1111 0000
-
-    //----------------------------------------------
-    
-    //                                 21 815 786
-    //       001        076        225        234
-    // 0000 0001  0100 1100  1110 0001  1110 1010
-
-    
-
-    // so add each cell and if overflow will occur, add 1 to next cell 
-    // but how to check if overflow has occured
-    // overflow has occured for [a + b = c] when [c < a] and [c < b]
-
-    unsigned char carry = 0;
-    const bool sign = isPositive();
-    
-    // iterate for the longer one
-    // expect 1234+123 but not 123+1234
-    ALi const* greater = this; // not const pointer to obj but pointer to const obj
-    ALi const* smaller = &right; // not const pointer to obj but pointer to const obj
-    if(this->smallerThan(right)){ // protect from case 123 + 1234 but accidently also protect from 1234 + 9876, not hardly needed, but it's fine
+    // corect (switch sides if needed) cause the greater handle, need to hold the longer (not greater) value for properly working 
+    if(this->length < right.length){
         greater = &right;
         smaller = this;
     }
     Cell* grHandle = greater->globalHandle;
     Cell* smHandle = smaller->globalHandle;
     
-    // special case that i can not include to while loop
-    result.globalHandle->var = grHandle->var + smHandle->var + carry;
-    if(result.globalHandle->var < grHandle->var && result.globalHandle->var < smHandle->var)
-        carry = 1;
-    grHandle = grHandle->L;
-    smHandle = smHandle->L;
-    
-    while(grHandle != greater->globalHandle){
-        if(result.isEmpty())
-            result.globalHandle->var = grHandle->var + smHandle->var + carry;
+    bool smHandleReachedEnd = false;
+    do{ 
+        // i want to keep this comment XD
+        // seams that if it will be const type then compiler might use (i hope) more efficient algorithm
+        // cause he already know that this value won't be changed in future
+        // if i want to ignore this idea just replace pointer to const value with non const standard value 
+        // const CELL_TYPE* cellsum; 
+        // if(smHandleReachedEnd) sum = new const CELL_TYPE(grHandle->var + (smaller->isPositive() ? mask000 : mask111) + carry);
+        // else cellsum = new const CELL_TYPE(grHandle->var + smHandle->var + carry);
+        
+        // hold the cells addition sum
+        const CELL_TYPE cellsum = grHandle->var + (smHandleReachedEnd ? (smaller->isPositive() ? mask000 : mask111) : smHandle->var) + carry;
+        
+        // if this is first iteration of while, add holded cells addition sum to globalHandle else create new one
+        // thanks to this avoid 8 SHR at the end, but also i thnk for larger numbers this "if" can be more significant than 8 SHR at the end
+        // but again for large numbers there is more to shift... idk what will be more efficient, i will stay with this "if" usage istead SHR
+        if(grHandle == greater->globalHandle)
+            result.globalHandle->var = cellsum;
         else
-            result.newCell(grHandle->var + smHandle->var + carry);
-        if(result.globalHandle->R->var < grHandle->var && result.globalHandle->R->var < smHandle->var)
-            carry = 1;
-        grHandle = grHandle->L;
-        smHandle = smHandle->L;
-    }
+            result.newCell(cellsum);
+        
+        // if overflow occur, then carry this additional bit to next cell
+        // overflow has occured for [a + b = c] when [c < a] and [c < b]
+        // in other words current operated right and left cells are smaller than current operated result cell
+        // + need to consider extra case, idk how to change this two condition in to one
+        if((result.globalHandle->R->var < grHandle->var && result.globalHandle->R->var < smHandle->var) ||
+        (result.globalHandle->R->var <= grHandle->var && result.globalHandle->R->var <= smHandle->var && carry == 1)) carry = 1;
+        else carry = 0;
 
-    if(carry == 1) result.newCell(carry);
+        // change handle to next cell
+        grHandle = grHandle->L;
+        // keep smaller handle at the last cell if was ended before greater handle
+        // this is handling on the begine of while loop by add mask000 or mask111
+        if(smHandle->L != smaller->globalHandle)
+            smHandle = smHandle->L;
+        else 
+            smHandleReachedEnd = true;
+    }while(grHandle != greater->globalHandle);
+
+    // overflow can only appear when adding two positive or two negative values
+    if(greater->isPositive() == smaller->isPositive()){
+        // and if they were an positive numbers and result finally is negative then add new cell with mask000
+        // but if they were an negative numbers and result finally is positive then add new cell with mask111
+        if(greater->isPositive() != result.isPositive()){ // overflow accured 
+            if(greater->isPositive()) result.newCell(mask000);
+            else result.newCell(mask111);
+        } 
+    }
+    result.optymize();
+    // if numbers have an oposite signs then just ignore last carry sign 
 
     return result;
 }
@@ -906,11 +947,141 @@ ALi ALi::addition(const ALi& right){
  * @brief 
  * @param right 
  */
-void ALi::addition_assign(const ALi& right){
+void ALi::additionAssign(const ALi& right){
 
 }
 
 
+/**
+ * @brief increment ALi by one
+ * 
+ */
+void ALi::decrement(){
+    printf("decrement not finished yet\n");
+    return;
+    if(this->isPositive()){
+        Cell *handle = this->globalHandle;
+        while(handle->var == mask111 && handle != this->globalHandle->R){
+            handle->var = mask000; // 11111111 -> (1)00000000
+            handle = handle->L;
+        }
+        // handle is pointing at first not full cell
+
+        if(handle->var == mask011 && handle == this->globalHandle->R){ 
+            // is the last cell and looks like 0b01111111 (on msb contains sign bit)
+            this->newCell(mask000); // keep sign bit
+            handle->var++;
+        }
+        else{ // is the casual cell or last cell with variable less than 0b01111111
+            handle->var ++;
+        }
+    }
+    else{
+        Cell *handle = this->globalHandle;
+        while(handle->var == mask000 && handle != this->globalHandle->R){
+            handle->var = mask111; // 00000000 -> (-1)11111111
+            handle = handle->L;
+        }
+        // handle is pointing at first not full cell
+
+        if(handle->var == mask100 && handle == this->globalHandle->R){ 
+            // is the last cell and looks like 0b10000000 (on msb contains sign bit)
+            this->newCell(mask111); // keep sign bit
+            handle->var = mask011;
+        }
+        else{ // is the casual cell or last cell with variable greater than 0b10000000
+            handle->var ++;
+        }
+    }
+}
+
+/**
+ * @brief 
+ * @param right 
+ * @return ALi 
+ */
+ALi ALi::subtraction(const ALi& right){
+    //! carry bit was changed, now consider about negation each bit while adding (without duplicate entire object)
+    ALi result;
+    if(right.isEmpty()) return *this; // both are 0 or right is 0
+    if(this->isEmpty()) return right; // left is 0
+    CELL_TYPE carry = 1;
+    
+    // iterate always for the longer one so expect 1234+123 but not 123+1234
+    // it is easier to just on begine know which is which
+    // not "const pointers to objects" but "pointers to const objects"
+    ALi const* greater = this; 
+    ALi const* smaller = &right;
+
+    // corect (switch sides if needed) cause the greater handle, need to hold the longer (not greater) value for properly working 
+    if(this->length < right.length){
+        greater = &right;
+        smaller = this;
+    }
+    Cell* grHandle = greater->globalHandle;
+    Cell* smHandle = smaller->globalHandle;
+    
+    bool smHandleReachedEnd = false;
+    do{ 
+        // i want to keep this comment XD
+        // seams that if it will be const type then compiler might use (i hope) more efficient algorithm
+        // cause he already know that this value won't be changed in future
+        // if i want to ignore this idea just replace pointer to const value with non const standard value 
+        // const CELL_TYPE* cellsum; 
+        // if(smHandleReachedEnd) sum = new const CELL_TYPE(grHandle->var + (smaller->isPositive() ? mask000 : mask111) + carry);
+        // else cellsum = new const CELL_TYPE(grHandle->var + smHandle->var + carry);
+        
+        // hold the cells addition sum
+        const CELL_TYPE cellsum = grHandle->var + (smHandleReachedEnd ? (smaller->isPositive() ? mask000 : mask111) : smHandle->var) + carry;
+        
+        // if this is first iteration of while, add holded cells addition sum to globalHandle else create new one
+        // thanks to this avoid 8 SHR at the end, but also i thnk for larger numbers this "if" can be more significant than 8 SHR at the end
+        // but again for large numbers there is more to shift... idk what will be more efficient, i will stay with this "if" usage istead SHR
+        if(grHandle == greater->globalHandle)
+            result.globalHandle->var = cellsum;
+        else
+            result.newCell(cellsum);
+        
+        // if overflow occur, then carry this additional bit to next cell
+        // overflow has occured for [a + b = c] when [c < a] and [c < b]
+        // in other words current operated right and left cells are smaller than current operated result cell
+        // + need to consider extra case, idk how to change this two condition in to one
+        if((result.globalHandle->R->var < grHandle->var && result.globalHandle->R->var < smHandle->var) ||
+        (result.globalHandle->R->var <= grHandle->var && result.globalHandle->R->var <= smHandle->var && carry == 1)) carry = 1;
+        else carry = 0;
+
+        // change handle to next cell
+        grHandle = grHandle->L;
+        // keep smaller handle at the last cell if was ended before greater handle
+        // this is handling on the begine of while loop by add mask000 or mask111
+        if(smHandle->L != smaller->globalHandle)
+            smHandle = smHandle->L;
+        else 
+            smHandleReachedEnd = true;
+    }while(grHandle != greater->globalHandle);
+
+    // overflow can only appear when adding two positive or two negative values
+    if(greater->isPositive() == smaller->isPositive()){
+        // and if they were an positive numbers and result finally is negative then add new cell with mask000
+        // but if they were an negative numbers and result finally is positive then add new cell with mask111
+        if(greater->isPositive() != result.isPositive()){ // overflow accured 
+            if(greater->isPositive()) result.newCell(mask000);
+            else result.newCell(mask111);
+        } 
+    }
+    result.optymize();
+    // if numbers have an oposite signs then just ignore last carry sign 
+
+    return result;
+}
+
+/**
+ * @brief 
+ * @param right 
+ */
+void ALi::subtractionAssign(const ALi& right){
+
+}
 
 
 
@@ -934,36 +1105,39 @@ void ALi::addition_assign(const ALi& right){
  * @param type type of file, decimal('d') or binary('b')
  * @param additionText default is "" text what will be printed at the end of variable
  */
-void ALi::print(const char& type, const char* additionText) const{
+void ALi::print(const char& type, const char* additionText, unsigned long long alignment) const{
     switch (type){
-        case 'b': this->printBinary(additionText); break;
-        case 'd': this->printDecimal(additionText); break;
+        case 'b': 
+            for(unsigned long long i=0; i<alignment; i++){
+                printf("%s",(this->isPositive() ? "00000000" : "11111111"));
+                if(this->separator != '\0') printf("%c",this->separator);
+            }
+            this->printBinary();
+            break;
+        case 'd': 
+            for(unsigned long long i=0; i<alignment; i++){
+                printf("%s","000");
+                if(this->separator != '\0') printf("%c",this->separator);
+            }
+            this->printDecimal(); 
+            break;
         default: printf("unknown type!\n"); return;
     }
+    printf("%s",additionText);
 }
 
 /**
- * @brief 
- * @param type 
+ * @brief printing binary variable in scientific notation format
+ * @param type
  * @param additionText 
+ * @param approximationPrecision simply how many digits (counting from left and without variable sign) will be printed
  */
-void ALi::printApproximation(const char& type, const char* additionText) const{
-    // approximation is possible only for numbers greater or equal 4722366482869645213696+1 (2^(9*8) +1)
-    if(this->length < 10){
-        if(type == 'd') this->printDecimal(additionText);
-        else if (type == 'b') this->printBinary(additionText);
-        else{
-
-        }
-        return;
+void ALi::printApproximation(const char& type, const char* additionText = "", unsigned long long approximationPrecision = 2) const{
+    switch (type){
+    case 'b': this->printBinaryApproximation(approximationPrecision); break;
+    case 'd': this->printDecimalApproximation(approximationPrecision); break;
+    default: printf("unknown type!\n"); return;
     }
-
-    if(this->need_opt()){
-        ALi optymization(*this); // optymize is in assign method
-        optymization.printApproximation(type,additionText);
-        return;
-    }
-        
     printf("%s",additionText);
 }
 
@@ -975,9 +1149,10 @@ void ALi::printApproximation(const char& type, const char* additionText) const{
  */
 void ALi::file(const char* path, const char& action, const char& type){
     switch (action){
-        case 'w': this->writeFile(path,type); break;
+        case 'w': this->writeFile(path,type,false); break;
+        case 'a': this->writeFile(path,type,true); break;
         case 'r': this->readFile(path,type); break;
-        default: printf("unknown action!\nnot attempted to read/create file\n"); return;
+        default: printf("unknown action!\nnot attempted to write/append/read a file\n"); return;
     }
 }
 

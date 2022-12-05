@@ -5,9 +5,10 @@
 #include <iostream>
 #include <cstdio>
 #include <optional>
-// #include <fstream>
 // #include <stdlib.h>
 #include <string>
+
+#define CELL_TYPE unsigned char // need to implement, to easier change to ull in future
 
 #define BITS_PER_BYTE 8
 #define BYTES_PER_VAR sizeof(Cell::var)

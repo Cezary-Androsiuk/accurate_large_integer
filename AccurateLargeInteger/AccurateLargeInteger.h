@@ -4,9 +4,8 @@
 /*
     ALi
     AccurateLargeInteger
-    ALi
     accurate large integer
-    is negative if first bit from right is 1  
+    is negative if first bit from left is 1  
 
     todo addition
     todo subtraction
@@ -28,19 +27,16 @@ public:
     Cell* L;
     Cell* R;
     
-    Cell();
-    Cell(unsigned char variable,Cell* left, Cell* right);
-    ~Cell();
-    
+    // Cell();
+    // Cell(unsigned char variable,Cell* left, Cell* right);
+    // ~Cell();
 };
 
 class ALi{
 protected:
     Cell *globalHandle; //   [...11010001] <-
-    // Cell ptrhdl; // pointer handle
     unsigned long long length;
     char separator; // '/0' means no separator others are printed in print method
-    bool approximation;
 public:
     ALi();
     ALi(const ALi& source);
@@ -51,8 +47,8 @@ public:
 protected:
     void newCell(const unsigned char&);
     const bool delCell();
-    // void newCellRight(UC);      // only for readFileReadable
-    // const bool delCellRight();  // only for readFileReadable
+    // void newCellRight(UC);      // was needed only for readFileReadable
+    // const bool delCellRight();  // was needed only for readFileReadable
 
 protected: public:
     // unsigned long long MSCell() const;
@@ -69,36 +65,42 @@ protected: public:
     void clear();
 
 protected:
-    void printBinary(const char* additionText) const;
-    void printDecimal(const char* additionText) const;
+    void printBinary() const;
+    void printDecimal() const;
 
-    void writeFileReadable(const char* path) const;
-    void writeFileBinary(const char* path) const;
-    void writeFile(const char* path, const char& type) const;
+    void printBinaryApproximation(unsigned long long appPrec) const;
+    void printDecimalApproximation(unsigned long long appPrec) const;
 
-    void readFileReadable(const char* path);
+    void writeFileBinary(const char* path, const bool& append) const;
+    void writeFileReadable(const char* path, const bool& append) const;
+    void writeFile(const char* path, const char& type, const bool& append) const;
+
     void readFileBinary(const char* path);
+    void readFileReadable(const char* path);
     void readFile(const char* path, const char& type);
     
 public:
+    void assignment(const ALi& source);
+    void assignment(const signed long long& source);
+
     const bool equal(const ALi& right) const;
     const bool greaterThan(const ALi& right) const;
     const bool smallerThan(const ALi& right) const;
 
-    void assignment(const ALi& source);
-    void assignment(const signed long long& source);
-
 
     void increment();
     ALi addition(const ALi& right);
-    void addition_assign(const ALi& right);
+    void additionAssign(const ALi& right);
+
+    void decrement();
+    ALi subtraction(const ALi& right);
+    void subtractionAssign(const ALi& right);
 
 
 public:
-    void print(const char& type, const char* additionText = "") const;
-    void printApproximation(const char& type, const char* additionText) const;
+    void print(const char& type, const char* additionText = "", unsigned long long alignment = 0) const;
+    void printApproximation(const char& type, const char* additionText = "", unsigned long long approximationPrecision = 2) const;
     void file(const char* path, const char& action, const char& type);
-
     void setSeparator(const char& separatorSign = '\0');
     const char getSeparator() const;
 

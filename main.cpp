@@ -28,6 +28,7 @@
 
 
 int main(){
+
     // BinaryVariable x(1136);
     // x.printBinary("\n");
     // x.printFileR("output1.txt");
@@ -83,13 +84,61 @@ int main(){
     // printf("%s -1ULL SHR NG \n",toBin(~(-1ULL >> 1)).c_str());
     // printf("%s -1ULL SHR NG \n",toBin((1U << 7)).c_str());
     // printf("%s -1ULL SHR NG \n",toBin((~(1ULL << 7))).c_str());
-    ALi x(323), y(324),z;
-    x.print('b',"\n");
-    x.print('d',"\n");
-    z.assignment(x.addition(y));
-    z.print('d',"\n");
-    z.assignment(y.addition(x));
-    z.print('d',"\n");
+
+    // int x = 9;
+    // int y = 7;
+    
+    // for(int i=-0xFFFE; i<0xFFFF; i++){
+    //     for(int j=-0xFFFF; j<0xFFFF; j++){
+    //         int z;
+    //         z = i + j;
+    //         if(x == y){
+    //             printf("%d,%d,%d,%d,%d\n",i,j,z,y,x);
+    //         }
+    //     }
+    // }
+    // printf("done");
+    /*
+    for(int i=-0xFFFE; i<0xFFFF; i++){
+        for(int j=-0xFFFF; j<0xFFFF; j++){
+            ALi x(i), y(j),z;
+            z.assignment(x.addition(y));
+            if(!z.equal(j+i)){
+                printf("%d + %d = %d = ",i,j,i+j);
+                z.print('d',"\n");
+            }
+        }
+        printf("%d\n",i);
+    }
+    printf("done");
+    //*/
+
+// -65267 + -1 = -65268 = -130804
+// -65267 + 65523 = 256 = -65280
+
+    // int intx = -65267, inty = -65523;
+    // ALi x(intx), y(inty), z, w(intx+inty);
+    // x.setSeparator(' ');
+    // y.setSeparator(' ');
+    // z.setSeparator(' ');
+    // w.setSeparator(' ');
+    // z.assignment(x.addition(y));
+    // printf("%d + %d = %d = ",intx,inty,intx+inty);
+    // z.print('d',"\n  ");
+    // x.print('b',"\n+ ");
+    // y.print('b',"\n= ");
+    // w.print('b',"\n= ");
+    // z.print('b',"\n");
+    
+    
+    
+    // x.print('b',"\n");
+    // x.print('d',"\n");
+    // y.print('d',"\n");
+    // z.assignment(x.addition(y));
+    // z.print('d',"\n");
+    // z.assignment(y.addition(x));
+    // z.print('b',"\n");
     // printf("%llu\n",x.MSCell());
     
     
