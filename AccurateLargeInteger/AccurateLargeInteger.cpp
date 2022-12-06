@@ -148,7 +148,6 @@ const bool ALi::delCell(){
 
 
 
-//! WITHOUT OPTYMALIZE METHOD
 
 // /**
 //  * @brief finding an index of the most significant bit
@@ -281,16 +280,16 @@ void ALi::PLSB(const unsigned char& bit){
     this->SHL();
     this->globalHandle->var |= (bit & mask001 ? mask001 : mask000);
 }
-
-
-
-
-
-
-
-
-
-
+    /*
+    #
+    #
+    #
+    #
+    #
+    #
+    #
+    #
+    */
 /**
  * @brief removes cells from begin which are not include any new information like 00000000 or 11111111
  */
@@ -364,16 +363,16 @@ void ALi::clear(){
     while(this->delCell());
     this->globalHandle->var = mask000;
 }
-
-
-
-
-
-
-
-
-
-
+    /*
+    #
+    #
+    #
+    #
+    #
+    #
+    #
+    #
+    */
 /**
  * @brief print each byte of variable seperated by separator sign and adding after all addition text
  * @param additionText default is "" text what will be printed at the end of variable
@@ -398,6 +397,7 @@ void ALi::printDecimal() const{
         printf("-");
         ALi tmp(*this);
         tmp.invert();
+        tmp.printDecimal();
         return;
     }
 
@@ -602,16 +602,16 @@ void ALi::readFile(const char* path, const char& type){
         default: printf("unknown type!\nnot attempted to read file\n"); return;
     }
 }
-
-
-
-
-
-
-
-
-
-
+    /*
+    #
+    #
+    #
+    #
+    #
+    #
+    #
+    #
+    */
 /**
  * @brief assigns existed ALi to variable
  * @param source ALi what will be assigned to variable
@@ -635,39 +635,34 @@ void ALi::assignment(const ALi& source){
  * @param source int what will be assigned to variable
  */
 void ALi::assignment(const signed long long& source){
-    signed long long sample = source;
-    unsigned long long mask = mask001;
-    unsigned char byte;
-    Cell* handle = this->globalHandle;
-    for(int i=0; i<8; i++){
-        byte = 0;
-        for(int j=0; j<8; j++){
-            if(sample & mask)
-                byte |= mask100;
-            if(j!=7) byte >>= 1;
-            mask <<= 1;
+    this->clear();
+    #ifdef UC_CELL
+        // const bool sign = 
+        // printf("in:%s\n",toBin(source).c_str());
+        unsigned long long sample = source;
+        this->globalHandle->var = sample % 256;
+        sample /= 256;
+        for(int i=0; i<7; i++){
+            this->newCell(sample % 256);
+            sample /= 256;
         }
-        handle->var = byte;
-        if(i!=7) this->newCell(0);
-        handle = handle->L; // after finish (for) handle == &this->globalHandle
-    }
+    #endif
+    #ifdef ULL_CELL
+        this->globalHandle->var = source;
+    #endif
+
     this->optymize();
-    // ~(static_cast<unsigned long long>(-1) >> 1); // most left bit 
-    // use this to check if variable is negative and 
-    // to avoid assign -1(1111...1111) as a one bit larger int but positive (0111...1111)
-    // seems like problem solved by itself
 }
-
-
-
-
-
-
-
-
-
-
-
+    /*
+    #
+    #
+    #
+    #
+    #
+    #
+    #
+    #
+    */
 /**
  * @brief check if left object is equal to right object
  * @param right object
@@ -804,16 +799,16 @@ const bool ALi::smallerThan(const ALi& right) const{
     }
     return false; // both are equal => left is NOT smaller
 }
-
-
-
-
-
-
-
-
-
-
+    /*
+    #
+    #
+    #
+    #
+    #
+    #
+    #
+    #
+    */
 /**
  * @brief increment ALi by one
  * 
@@ -861,75 +856,74 @@ void ALi::increment(){
  * @return ALi 
  */
 ALi ALi::addition(const ALi& right){
-    ALi result;
     if(right.isEmpty()) return *this; // both are 0 or right is 0
     if(this->isEmpty()) return right; // left is 0
+    
+    ALi result;
     CELL_TYPE carry = 0;
     
-    // iterate always for the longer one so expect 1234+123 but not 123+1234
-    // it is easier to just on begine know which is which
-    // not "const pointers to objects" but "pointers to const objects"
-    ALi const* greater = this; 
-    ALi const* smaller = &right;
+    ALi const* lobj = this; 
+    ALi const* robj = &right;
+    const bool lsign = lobj->isPositive();
+    const bool rsign = robj->isPositive();
+    Cell* lHandle = lobj->globalHandle->L;
+    Cell* rHandle = robj->globalHandle->L;
 
-    // corect (switch sides if needed) cause the greater handle, need to hold the longer (not greater) value for properly working 
-    if(this->length < right.length){
-        greater = &right;
-        smaller = this;
-    }
-    Cell* grHandle = greater->globalHandle;
-    Cell* smHandle = smaller->globalHandle;
-    
-    bool smHandleReachedEnd = false;
-    do{ 
-        // i want to keep this comment XD
-        // seams that if it will be const type then compiler might use (i hope) more efficient algorithm
-        // cause he already know that this value won't be changed in future
-        // if i want to ignore this idea just replace pointer to const value with non const standard value 
-        // const CELL_TYPE* cellsum; 
-        // if(smHandleReachedEnd) sum = new const CELL_TYPE(grHandle->var + (smaller->isPositive() ? mask000 : mask111) + carry);
-        // else cellsum = new const CELL_TYPE(grHandle->var + smHandle->var + carry);
-        
-        // hold the cells addition sum
-        const CELL_TYPE cellsum = grHandle->var + (smHandleReachedEnd ? (smaller->isPositive() ? mask000 : mask111) : smHandle->var) + carry;
-        
-        // if this is first iteration of while, add holded cells addition sum to globalHandle else create new one
-        // thanks to this avoid 8 SHR at the end, but also i thnk for larger numbers this "if" can be more significant than 8 SHR at the end
-        // but again for large numbers there is more to shift... idk what will be more efficient, i will stay with this "if" usage istead SHR
-        if(grHandle == greater->globalHandle)
-            result.globalHandle->var = cellsum;
-        else
-            result.newCell(cellsum);
-        
-        // if overflow occur, then carry this additional bit to next cell
-        // overflow has occured for [a + b = c] when [c < a] and [c < b]
-        // in other words current operated right and left cells are smaller than current operated result cell
-        // + need to consider extra case, idk how to change this two condition in to one
-        if((result.globalHandle->R->var < grHandle->var && result.globalHandle->R->var < smHandle->var) ||
-        (result.globalHandle->R->var <= grHandle->var && result.globalHandle->R->var <= smHandle->var && carry == 1)) carry = 1;
-        else carry = 0;
+    // case pull out from while cause idk how to implement while which starts from handle and ends on handle iterating through all 
+    result.globalHandle->var = lobj->globalHandle->var + robj->globalHandle->var; 
+    // keep carry to next iteration
+    if((result.globalHandle->R->var < robj->globalHandle->var && result.globalHandle->R->var < lobj->globalHandle->var) ||
+    (result.globalHandle->R->var <= robj->globalHandle->var && result.globalHandle->R->var <= lobj->globalHandle->var && carry == 1)) 
+        carry = 1;
+    else 
+        carry = 0;
 
-        // change handle to next cell
-        grHandle = grHandle->L;
-        // keep smaller handle at the last cell if was ended before greater handle
-        // this is handling on the begine of while loop by add mask000 or mask111
-        if(smHandle->L != smaller->globalHandle)
-            smHandle = smHandle->L;
+    do{
+        // addition both cells and carry
+        result.newCell((lHandle == lobj->globalHandle ? (lsign ? mask000 : mask111) : lHandle->var) + 
+        (rHandle == robj->globalHandle ? (rsign ? mask000 : mask111) : rHandle->var) + carry);
+        
+        // keep carry to next iteration
+        if((result.globalHandle->R->var < rHandle->var && result.globalHandle->R->var < lHandle->var) ||
+        (result.globalHandle->R->var <= rHandle->var && result.globalHandle->R->var <= lHandle->var && carry == 1)) 
+            carry = 1;
         else 
-            smHandleReachedEnd = true;
-    }while(grHandle != greater->globalHandle);
+            carry = 0;
 
-    // overflow can only appear when adding two positive or two negative values
-    if(greater->isPositive() == smaller->isPositive()){
-        // and if they were an positive numbers and result finally is negative then add new cell with mask000
-        // but if they were an negative numbers and result finally is positive then add new cell with mask111
-        if(greater->isPositive() != result.isPositive()){ // overflow accured 
-            if(greater->isPositive()) result.newCell(mask000);
-            else result.newCell(mask111);
-        } 
+        // change handles to next cell if not reached end variable yet
+        if(lHandle != lobj->globalHandle) lHandle = lHandle->L;
+        if(rHandle != robj->globalHandle) rHandle = rHandle->L;
+    }while(rHandle != robj->globalHandle || lHandle != lobj->globalHandle);
+
+
+    /*
+        6   +  6   =  12    0110 + 0110 = 0000 1100
+        6   +  4   =  10    0110 + 0100 = 0000 1010
+        4   +  6   =  10    0100 + 0110 = 0000 1010
+
+        -6  +  6   =   0    1010 + 0110 = 0000
+        -6  +  4   =  -2    1010 + 0100 = 1110
+        -4  +  6   =   2    1100 + 0110 = 0010
+        
+        6   + -6  =    0    0110 + 1010 = 0000
+        6   + -4  =    2
+        4   + -6  =   -2
+
+        -6  + -6  =  -12
+        -6  + -4  =  -10
+        -4  + -6  =  -10
+    */
+
+
+
+    // overflow can only appear when both operation argument sign values are equal
+    if(lsign == rsign && lsign != result.isPositive()){
+        // if lsign(and rsign) is positive => result is also positive
+        if(lsign) result.newCell(mask000);
+        // if lsign(and rsign) is negative => result is also negative
+        else result.newCell(mask111);
     }
     result.optymize();
-    // if numbers have an oposite signs then just ignore last carry sign 
 
     return result;
 }
@@ -995,73 +989,70 @@ ALi ALi::subtraction(const ALi& right){
     //! carry bit was changed, now consider about negation each bit while adding (without duplicate entire object)
     ALi result;
     if(right.isEmpty()) return *this; // both are 0 or right is 0
-    if(this->isEmpty()) return right; // left is 0
+    if(this->isEmpty()){ // left is 0
+        result.assignment(right);
+        result.invert();
+        return result;
+    }
+    
     CELL_TYPE carry = 1;
     
-    // iterate always for the longer one so expect 1234+123 but not 123+1234
-    // it is easier to just on begine know which is which
-    // not "const pointers to objects" but "pointers to const objects"
-    ALi const* greater = this; 
-    ALi const* smaller = &right;
+    ALi const* lobj = this; 
+    ALi const* robj = &right;
+    Cell* lHandle = lobj->globalHandle;
+    Cell* rHandle = robj->globalHandle;
+    const bool lsign = lobj->isPositive();
+    const bool rsign = robj->isPositive();
 
-    // corect (switch sides if needed) cause the greater handle, need to hold the longer (not greater) value for properly working 
-    if(this->length < right.length){
-        greater = &right;
-        smaller = this;
-    }
-    Cell* grHandle = greater->globalHandle;
-    Cell* smHandle = smaller->globalHandle;
-    
-    bool smHandleReachedEnd = false;
     do{ 
-        // i want to keep this comment XD
-        // seams that if it will be const type then compiler might use (i hope) more efficient algorithm
-        // cause he already know that this value won't be changed in future
-        // if i want to ignore this idea just replace pointer to const value with non const standard value 
-        // const CELL_TYPE* cellsum; 
-        // if(smHandleReachedEnd) sum = new const CELL_TYPE(grHandle->var + (smaller->isPositive() ? mask000 : mask111) + carry);
-        // else cellsum = new const CELL_TYPE(grHandle->var + smHandle->var + carry);
+        // addition both cells and carry
+        if(rHandle == robj->globalHandle && lHandle == lobj->globalHandle) // in first iteration
+            result.globalHandle->var = lHandle->var + ~rHandle->var + carry; 
+        else // in other than the first one iterations 
+            result.newCell((lHandle == lobj->globalHandle ? (lsign ? mask000 : mask111) : lHandle->var) + 
+            ~(rHandle == robj->globalHandle ? (rsign ? mask000 : mask111) : rHandle->var) + carry);
         
-        // hold the cells addition sum
-        const CELL_TYPE cellsum = grHandle->var + (smHandleReachedEnd ? (smaller->isPositive() ? mask000 : mask111) : smHandle->var) + carry;
-        
-        // if this is first iteration of while, add holded cells addition sum to globalHandle else create new one
-        // thanks to this avoid 8 SHR at the end, but also i thnk for larger numbers this "if" can be more significant than 8 SHR at the end
-        // but again for large numbers there is more to shift... idk what will be more efficient, i will stay with this "if" usage istead SHR
-        if(grHandle == greater->globalHandle)
-            result.globalHandle->var = cellsum;
-        else
-            result.newCell(cellsum);
-        
-        // if overflow occur, then carry this additional bit to next cell
-        // overflow has occured for [a + b = c] when [c < a] and [c < b]
-        // in other words current operated right and left cells are smaller than current operated result cell
-        // + need to consider extra case, idk how to change this two condition in to one
-        if((result.globalHandle->R->var < grHandle->var && result.globalHandle->R->var < smHandle->var) ||
-        (result.globalHandle->R->var <= grHandle->var && result.globalHandle->R->var <= smHandle->var && carry == 1)) carry = 1;
-        else carry = 0;
-
-        // change handle to next cell
-        grHandle = grHandle->L;
-        // keep smaller handle at the last cell if was ended before greater handle
-        // this is handling on the begine of while loop by add mask000 or mask111
-        if(smHandle->L != smaller->globalHandle)
-            smHandle = smHandle->L;
+        // keep carry to next iteration
+        if((result.globalHandle->R->var < rHandle->var && result.globalHandle->R->var < lHandle->var) ||
+        (result.globalHandle->R->var <= rHandle->var && result.globalHandle->R->var <= lHandle->var && carry == 1)) 
+            carry = 1;
         else 
-            smHandleReachedEnd = true;
-    }while(grHandle != greater->globalHandle);
+            carry = 0;
 
-    // overflow can only appear when adding two positive or two negative values
-    if(greater->isPositive() == smaller->isPositive()){
-        // and if they were an positive numbers and result finally is negative then add new cell with mask000
-        // but if they were an negative numbers and result finally is positive then add new cell with mask111
-        if(greater->isPositive() != result.isPositive()){ // overflow accured 
-            if(greater->isPositive()) result.newCell(mask000);
-            else result.newCell(mask111);
-        } 
+        // change handles to next cell if not reached end variable yet
+        if(lHandle != lobj->globalHandle) lHandle = lHandle->L;
+        if(rHandle != robj->globalHandle) rHandle = rHandle->L;
+    }while(rHandle != robj->globalHandle || lHandle != lobj->globalHandle);
+
+
+    /*
+        6   -   6   = 0
+        6   -   4   = 2
+        4   -   6   = -2
+
+        -6  -   6   = -12
+        1010-0110 = 1010+1010 = 1111 0100
+        -6  -   4   = -10
+        1010-0100 = 1010+1100 = 1111 0110
+        -4  -   6   = -10
+        1100-0110 = 1100+1010 = 1111 0110
+        
+        6   -   -6  = 12
+        0110-1010 = 0110+0110 = 0000 1100
+        6   -   -4  = 10
+        4   -   -6  = 10
+    */
+
+
+
+    // overflow can only appear when subtracting oposite signs values
+    if(lsign != rsign){
+        // if lsign is positive => result is also positive
+        if(lsign) result.newCell(mask000);
+        // if lsign is negative => result is also negative
+        else result.newCell(mask111);
     }
     result.optymize();
-    // if numbers have an oposite signs then just ignore last carry sign 
 
     return result;
 }
@@ -1073,24 +1064,16 @@ ALi ALi::subtraction(const ALi& right){
 void ALi::subtractionAssign(const ALi& right){
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    /*
+    #
+    #
+    #
+    #
+    #
+    #
+    #
+    #
+    */
 /**
  * @brief print variable as a binary or decimal
  * @param type type of file, decimal('d') or binary('b')
@@ -1123,7 +1106,7 @@ void ALi::print(const char& type, const char* additionText, unsigned long long a
  * @param additionText 
  * @param approximationPrecision simply how many digits (counting from left and without variable sign) will be printed
  */
-void ALi::printApproximation(const char& type, const char* additionText = "", unsigned long long approximationPrecision = 2) const{
+void ALi::printApproximation(const char& type, const char* additionText, unsigned long long approximationPrecision) const{
     switch (type){
     case 'b': this->printBinaryApproximation(approximationPrecision); break;
     case 'd': this->printDecimalApproximation(approximationPrecision); break;

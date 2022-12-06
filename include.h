@@ -9,8 +9,19 @@
 #include <string>
 
 
-#define CELL_TYPE unsigned char // need to implement, to easier change to ull in future
+#define UC_CELL
 
+#ifndef UC_CELL
+    #define ULL_CELL
+#endif
+
+// need to implement, to easier change to ull in future
+#ifdef UC_CELL
+    #define CELL_TYPE unsigned char 
+#endif
+#ifdef ULL_CELL
+    #define CELL_TYPE unsigned long long
+#endif
 // i know this is not the best pleace to store cell definition class
 // but if it is here might be easier with switching unsigned char and unsigned long long
 /**

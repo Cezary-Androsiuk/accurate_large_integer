@@ -7,6 +7,75 @@ int main(){
     // TODO describe thouse methods which do not have optymization method
     // TODO max unsigned long long value and signed long long values compare to ALi
 
+    
+    if(false){
+        ALi x;
+        for(int i=-0xFFFE; i<0xFFFF; i++){
+            x.assignment(i);
+            x.print('b'," - ");
+            x.print('d',"\n");
+        }
+    }
+
+
+    //* addition
+    if(false){
+        ALi x,y,z;
+        x.setSeparator(' ');
+        y.setSeparator(' ');
+        z.setSeparator(' ');
+        for(int i=-0xFFE; i<0xFFF; i++){
+            x.assignment(i);
+            for(int j=-0xFFE; j<0xFFF; j++){
+                y.assignment(j);
+                z.assignment(x.addition(y));
+                if(!z.equal(j+i)){
+                    printf("%d + %d = %d = ",i,j,i+j);
+                    z.print('d',"\n");
+                    x.print('b',"\n");
+                    y.print('b',"\n");
+                    z.print('b',"\n");
+                }
+            }
+            printf("%d\n",i);
+        }
+        printf("addition done\n");
+    }
+    if(false){
+        int _x = -254, _y = -254;
+        ALi x(_x),y(_y),z;
+        z.assignment(x.addition(y));
+        printf("%d + %d = %d = ",_x,_y,_x+_y);
+        z.print('d',"\n");
+    }
+
+    //* subtraction
+    if(false){
+        ALi x,y,z;
+        for(int i=-0xFE; i<0xFF; i++){
+            x.assignment(i);
+            for(int j=-0xFF; j<0xFF; j++){
+                y.assignment(j);
+                z.assignment(x.subtraction(y));
+                if(!z.equal(j-i)){
+                    printf("%d - %d = %d = ",i,j,i+j);
+                    z.print('d',"\n");
+                }
+            }
+            printf("%d\n",i);
+        }
+        printf("subtraction done");
+    }
+    if(false){
+        int _x = -211, _y = -169;
+        ALi x(_x),y(_y),z;
+        z.assignment(x.subtraction(y));
+        printf("%d - %d = %d = ",_x,_y,_x-_y);
+        z.print('d',"\n");
+    }
+    
+
+
     // long long variable = 0x7fffffffffffffffLL;
     // long long variable = 0b0111111111111111111111111111111111111111111111111111111111111111;
     // // ALi v(variable);
