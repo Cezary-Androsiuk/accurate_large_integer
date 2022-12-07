@@ -18,6 +18,21 @@ int main(){
     }
 
 
+    //* increment
+    if(false){
+        ALi x(-0xFFE);
+        x.setSeparator(' ');
+        for(int i=-0xFFE; i<0xFFF; i++){
+            if(!x.equal(i)){
+                printf("%d = ",i);
+                x.print('d'," ");
+                x.print('b',"\n");
+            }
+            x.increment();
+        }
+        printf("incrementation done\n");
+    }
+
     //* addition
     if(false){
         ALi x,y,z;
@@ -35,6 +50,7 @@ int main(){
                     x.print('b',"\n");
                     y.print('b',"\n");
                     z.print('b',"\n");
+                    exit(0);
                 }
             }
             printf("%d\n",i);
@@ -52,14 +68,21 @@ int main(){
     //* subtraction
     if(false){
         ALi x,y,z;
+        x.setSeparator(' ');
+        y.setSeparator(' ');
+        z.setSeparator(' ');
         for(int i=-0xFE; i<0xFF; i++){
             x.assignment(i);
             for(int j=-0xFF; j<0xFF; j++){
                 y.assignment(j);
                 z.assignment(x.subtraction(y));
-                if(!z.equal(j-i)){
-                    printf("%d - %d = %d = ",i,j,i+j);
+                if(!z.equal(i-j)){
+                    printf("%d - %d = %d = ",i,j,i-j);
                     z.print('d',"\n");
+                    x.print('b',"\n");
+                    y.print('b',"\n");
+                    z.print('b',"\n");
+                    exit(0);
                 }
             }
             printf("%d\n",i);
@@ -67,11 +90,17 @@ int main(){
         printf("subtraction done");
     }
     if(false){
-        int _x = -211, _y = -169;
+        int _x = 0, _y = 127;
         ALi x(_x),y(_y),z;
+        x.setSeparator(' ');
+        y.setSeparator(' ');
+        z.setSeparator(' ');
         z.assignment(x.subtraction(y));
         printf("%d - %d = %d = ",_x,_y,_x-_y);
         z.print('d',"\n");
+        x.print('b',"\n");
+        y.print('b',"\n");
+        z.print('b',"\n");
     }
     
 

@@ -814,40 +814,17 @@ const bool ALi::smallerThan(const ALi& right) const{
  * 
  */
 void ALi::increment(){
-    if(this->isPositive()){
-        Cell *handle = this->globalHandle;
-        while(handle->var == mask111 && handle != this->globalHandle->R){
-            handle->var = mask000; // 11111111 -> (1)00000000
-            handle = handle->L;
-        }
-        // handle is pointing at first not full cell
-
-        if(handle->var == mask011 && handle == this->globalHandle->R){ 
-            // is the last cell and looks like 0b01111111 (on msb contains sign bit)
-            this->newCell(mask000); // keep sign bit
-            handle->var++;
-        }
-        else{ // is the casual cell or last cell with variable less than 0b01111111
-            handle->var ++;
-        }
+    Cell *handle = this->globalHandle;
+    while(handle->var == mask111 && handle != this->globalHandle->R){
+        handle->var = mask000; // 11111111 -> (1)00000000
+        handle = handle->L;
     }
-    else{
-        Cell *handle = this->globalHandle;
-        while(handle->var == mask000 && handle != this->globalHandle->R){
-            handle->var = mask111; // 00000000 -> (-1)11111111
-            handle = handle->L;
-        }
-        // handle is pointing at first not full cell
-
-        if(handle->var == mask100 && handle == this->globalHandle->R){ 
-            // is the last cell and looks like 0b10000000 (on msb contains sign bit)
-            this->newCell(mask111); // keep sign bit
-            handle->var = mask011;
-        }
-        else{ // is the casual cell or last cell with variable greater than 0b10000000
-            handle->var ++;
-        }
+    // protect from overflow, cause we adding two positive values (*this + 1)
+    if(this->isPositive() && (handle->var == mask011 && handle == this->globalHandle->R)){
+        this->newCell(mask000);
     }
+    handle->var++;
+    this->optymize();
 }
 
 /**
@@ -860,23 +837,24 @@ ALi ALi::addition(const ALi& right){
     if(this->isEmpty()) return right; // left is 0
     
     ALi result;
-    CELL_TYPE carry = 0;
     
     ALi const* lobj = this; 
     ALi const* robj = &right;
+
+    CELL_TYPE carry = 0;
+    // case pull out from while cause idk how to implement while which starts from handle and ends on handle iterating through all 
+    result.globalHandle->var = lobj->globalHandle->var + robj->globalHandle->var; 
+    // keep carry to next iteration
+    if(result.globalHandle->var < robj->globalHandle->var && result.globalHandle->var < lobj->globalHandle->var)
+        carry = 1;
+    else 
+        carry = 0;
+
+
     const bool lsign = lobj->isPositive();
     const bool rsign = robj->isPositive();
     Cell* lHandle = lobj->globalHandle->L;
     Cell* rHandle = robj->globalHandle->L;
-
-    // case pull out from while cause idk how to implement while which starts from handle and ends on handle iterating through all 
-    result.globalHandle->var = lobj->globalHandle->var + robj->globalHandle->var; 
-    // keep carry to next iteration
-    if((result.globalHandle->R->var < robj->globalHandle->var && result.globalHandle->R->var < lobj->globalHandle->var) ||
-    (result.globalHandle->R->var <= robj->globalHandle->var && result.globalHandle->R->var <= lobj->globalHandle->var && carry == 1)) 
-        carry = 1;
-    else 
-        carry = 0;
 
     do{
         // addition both cells and carry
@@ -893,7 +871,7 @@ ALi ALi::addition(const ALi& right){
         // change handles to next cell if not reached end variable yet
         if(lHandle != lobj->globalHandle) lHandle = lHandle->L;
         if(rHandle != robj->globalHandle) rHandle = rHandle->L;
-    }while(rHandle != robj->globalHandle || lHandle != lobj->globalHandle);
+    }while(lHandle != lobj->globalHandle || rHandle != robj->globalHandle);
 
 
     /*
@@ -986,35 +964,46 @@ void ALi::decrement(){
  * @return ALi 
  */
 ALi ALi::subtraction(const ALi& right){
-    //! carry bit was changed, now consider about negation each bit while adding (without duplicate entire object)
     ALi result;
     if(right.isEmpty()) return *this; // both are 0 or right is 0
     if(this->isEmpty()){ // left is 0
         result.assignment(right);
+        result.print('b',"-\n");
         result.invert();
+        result.print('b',"-\n");
         return result;
     }
+//! new code 
     
-    CELL_TYPE carry = 1;
     
     ALi const* lobj = this; 
     ALi const* robj = &right;
-    Cell* lHandle = lobj->globalHandle;
-    Cell* rHandle = robj->globalHandle;
+
+    CELL_TYPE carry = 1;
+    // case pull out from while cause idk how to implement while which starts from handle and ends on handle iterating through all 
+    result.globalHandle->var = lobj->globalHandle->var + ~robj->globalHandle->var + carry; 
+    // keep carry to next iteration
+    if(result.globalHandle->var <= lobj->globalHandle->var && 
+    result.globalHandle->var <= (unsigned char)(~robj->globalHandle->var) && 
+    carry == 1)
+        carry = 1;
+    else 
+        carry = 0;
+    
+    
+    Cell* lHandle = lobj->globalHandle->L;
+    Cell* rHandle = robj->globalHandle->L;
     const bool lsign = lobj->isPositive();
     const bool rsign = robj->isPositive();
 
-    do{ 
+    do{
         // addition both cells and carry
-        if(rHandle == robj->globalHandle && lHandle == lobj->globalHandle) // in first iteration
-            result.globalHandle->var = lHandle->var + ~rHandle->var + carry; 
-        else // in other than the first one iterations 
-            result.newCell((lHandle == lobj->globalHandle ? (lsign ? mask000 : mask111) : lHandle->var) + 
-            ~(rHandle == robj->globalHandle ? (rsign ? mask000 : mask111) : rHandle->var) + carry);
+        result.newCell((lHandle == lobj->globalHandle ? (lsign ? mask000 : mask111) : lHandle->var) + 
+        ~(rHandle == robj->globalHandle ? (rsign ? mask000 : mask111) : rHandle->var) + carry);
         
         // keep carry to next iteration
-        if((result.globalHandle->R->var < rHandle->var && result.globalHandle->R->var < lHandle->var) ||
-        (result.globalHandle->R->var <= rHandle->var && result.globalHandle->R->var <= lHandle->var && carry == 1)) 
+        if((result.globalHandle->R->var < lHandle->var && result.globalHandle->R->var < rHandle->var) ||
+        (result.globalHandle->R->var <= lHandle->var && result.globalHandle->R->var <= rHandle->var && carry == 1)) 
             carry = 1;
         else 
             carry = 0;
@@ -1022,7 +1011,40 @@ ALi ALi::subtraction(const ALi& right){
         // change handles to next cell if not reached end variable yet
         if(lHandle != lobj->globalHandle) lHandle = lHandle->L;
         if(rHandle != robj->globalHandle) rHandle = rHandle->L;
-    }while(rHandle != robj->globalHandle || lHandle != lobj->globalHandle);
+    }while(lHandle != lobj->globalHandle || rHandle != robj->globalHandle);
+
+//! old code
+    // CELL_TYPE carry = 1;
+    
+    // ALi const* lobj = this; 
+    // ALi const* robj = &right;
+    // Cell* lHandle = lobj->globalHandle;
+    // Cell* rHandle = robj->globalHandle;
+    // const bool lsign = lobj->isPositive();
+    // const bool rsign = robj->isPositive();
+
+    // do{ 
+    //     // addition both cells and carry
+    //     if(rHandle == robj->globalHandle && lHandle == lobj->globalHandle) // in first iteration
+    //         result.globalHandle->var = lHandle->var + ~rHandle->var + carry; 
+    //     else // in other than the first one iterations 
+    //         result.newCell((lHandle == lobj->globalHandle ? (lsign ? mask000 : mask111) : lHandle->var) + 
+    //         ~(rHandle == robj->globalHandle ? (rsign ? mask000 : mask111) : rHandle->var) + carry);
+        
+    //     // keep carry to next iteration
+    //     if((result.globalHandle->R->var < rHandle->var && result.globalHandle->R->var < lHandle->var) ||
+    //     (result.globalHandle->R->var <= rHandle->var && result.globalHandle->R->var <= lHandle->var && carry == 1)) 
+    //         carry = 1;
+    //     else 
+    //         carry = 0;
+
+    //     // change handles to next cell if not reached end variable yet
+    //     if(lHandle != lobj->globalHandle) lHandle = lHandle->L;
+    //     if(rHandle != robj->globalHandle) rHandle = rHandle->L;
+    // }while(rHandle != robj->globalHandle || lHandle != lobj->globalHandle);
+
+
+
 
 
     /*
@@ -1042,7 +1064,6 @@ ALi ALi::subtraction(const ALi& right){
         6   -   -4  = 10
         4   -   -6  = 10
     */
-
 
 
     // overflow can only appear when subtracting oposite signs values
