@@ -920,42 +920,22 @@ void ALi::additionAssign(const ALi& right){
  * 
  */
 void ALi::decrement(){
-    printf("decrement not finished yet\n");
-    return;
-    if(this->isPositive()){
-        Cell *handle = this->globalHandle;
-        while(handle->var == mask111 && handle != this->globalHandle->R){
-            handle->var = mask000; // 11111111 -> (1)00000000
-            handle = handle->L;
-        }
-        // handle is pointing at first not full cell
+    // if(this->isEmpty()){
+    //     this->globalHandle->var = mask111;
+    //     return;
+    // }
 
-        if(handle->var == mask011 && handle == this->globalHandle->R){ 
-            // is the last cell and looks like 0b01111111 (on msb contains sign bit)
-            this->newCell(mask000); // keep sign bit
-            handle->var++;
-        }
-        else{ // is the casual cell or last cell with variable less than 0b01111111
-            handle->var ++;
-        }
+    Cell *handle = this->globalHandle;
+    while(handle->var == mask000 && handle != this->globalHandle->R){
+        handle->var = mask111; // (1)00000000 -> (0)11111111
+        handle = handle->L;
     }
-    else{
-        Cell *handle = this->globalHandle;
-        while(handle->var == mask000 && handle != this->globalHandle->R){
-            handle->var = mask111; // 00000000 -> (-1)11111111
-            handle = handle->L;
-        }
-        // handle is pointing at first not full cell
-
-        if(handle->var == mask100 && handle == this->globalHandle->R){ 
-            // is the last cell and looks like 0b10000000 (on msb contains sign bit)
-            this->newCell(mask111); // keep sign bit
-            handle->var = mask011;
-        }
-        else{ // is the casual cell or last cell with variable greater than 0b10000000
-            handle->var ++;
-        }
+    // protect from overflow, cause we adding two positive values (*this + 1)
+    if(!this->isPositive() && (handle->var == mask100 && handle == this->globalHandle->R)){
+        this->newCell(mask111);
     }
+    handle->var--;
+    this->optymize();
 }
 
 /**
@@ -968,9 +948,7 @@ ALi ALi::subtraction(const ALi& right){
     if(right.isEmpty()) return *this; // both are 0 or right is 0
     if(this->isEmpty()){ // left is 0
         result.assignment(right);
-        result.print('b',"-\n");
         result.invert();
-        result.print('b',"-\n");
         return result;
     }
 //! new code 

@@ -7,38 +7,47 @@ int main(){
     // TODO describe thouse methods which do not have optymization method
     // TODO max unsigned long long value and signed long long values compare to ALi
 
-    
-    if(false){
-        ALi x;
+    // #define TEST_ASSIGN
+    // #define TEST_INC
+    #define TEST_ADD
+    // #define TEST_UNIT
+    // #define TEST_ADDAS
+    // #define TEST_DEC
+    // #define TEST_SUB
+    // #define TEST_SUBAS
+
+    ALi x,y,z;
+    x.setSeparator(' ');
+    y.setSeparator(' ');
+    z.setSeparator(' ');
+
+    #ifdef TEST_ASSIGN
         for(int i=-0xFFFE; i<0xFFFF; i++){
             x.assignment(i);
             x.print('b'," - ");
             x.print('d',"\n");
         }
-    }
+    #endif
 
 
     //* increment
-    if(false){
-        ALi x(-0xFFE);
-        x.setSeparator(' ');
-        for(int i=-0xFFE; i<0xFFF; i++){
+    #ifdef TEST_INC
+        x.assignment(-0xFFFE);
+        for(int i=-0xFFFE; i<0xFFFF; i++){
             if(!x.equal(i)){
                 printf("%d = ",i);
                 x.print('d'," ");
                 x.print('b',"\n");
+                exit(0);
             }
             x.increment();
         }
         printf("incrementation done\n");
-    }
+    #endif
+
 
     //* addition
-    if(false){
-        ALi x,y,z;
-        x.setSeparator(' ');
-        y.setSeparator(' ');
-        z.setSeparator(' ');
+    #ifdef TEST_ADD
         for(int i=-0xFFE; i<0xFFF; i++){
             x.assignment(i);
             for(int j=-0xFFE; j<0xFFF; j++){
@@ -56,24 +65,35 @@ int main(){
             printf("%d\n",i);
         }
         printf("addition done\n");
-    }
-    if(false){
-        int _x = -254, _y = -254;
-        ALi x(_x),y(_y),z;
-        z.assignment(x.addition(y));
-        printf("%d + %d = %d = ",_x,_y,_x+_y);
-        z.print('d',"\n");
-    }
+    #endif
+
+
+    #ifdef TEST_ADDAS
+
+    #endif
+
+
+    //* decrement
+    #ifdef TEST_DEC
+        x.assignment(0xFFF);
+        for(int i=0xFFF; i>-0xFFF; i--){
+            if(!x.equal(i)){
+                printf("%d = ",i);
+                x.print('d'," ");
+                x.print('b',"\n");
+                exit(0);
+            }
+            x.decrement();
+        }
+        printf("decrementation done\n");
+    #endif
+
 
     //* subtraction
-    if(false){
-        ALi x,y,z;
-        x.setSeparator(' ');
-        y.setSeparator(' ');
-        z.setSeparator(' ');
-        for(int i=-0xFE; i<0xFF; i++){
+    #ifdef TEST_SUB
+        for(int i=-0xFFE; i<0xFFF; i++){
             x.assignment(i);
-            for(int j=-0xFF; j<0xFF; j++){
+            for(int j=-0xFFE; j<0xFFF; j++){
                 y.assignment(j);
                 z.assignment(x.subtraction(y));
                 if(!z.equal(i-j)){
@@ -88,20 +108,35 @@ int main(){
             printf("%d\n",i);
         }
         printf("subtraction done");
-    }
-    if(false){
+    #endif
+
+
+    #ifdef TEST_SUBAS
+
+    #endif
+
+
+    #ifdef TEST_UNIT
+        int _x = -254, _y = -254;
+        x.assignment(_x);
+        y.assignment(_y);
+        z.assignment(x.addition(y));
+        printf("%d + %d = %d = ",_x,_y,_x+_y);
+        z.print('d',"\n");
+        x.print('b',"\n");
+        y.print('b',"\n");
+        z.print('b',"\n");
+        
         int _x = 0, _y = 127;
-        ALi x(_x),y(_y),z;
-        x.setSeparator(' ');
-        y.setSeparator(' ');
-        z.setSeparator(' ');
+        x.assignment(_x);
+        y.assignment(_y);
         z.assignment(x.subtraction(y));
         printf("%d - %d = %d = ",_x,_y,_x-_y);
         z.print('d',"\n");
         x.print('b',"\n");
         y.print('b',"\n");
         z.print('b',"\n");
-    }
+    #endif
     
 
 
