@@ -5,11 +5,6 @@
     ALi
     AccurateLargeInteger
     accurate large integer
-    is negative if first bit from left is 1  
-
-    todo addition
-    todo subtraction
-
 */
 class ALi{
 protected:
@@ -26,22 +21,23 @@ public:
 protected:
     void newCell(const unsigned char&);
     const bool delCell();
-    // void newCellRight(UC);      // was needed only for readFileReadable
-    // const bool delCellRight();  // was needed only for readFileReadable
 
-protected: public:
-    // unsigned long long MSCell() const;
-    // unsigned long long MSB() const;
-    bool isPositive() const;
+protected:
     void SHR();
     void SHL();
+    void PMSB(const unsigned char& bit);
     void PLSB(const unsigned char& bit);
 
+    // const bool isPositive() const; // to delete
+    const bool sign() const;
+    const bool is0() const;
+    const bool is1() const;
+    const bool need_opt() const;
+
+    void clear();
     void optymize();
-    bool need_opt() const;
     void negate();
     void invert();
-    void clear();
 
 protected:
     void printBinary() const;
@@ -58,31 +54,49 @@ protected:
     void readFileReadable(const char* path);
     void readFile(const char* path, const char& type);
     
-public:
+protected: public:
+    // Returns
+    const ALi returnNegate() const;
+    const ALi returnInvert() const;
+    
+    // Assignment
     void assignment(const ALi& source);
     void assignment(const signed long long& source);
 
+    // Bolean
     const bool equal(const ALi& right) const;
     const bool greaterThan(const ALi& right) const;
     const bool smallerThan(const ALi& right) const;
 
-
+    // Addition
     void increment();
     ALi addition(const ALi& right);
     void additionAssign(const ALi& right);
 
+    // Subtraction
     void decrement();
     ALi subtraction(const ALi& right);
     void subtractionAssign(const ALi& right);
 
+    // Multiplication
+    ALi multiplication(const ALi& right);
+    void multiplicationAssign(const ALi& right);
+
+    // Division
+    ALi division(const ALi& right);
+    void divisionAssign(const ALi& right);
 
 public:
+    // Public
     void print(const char& type, const char* additionText = "", unsigned long long alignment = 0) const;
     void printApproximation(const char& type, const char* additionText = "", unsigned long long approximationPrecision = 2) const;
     void file(const char* path, const char& action, const char& type);
+
     void setSeparator(const char& separatorSign = '\0');
     const char getSeparator() const;
 
     const bool isEmpty() const;
+
+    // Operators
 };
 
