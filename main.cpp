@@ -1,246 +1,238 @@
 #include "include.h"
 #include "AccurateLargeInteger/AccurateLargeInteger.h"
 
+int prev = -1;
+
+void percent(unsigned long long from, unsigned long long current, unsigned long long to){
+    unsigned long long range = to - from;
+    unsigned long long currentinrange = current - from;
+    int prcntxd = (currentinrange * 100) / range;
+    if(prcntxd != prev){
+        printf("  %d%%\b\b\b\b\b",prcntxd);
+        // std::cout << "\b\b\b" << prcntxd << "0%";
+        prev = prcntxd;
+    }
+}
+
+const bool test_equal(){
+    ALi x,y;
+    x.setSeparator(' ');
+    y.setSeparator(' ');
+    long long from = -0xFFFe;
+    long long to   =  0xFFFF;
+    for(long long i=from; i<to; i++){
+        x.assignment(i);
+        for(long long j=from; j<to; j++){
+            y.assignment(j);
+            if(x.equal(y) != (i==j)){
+                printf("\n%llu == %llu = %d = %d\n",i,j,i==j,x.equal(y));
+                x.print('b',"\n");
+                y.print('b',"\n\n");
+                return false;
+            }
+        }
+        fflush(stdout);
+        percent(from, i, to);
+    }
+    return true;
+}
+
+
+const bool test_greaterThan(){
+    ALi x,y;
+    x.setSeparator(' ');
+    y.setSeparator(' ');
+    long long from = -0xFFFe;
+    long long to   =  0xFFFF;
+    for(long long i=from; i<to; i++){
+        x.assignment(i);
+        for(long long j=from; j<to; j++){
+            y.assignment(j);
+            if(x.greaterThan(y) != (i>j)){
+                printf("\n%llu > %llu = %d = %d\n",i,j,i>j,x.greaterThan(y));
+                x.print('b',"\n");
+                y.print('b',"\n\n");
+                return false;
+            }
+        }
+        fflush(stdout);
+        percent(from, i, to);
+    }
+    return true;
+}
+
+
+const bool test_smallerThan(){
+    ALi x,y;
+    x.setSeparator(' ');
+    y.setSeparator(' ');
+    long long from = -0xFFFe;
+    long long to   =  0xFFFF;
+    for(long long i=from; i<to; i++){
+        x.assignment(i);
+        for(long long j=from; j<to; j++){
+            y.assignment(j);
+            if(x.smallerThan(y) != (i<j)){
+                printf("\n%llu < %llu = %d = %d\n",i,j,i<j,x.smallerThan(y));
+                x.print('b',"\n");
+                y.print('b',"\n\n");
+                return false;
+            }
+        }
+        fflush(stdout);
+        percent(from, i, to);
+    }
+    return true;
+}
+
+
+const bool increment(){
+    ALi x;
+    x.setSeparator(' ');
+    long long from = -0xFFFFFFFe;
+    long long to   =  0xFFFFFFFF;
+    x.assignment(from);
+    for(long long i=from; i<to; i++){
+        if(!x.equal(i)){
+            ALi(i).print('b',"\n");
+            x.print('b',"\n");
+            return false;
+        }
+        fflush(stdout);
+        percent(from, i, to);
+        x.increment();
+    }
+    return true;
+}
+
+
+
+
+
+
+
+
+
+
 int main(){
+    std::clock_t start = std::clock();
+    // // 236325ms
+    // if(!test_equal()){
+    //     printf("equal was't finished!\n");
+    //     return 1;
+    // }
+    // else
+    //     printf("equal ok!\n");
 
 
+    // // 238068ms
+    // if(!test_greaterThan()){
+    //     printf("test_greaterThan was't finished!\n");
+    //     return 1;
+    // }
+    // else
+    //     printf("test_greaterThan ok!\n");
+
+
+    // // 237135ms
+    // if(!test_smallerThan()){
+    //     printf("smallerThan was't finished!\n");
+    //     return 1;
+    // }
+    // else
+    //     printf("smallerThan ok!\n");
+
+
+    // // 218291ms
+    // if(!increment()){
+    //     printf("increment was't finished!\n");
+    //     return 1;
+    // }
+    // else
+    //     printf("increment ok!\n");
+
+
+    std::cout << "time : " << (std::clock() - start) / (double)(CLOCKS_PER_SEC/1000) << "ms\n";
+
+    return 0;
+
+
+
+
+
+    std::clock_t start;
+    std::clock_t stop;
+    start = std::clock();
+    system("sleep 1");
+    stop = std::clock();
+    std::cout << "time : " << (stop - start) / (double)(CLOCKS_PER_SEC/1000) << "ms\n";
+
+    exit(0);
     ALi x,y,z;
     x.setSeparator(' ');
     y.setSeparator(' ');
     z.setSeparator(' ');
-    unsigned long long val;
-    std::clock_t start1,start2,start3;
-    std::clock_t stop1,stop2,stop3;
-    // start1 = std::clock();
-    // for(unsigned long long i=0; i<0xFFFFFFFFFFFFFFFF; i++){
-    //     val=0x0F2F0FF5FFFaFF9Fu;
-    //     val <<= 1;
-    // }
-    // stop1 = std::clock();
 
-    // start2 = std::clock();
-    // for(unsigned long long i=0; i<0xFFFFFFFFFFFFFFFF; i++){
-    //     val=0x0F2F0FF5FFFaFF9Fu;
-    //     val *= 2;
-    // }
-    // stop2 = std::clock();
-    
-    // start3 = std::clock();
-    // for(unsigned long long i=0; i<0xFFFFFFFFFFFFFFFF; i++){
-    //     val=0x0F2F0FF5FFFaFF9Fu;
-    //     if(val == 0x0F2F0FF5FFFaFF9Fu)
-    //         val = 2188221567420727102;
-    // }
-    // stop3 = std::clock();
-
-    long long x1,y1,z1;
-    double x2,y2,z2;
-    x1 = 0x00FFFFFFFFFFFFFF;
-    y1 = 0x01EFFFFFFFFFFFFF;
-    x2 = 0x00FFFFFFFFFFFFFF;
-    y2 = 0x01EFFFFFFFFFFFFF;
-    x.assignment(x1);
-    y.assignment(y1);
-
-    start1 = std::clock();
+    //* assignment
     for(int i=-0xFFFE; i<0xFFFF; i++){
-        // x1 = i;
-        // x.assignment(i);
-        for(int j=-0xFFFE; j<0xFFFF; j++){
-            // y1 = j;
-            // y.assignment(j);
-            // x1 + y1;
-            // z1 = x1 + y1;
-            x2 + y2;
-            // z2 = x2 + y2;
-            // x.addition(y);
-            // z.assignment(x.addition(y));
+        x.assignment(i);
+        x.print('b'," - ");
+        x.print('d',"\n");
+    }
+
+    //* addition
+    start = std::clock();
+
+    for(int i=-0xFE; i<0xFF; i++){
+        x.assignment(i);
+        for(int j=-0xFE; j<0xFF; j++){
+            y.assignment(j);
+            z.assignment(x.addition(y));
+            if(!z.equal(j+i)){
+                printf("%d + %d = %d = ",i,j,i+j);
+                z.print('d',"\n");
+                x.print('b',"\n");
+                y.print('b',"\n");
+                z.print('b',"\n");
+                exit(0);
+            }
         }
         // printf("%d\n",i);
     }
-    stop1 = std::clock();
-    std::cout << "time : " << (stop1 - start1) / (double)(CLOCKS_PER_SEC/1000) << "ms\n";
-
-    exit(0);
-
-
-
-    // #define TEST_ASSIGN
-
-    // #define TEST_EQUAL
-    // #define TEST_GREATER
-    // #define TEST_SMALLER
-
-    // #define TEST_INC
-    // #define TEST_ADD
-    // #define TEST_ADDAS
-
-    // #define TEST_DEC
-    // #define TEST_SUB
-    // #define TEST_SUBAS
-
-    #define TEST_MUL
-    // #define TEST_MULAS
-
-    // #define TEST_UNIT
-
-
-    #ifdef TEST_ASSIGN
-        for(int i=-0xFFFE; i<0xFFFF; i++){
-            x.assignment(i);
-            x.print('b'," - ");
-            x.print('d',"\n");
-        }
-    #endif
-
-    //* bool equal
-    #ifdef TEST_EQUAL
-        // for(int i=-0xFFFE; i<0xFFFF; i++){
-        //     x.assignment(i);
-        //     for(int j=-0xFFFE; j<0xFFFF; j++){
-        //         y.assignment(j);
-        //         z.assignment(x.addition(y));
-        //         if(!z.equal(j+i)){
-        //             printf("%d + %d = %d = ",i,j,i+j);
-        //             z.print('d',"\n");
-        //             x.print('b',"\n");
-        //             y.print('b',"\n");
-        //             z.print('b',"\n");
-        //             exit(0);
-        //         }
-        //     }
-        //     printf("%d\n",i);
-        // }
-        // printf("addition done\n");
-    #endif
-
-    //* bool greater
-    #ifdef TEST_GREATER
-        // for(int i=-0xFFFE; i<0xFFFF; i++){
-        //     x.assignment(i);
-        //     for(int j=-0xFFFE; j<0xFFFF; j++){
-        //         y.assignment(j);
-        //         z.assignment(x.addition(y));
-        //         if(!z.equal(j+i)){
-        //             printf("%d + %d = %d = ",i,j,i+j);
-        //             z.print('d',"\n");
-        //             x.print('b',"\n");
-        //             y.print('b',"\n");
-        //             z.print('b',"\n");
-        //             exit(0);
-        //         }
-        //     }
-        //     printf("%d\n",i);
-        // }
-        // printf("addition done\n");
-    #endif
-
-    //* bool smaller
-    #ifdef TEST_SMALLER
-        // for(int i=-0xFFFE; i<0xFFFF; i++){
-        //     x.assignment(i);
-        //     for(int j=-0xFFFE; j<0xFFFF; j++){
-        //         y.assignment(j);
-        //         z.assignment(x.addition(y));
-        //         if(!z.equal(j+i)){
-        //             printf("%d + %d = %d = ",i,j,i+j);
-        //             z.print('d',"\n");
-        //             x.print('b',"\n");
-        //             y.print('b',"\n");
-        //             z.print('b',"\n");
-        //             exit(0);
-        //         }
-        //     }
-        //     printf("%d\n",i);
-        // }
-        // printf("addition done\n");
-    #endif
-
-    //* increment
-    #ifdef TEST_INC
-        x.assignment(-0xFFFE);
-        for(int i=-0xFFFE; i<0xFFFF; i++){
-            if(!x.equal(i)){
-                printf("%d = ",i);
-                x.print('d'," ");
-                x.print('b',"\n");
-                exit(0);
-            }
-            x.increment();
-        }
-        printf("incrementation done\n");
-    #endif
-
-    //* addition
-    #ifdef TEST_ADD
-        start = std::clock();
-
-        for(int i=-0xFE; i<0xFF; i++){
-            x.assignment(i);
-            for(int j=-0xFE; j<0xFF; j++){
-                y.assignment(j);
-                z.assignment(x.addition(y));
-                if(!z.equal(j+i)){
-                    printf("%d + %d = %d = ",i,j,i+j);
-                    z.print('d',"\n");
-                    x.print('b',"\n");
-                    y.print('b',"\n");
-                    z.print('b',"\n");
-                    exit(0);
-                }
-            }
-            // printf("%d\n",i);
-        }
-        stop = std::clock();
-        // printf("addition done\n");
-        std::cout << "time: " << (stop - start) / (double)(CLOCKS_PER_SEC/1000) << "ms\n";
-    #endif
-
-
-    #ifdef TEST_ADDAS
-
-    #endif
-
+    stop = std::clock();
+    // printf("addition done\n");
+    std::cout << "time: " << (stop - start) / (double)(CLOCKS_PER_SEC/1000) << "ms\n";
 
     //* decrement
-    #ifdef TEST_DEC
-        x.assignment(0xFFFF);
-        for(int i=0xFFFF; i>-0xFFFF; i--){
-            if(!x.equal(i)){
-                printf("%d = ",i);
-                x.print('d'," ");
-                x.print('b',"\n");
-                exit(0);
-            }
-            x.decrement();
+    x.assignment(0xFFFF);
+    for(int i=0xFFFF; i>-0xFFFF; i--){
+        if(!x.equal(i)){
+            printf("%d = ",i);
+            x.print('d'," ");
+            x.print('b',"\n");
+            exit(0);
         }
-        printf("decrementation done\n");
-    #endif
+        x.decrement();
+    }
+    printf("decrementation done\n");
 
 
     //* subtraction
-    #ifdef TEST_SUB
-        for(int i=-0xFFFE; i<0xFFFF; i++){
-            x.assignment(i);
-            for(int j=-0xFFFE; j<0xFFFF; j++){
-                y.assignment(j);
-                z.assignment(x.subtraction(y));
-                if(!z.equal(i-j)){
-                    printf("%d - %d = %d = ",i,j,i-j);
-                    z.print('d',"\n");
-                    x.print('b',"\n");
-                    y.print('b',"\n");
-                    z.print('b',"\n");
-                    exit(0);
-                }
+    for(int i=-0xFFFE; i<0xFFFF; i++){
+        x.assignment(i);
+        for(int j=-0xFFFE; j<0xFFFF; j++){
+            y.assignment(j);
+            z.assignment(x.subtraction(y));
+            if(!z.equal(i-j)){
+                printf("%d - %d = %d = ",i,j,i-j);
+                z.print('d',"\n");
+                x.print('b',"\n");
+                y.print('b',"\n");
+                z.print('b',"\n");
+                exit(0);
             }
-            printf("%d\n",i);
         }
-        printf("subtraction done");
-    #endif
-
-
-    #ifdef TEST_SUBAS
-
-    #endif
+        printf("%d\n",i);
+    }
+    printf("subtraction done");
 }

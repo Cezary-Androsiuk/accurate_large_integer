@@ -12,64 +12,58 @@ protected:
     unsigned long long length;
     char separator; // '/0' means no separator others are printed in print method
 public:
-    ALi();
-    ALi(const ALi& source);
-    ALi(const signed long long& source);
-    ALi(const char* sourcePath,const char& type);
-    ~ALi();
+    ALi();//
+    ALi(const ALi& source);//
+    ALi(const signed long long& source);//
+    ALi(const char* sourcePath,const char& type);//
+    ~ALi();//
 
 protected:
-    void newCell(const unsigned char&);
-    const bool delCell();
+    void newCell(const CELL_TYPE&);//
+    const bool delCell();//
 
-protected:
-    void SHR();
-    void SHL();
-    void PMSB(const unsigned char& bit);
-    void PLSB(const unsigned char& bit);
+protected: public:
+    void SHR();//
+    void SHL();//
+    void PMSB(const bool& bit);//
+    void PLSB(const bool& bit);//
 
-    // const bool isPositive() const; // to delete
-    const bool sign() const;
-    const bool is0() const;
-    const bool is1() const;
-    const bool need_opt() const;
+    const bool sgn() const;//
+    const bool is0() const;//
+    const bool is1() const;//
 
-    void clear();
-    void optymize();
-    void negate();
-    void invert();
+    void clear();//
+    void optymize();//?
+    void negate();//
+    void invert();//
 
-protected:
-    void printBinary() const;
-    void printDecimal() const;
+protected: public:
+    void printBinary() const;//
+    void printDecimal() const;//!
 
-    void printBinaryApproximation(unsigned long long appPrec) const;
-    void printDecimalApproximation(unsigned long long appPrec) const;
+    void printBinaryApproximation(unsigned long long appPrec) const;//!
+    void printDecimalApproximation(unsigned long long appPrec) const;//!
 
-    void writeFileBinary(const char* path, const bool& append) const;
-    void writeFileReadable(const char* path, const bool& append) const;
-    void writeFile(const char* path, const char& type, const bool& append) const;
+    void writeFileBinary(const char* path) const;//
+    void writeFileReadable(const char* path) const;//
+    void writeFile(const char* path, const char& type) const;//
 
-    void readFileBinary(const char* path);
-    void readFileReadable(const char* path);
-    void readFile(const char* path, const char& type);
+    void readFileBinary(const char* path);//
+    void readFileReadable(const char* path);//!
+    void readFile(const char* path, const char& type);//
     
 protected: public:
-    // Returns
-    const ALi returnNegate() const;
-    const ALi returnInvert() const;
-    
     // Assignment
-    void assignment(const ALi& source);
-    void assignment(const signed long long& source);
+    void assignment(const ALi& source);//
+    void assignment(const signed long long& source);//
 
     // Bolean
-    const bool equal(const ALi& right) const;
-    const bool greaterThan(const ALi& right) const;
-    const bool smallerThan(const ALi& right) const;
+    const bool equal(const ALi& right) const;//
+    const bool greaterThan(const ALi& right) const;//?
+    const bool smallerThan(const ALi& right) const;//?
 
     // Addition
-    void increment();
+    void increment();//
     ALi addition(const ALi& right);
     void additionAssign(const ALi& right);
 
