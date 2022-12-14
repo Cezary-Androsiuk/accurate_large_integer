@@ -241,7 +241,7 @@ const bool ALi::sgn() const{
  * @return false 
  */
 const bool ALi::is0() const{
-    if(this->length == 1 && this->globalHandle->var == 0) return true;
+    if(this->length == 1 && this->globalHandle->var == mask000) return true;
     else return false;
 }
 /**
@@ -250,7 +250,7 @@ const bool ALi::is0() const{
  * @return false 
  */
 const bool ALi::is1() const{
-    if(this->length == 1 && this->globalHandle->var == 1) return true;
+    if(this->length == 1 && this->globalHandle->var == mask001) return true;
     else return false;
 }
     // #
@@ -458,8 +458,17 @@ void ALi::printDecimal() const{
     //     decimal.pop();
     // }
 }
-
-
+    // #
+    // #
+    // #
+    // #
+    // #
+    // #
+    // #
+    // #
+    // #
+    // #
+    // #
 /**
  * @brief printing binary variable in scientific notation format
  * @param appPrec simply how many digits (counting from left and without variable sign) will be printed
@@ -482,8 +491,17 @@ void ALi::printDecimalApproximation(unsigned long long appPrec) const{
     // 
     printf("printDecimalApproximation is not finished yet\n");
 }
-
-
+    // #
+    // #
+    // #
+    // #
+    // #
+    // #
+    // #
+    // #
+    // #
+    // #
+    // #
 /**
  * @brief save variable to file in binary form
  * @param path path to file where variable should be stored
@@ -515,7 +533,7 @@ void ALi::writeFileReadable(const char* path) const{
     }
     Cell* handle = this->globalHandle->R;
     do{
-        std::string binary = toBin(handle->var,this->separator);
+        std::string binary = toBin(handle->var,ULL_VAR_SEP);
         fwrite(binary.c_str(), sizeof(char), binary.length(), file); // bufer, size of cell, cell amout, source
         handle = handle->R;
     }while(handle != this->globalHandle->R);
@@ -534,8 +552,17 @@ void ALi::writeFile(const char* path, const char& type) const{
         default: printf("unknown type!\nnot attempted to create file\n"); return;
     }
 }
-
-
+    // #
+    // #
+    // #
+    // #
+    // #
+    // #
+    // #
+    // #
+    // #
+    // #
+    // #
 /**
  * @brief copy value from source file to variable
  * @param path source where an readable binary file is stored
@@ -672,6 +699,9 @@ void ALi::assignment(const signed long long& source){
     #ifdef ULL_CELL
         this->globalHandle->var = source;
     #endif
+}
+CELL_TYPE ALi::returnglobalHandle() const{
+    return this->globalHandle->var;
 }
     // #
     // #
@@ -859,13 +889,23 @@ void ALi::increment(){
  * @return ALi 
  */
 ALi ALi::addition(const ALi& right){
-    if(right.is0()) return *this; // both are 0 or right is 0
-    else if(this->is0()) return right; // left is 0
-    
+    // printf("in: %llu\nin: %llu\n\n",this->globalHandle->var, right.globalHandle->var);
+    if(right.is0()) return *this; // x+0 = x
+    else if (this->is0()) return right; // 0+x = x
+    else if (right.is1()){
+        ALi tmp(*this);
+        tmp.increment();
+        return tmp;
+    }
+    else if (this->is1()){
+        ALi tmp(right);
+        tmp.increment();
+        return tmp;
+    }
+
     ALi result;
     ALi const* lobj = this; 
     ALi const* robj = &right;
-
     CELL_TYPE carry = 0;
     // case pull out from while cause idk how to implement while which starts from handle and ends on handle iterating through all 
     result.globalHandle->var = lobj->globalHandle->var + robj->globalHandle->var; 
@@ -876,36 +916,35 @@ ALi ALi::addition(const ALi& right){
     else 
         carry = 0;
 
-    const bool lsign = !lobj->sgn();
-    const bool rsign = !robj->sgn();
-    Cell const* lHandle = lobj->globalHandle->L;
-    Cell const* rHandle = robj->globalHandle->L;
+    const bool lsign = lobj->sgn();
+    const bool rsign = robj->sgn();
+    const CELL_TYPE lmask = (lsign ? mask111 : mask000);
+    const CELL_TYPE rmask = (rsign ? mask111 : mask000);
+    const Cell* const lgh = lobj->globalHandle;
+    const Cell* const rgh = robj->globalHandle;
+    const Cell* lh = lgh->L;
+    const Cell* rh = rgh->L;
 
-    do{
+    while(lh != lgh || rh != rgh){
         // addition both cells and carry
-        result.newCell((lHandle == lobj->globalHandle ? (lsign ? mask000 : mask111) : lHandle->var) + 
-        (rHandle == robj->globalHandle ? (rsign ? mask000 : mask111) : rHandle->var) + carry);
+        result.newCell((lh == lgh ? lmask : lh->var) + (rh == rgh ? rmask : rh->var) + carry);
         
         // keep carry to next iteration
-        if((result.globalHandle->R->var < rHandle->var && result.globalHandle->R->var < lHandle->var) ||
-        (result.globalHandle->R->var <= rHandle->var && result.globalHandle->R->var <= lHandle->var && carry == 1)) 
+        if((result.globalHandle->R->var < rh->var && result.globalHandle->R->var < lh->var) ||
+        (result.globalHandle->R->var <= rh->var && result.globalHandle->R->var <= lh->var && carry)) 
             carry = 1;
         else 
             carry = 0;
 
         // change handles to next cell if not reached end variable yet
-        if(lHandle != lobj->globalHandle) lHandle = lHandle->L;
-        if(rHandle != robj->globalHandle) rHandle = rHandle->L;
-    }while(lHandle != lobj->globalHandle || rHandle != robj->globalHandle);
-
-    // overflow can only appear when both operation argument sign values are equal
-    if(lsign == rsign && lsign != !result.sgn()){
-        // if lsign(and rsign) is positive => result is also positive
-        if(lsign) result.newCell(mask000);
-        // if lsign(and rsign) is negative => result is also negative
-        else result.newCell(mask111);
+        if(lh != lgh) lh = lh->L;
+        if(rh != rgh) rh = rh->L;
     }
+    // overflow can only appear when both operation argument sign values are equal
+    if(lsign == rsign && lsign != result.sgn())
+        result.newCell(lmask);
     // result.optymize();
+    // printf("end: %llu\nend: %llu\nend: %llu\n\n",this->globalHandle->var, right.globalHandle->var, result.globalHandle->var);
 
     return result;
 }

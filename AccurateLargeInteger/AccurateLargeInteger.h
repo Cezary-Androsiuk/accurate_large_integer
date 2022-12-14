@@ -56,10 +56,11 @@ protected: public:
     // Assignment
     void assignment(const ALi& source);//
     void assignment(const signed long long& source);//
+    CELL_TYPE returnglobalHandle() const;
 
     // Bolean
     const bool equal(const ALi& right) const;//
-    const bool greaterThan(const ALi& right) const;//?
+    const bool greaterThan(const ALi& right) const;//
     const bool smallerThan(const ALi& right) const;//?
 
     // Addition

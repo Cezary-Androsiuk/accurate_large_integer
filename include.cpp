@@ -18,7 +18,7 @@
 //     }
 //     return bin;
 // }
-const std::string toBin(long long src, const char& sep){
+const std::string toBin(long long src, const std::string& sep){
     std::string bin;
     for(int i=0; i<8; i++){
         std::string byte = "00000000";
@@ -30,20 +30,20 @@ const std::string toBin(long long src, const char& sep){
         }
         src >>= 8;
         if(i){
-            if(byte == "00000000")
-                bin = std::string("0") + sep + bin;
-            else if (byte == "11111111")
-                bin = std::string("1") + sep + bin;
-            else
-                bin = byte + "_" + bin;
+            // if(byte == "00000000")
+            //     bin = std::string("0") + sep + bin;
+            // else if (byte == "11111111")
+            //     bin = std::string("1") + sep + bin;
+            // else
+                bin = byte + sep + bin;
 
         }
         else{
-            if(byte == "00000000")
-                bin = std::string("0");
-            else if (byte == "11111111")
-                bin = std::string("1");
-            else
+            // if(byte == "00000000")
+            //     bin = std::string("0");
+            // else if (byte == "11111111")
+            //     bin = std::string("1");
+            // else
                 bin = byte;
         }
     }

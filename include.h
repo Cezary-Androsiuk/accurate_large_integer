@@ -54,7 +54,7 @@ public:
 #define BITS_PER_BYTE 8
 #define BYTES_PER_VAR sizeof(CELL_TYPE)
 #define BITS_PER_VAR BYTES_PER_VAR * BITS_PER_BYTE
-#define ULL_VAR_SEP '_'
+#define ULL_VAR_SEP "_"
 
 // masks can be used instead of typing those bits
 // help with switching from unsigned char to unsigned long long 
@@ -80,5 +80,5 @@ public:
 
 
 
-const std::string toBin(long long src, const char& sep);
+const std::string toBin(long long src, const std::string& sep);
 // const std::string toByte(const unsigned char&);
