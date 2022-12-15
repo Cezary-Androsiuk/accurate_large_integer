@@ -65,7 +65,7 @@ protected: public:
 
     // Addition
     void increment();//
-    ALi addition(const ALi& right);
+    ALi addition(const ALi& right); //
     void additionAssign(const ALi& right);
 
     // Subtraction
@@ -86,10 +86,9 @@ public:
     void print(const char& type, const char* additionText = "", unsigned long long alignment = 0) const;
     void printApproximation(const char& type, const char* additionText = "", unsigned long long approximationPrecision = 2) const;
     void file(const char* path, const char& action, const char& type);
-
+    // Get / Set
     void setSeparator(const char& separatorSign = '\0');
     const char getSeparator() const;
-
     const bool isEmpty() const;
 
     // Operators

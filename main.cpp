@@ -176,7 +176,7 @@ const bool test_addition(){
             y.assignment(j);
             z.assignment(x.addition(y));
             if(!z.equal(i+j)){
-                printf("\n%llu + %llu = %llu = ",i,j,i+j);
+                printf("\n%lld + %lld = %lld = ",i,j,i+j);
                 z.print('d',"\n");
                 x.print('b',"\n");
                 y.print('b',"\n");
@@ -196,7 +196,7 @@ const bool test_additionAssign(){
     x.setSeparator(' ');
     y.setSeparator(' ');
     // z.setSeparator(' ');
-    long long from = -0xFFFe;
+    long long from = 0;// -0xFFFe;
     long long to   =  0xFFFF;
     for(long long i=from; i<to; i++){
         for(long long j=from; j<to; j++){
@@ -204,11 +204,11 @@ const bool test_additionAssign(){
             y.assignment(j);
             x.additionAssign(y);
             if(!x.equal(i+j)){
-                printf("\n%llu + %llu = %llu = ",i,j,i+j);
+                printf("\n%lld + %lld = %lld = ",i,j,i+j);
                 x.print('d',"\n");
-                ALi(i).print('b',"\n");
                 y.print('b',"\n");
-                x.print('b',"\n\n");
+                ALi(i).print('b',"\n");
+                x.print('b',"\n");
                 return false;
             }
         }
@@ -292,13 +292,22 @@ int main(){
     //     printf("assignment ok!\n");
 
 
+    // // 1.88941e+06ms
+    // if(!test_addition()){
+    //     printf("addition was't finished!\n");
+    //     return 1;
+    // }
+    // else
+    //     printf("addition ok!\n");
+
+
     // 
-    if(!test_addition()){
-        printf("addition was't finished!\n");
+    if(!test_additionAssign()){
+        printf("additionAssign was't finished!\n");
         return 1;
     }
     else
-        printf("addition ok!\n");
+        printf("additionAssign ok!\n");
 
 
     std::cout << "time : " << (std::clock() - start) / (double)(CLOCKS_PER_SEC/1000) << "ms\n";

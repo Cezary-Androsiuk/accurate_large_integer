@@ -51,15 +51,17 @@ ALi::~ALi(){
     delete this->globalHandle;
 }
     // #
+    
     // #
+    
     // #
+    
     // #
+    
     // #
+    
     // #
-    // #
-    // #
-    // #
-    // #
+    
     // #
 /**
  * @brief create new cell from the left side
@@ -96,15 +98,17 @@ const bool ALi::delCell(){
     return true;
 }
     // #
+    
     // #
+    
     // #
+    
     // #
+    
     // #
+    
     // #
-    // #
-    // #
-    // #
-    // #
+    
     // #
 /**
  * @brief execute shift right operation
@@ -217,15 +221,17 @@ void ALi::PLSB(const bool& bit){
     }
 }
     // #
+    
     // #
+    
     // #
+    
     // #
+    
     // #
+    
     // #
-    // #
-    // #
-    // #
-    // #
+    
     // #
 /**
  * @brief return sign bit
@@ -254,15 +260,17 @@ const bool ALi::is1() const{
     else return false;
 }
     // #
+    
     // #
+    
     // #
+    
     // #
+    
     // #
+    
     // #
-    // #
-    // #
-    // #
-    // #
+    
     // #
 /**
  * @brief remove all dynamic allocated cells 
@@ -345,15 +353,17 @@ void ALi::invert(){
     this->increment();
 }
     // #
+    
     // #
+    
     // #
+    
     // #
+    
     // #
+    
     // #
-    // #
-    // #
-    // #
-    // #
+    
     // #
 /**
  * @brief print each byte of variable seperated by separator sign and adding after all addition text
@@ -365,7 +375,6 @@ void ALi::printBinary() const{
         printf("%s%c",toBin(handle->var, ULL_VAR_SEP).c_str(),this->separator);
         handle = handle->R;
     }while(handle != this->globalHandle->R);
-    printf("\b "); // space is not the best choice, cause despite it is invisible, it is not \0
 }
 /**
  * @brief print digit of variable seperated by separator sign every 3 digits and adding after all addition text
@@ -459,15 +468,17 @@ void ALi::printDecimal() const{
     // }
 }
     // #
+    
     // #
+    
     // #
+    
     // #
+    
     // #
+    
     // #
-    // #
-    // #
-    // #
-    // #
+    
     // #
 /**
  * @brief printing binary variable in scientific notation format
@@ -492,15 +503,17 @@ void ALi::printDecimalApproximation(unsigned long long appPrec) const{
     printf("printDecimalApproximation is not finished yet\n");
 }
     // #
+    
     // #
+    
     // #
+    
     // #
+    
     // #
+    
     // #
-    // #
-    // #
-    // #
-    // #
+    
     // #
 /**
  * @brief save variable to file in binary form
@@ -553,15 +566,17 @@ void ALi::writeFile(const char* path, const char& type) const{
     }
 }
     // #
+    
     // #
+    
     // #
+    
     // #
+    
     // #
+    
     // #
-    // #
-    // #
-    // #
-    // #
+    
     // #
 /**
  * @brief copy value from source file to variable
@@ -647,15 +662,17 @@ void ALi::readFile(const char* path, const char& type){
     }
 }
     // #
+    
     // #
+    
     // #
-    // #
-    // #
+    
     // # Assignment
+    
     // #
+    
     // #
-    // #
-    // #
+    
     // #
 /**
  * @brief assigns existed ALi to variable
@@ -704,15 +721,17 @@ CELL_TYPE ALi::returnglobalHandle() const{
     return this->globalHandle->var;
 }
     // #
+    
     // #
+    
     // #
+    
+    // # Boolean
+    
     // #
+    
     // #
-    // # Bolean
-    // #
-    // #
-    // #
-    // #
+    
     // #
 /**
  * @brief check if left object is equal to right object
@@ -856,15 +875,17 @@ const bool ALi::smallerThan(const ALi& right) const{
     return false; // both are equal => left is NOT smaller
 }
     // #
+    
     // #
+    
     // #
-    // #
-    // #
+    
     // # Addition
+    
     // #
+    
     // #
-    // #
-    // #
+    
     // #
 /**
  * @brief increment ALi by one
@@ -904,26 +925,28 @@ ALi ALi::addition(const ALi& right){
     }
 
     ALi result;
-    ALi const* lobj = this; 
-    ALi const* robj = &right;
-    CELL_TYPE carry = 0;
-    // case pull out from while cause idk how to implement while which starts from handle and ends on handle iterating through all 
-    result.globalHandle->var = lobj->globalHandle->var + robj->globalHandle->var; 
     
+    const ALi* const lobj = this; 
+    const Cell* const lgh = lobj->globalHandle;
+    const Cell* lh = lgh;
+    const bool lsign = lobj->sgn();
+    const CELL_TYPE lmask = (lsign ? mask111 : mask000);
+
+    const ALi* const robj = &right;
+    const Cell* const rgh = robj->globalHandle;
+    const Cell* rh = rgh;
+    const bool rsign = robj->sgn();
+    const CELL_TYPE rmask = (rsign ? mask111 : mask000);
+    
+    CELL_TYPE carry = 0;
+    
+    // case pull out from while cause idk how to implement while which starts from handle and ends on handle iterating through all 
+    result.globalHandle->var = lgh->var + rgh->var; 
     // keep carry to next iteration
-    if(result.globalHandle->var < robj->globalHandle->var && result.globalHandle->var < lobj->globalHandle->var)
+    if(result.globalHandle->var < rgh->var && result.globalHandle->var < lgh->var)
         carry = 1;
     else 
         carry = 0;
-
-    const bool lsign = lobj->sgn();
-    const bool rsign = robj->sgn();
-    const CELL_TYPE lmask = (lsign ? mask111 : mask000);
-    const CELL_TYPE rmask = (rsign ? mask111 : mask000);
-    const Cell* const lgh = lobj->globalHandle;
-    const Cell* const rgh = robj->globalHandle;
-    const Cell* lh = lgh->L;
-    const Cell* rh = rgh->L;
 
     while(lh != lgh || rh != rgh){
         // addition both cells and carry
@@ -953,76 +976,84 @@ ALi ALi::addition(const ALi& right){
  * @param right 
  */
 void ALi::additionAssign(const ALi& right){
-    this->assignment(this->addition(right));
-    // if(right.isEmpty()) return; // both are 0 or right is 0
-    // if(this->isEmpty()){ // left is 0
-    //     this->assignment(right);
-    //     return;
-    // }
+    // this->assignment(this->addition(right));
+    printf("in: %llu\nin: %llu\n\n",this->globalHandle->var, right.globalHandle->var);
+    if(right.is0()) return; // x+0 = x
+    else if (this->is0()){ // 0+x = x
+        this->assignment(right);
+        return;
+    }
+    else if (right.is1()){
+        this->increment();
+        return;
+    }
+    else if (this->is1()){
+        this->assignment(right);
+        this->increment();
+        return;
+    }
+
+    ALi* const lobj = this; 
+    Cell* const lgh = lobj->globalHandle;
+    Cell* lh = lgh->L;
+    const bool lsign = lobj->sgn();
+    const CELL_TYPE lmask = (lsign ? mask111 : mask000);
+
+    const ALi* const robj = &right;
+    const Cell* const rgh = robj->globalHandle;
+    const Cell* rh = rgh->L;
+    const bool rsign = robj->sgn();
+    const CELL_TYPE rmask = (rsign ? mask111 : mask000);
+
+    CELL_TYPE oldcellvar = lgh->var;
+    CELL_TYPE carry = 0;
     
-    // ALi* lobj = this; 
-    // ALi const* robj = &right;
+    // case pull out from while cause idk how to implement while which starts from handle and ends on handle iterating through all 
+    lgh->var += rgh->var; 
+    // keep carry to next iteration
+    if(rgh->var < oldcellvar && rgh->var < lgh->var)
+        carry = 1;
+    else 
+        carry = 0;
 
-    // CELL_TYPE carry = 0;
-    // // case pull out from while cause 
-    // // idk how to implement while which starts from handle and ends on handle iterating through all 
-    // CELL_TYPE lobj_cell_tmp = lobj->globalHandle->var;
-    // lobj->globalHandle->var += robj->globalHandle->var; 
-    // // keep carry to next iteration
-    // if(lobj->globalHandle->var < robj->globalHandle->var && lobj->globalHandle->var < lobj_cell_tmp)
-    //     carry = 1;
-    // else 
-    //     carry = 0;
-
-    // const bool lsign = lobj->isPositive();
-    // const bool rsign = robj->isPositive();
-    // Cell* lHandle = lobj->globalHandle->L;
-    // Cell const* rHandle = robj->globalHandle->L;
-
-    // do{
-    //     // addition both cells and carry
-    //     if(lHandle == lobj->globalHandle)
-    //         lobj->newCell((lsign ? mask000 : mask111) + rHandle->var + carry);
-    //     else
-            
-
-
-    //     result.newCell((lHandle == lobj->globalHandle ? (lsign ? mask000 : mask111) : lHandle->var) + 
-    //     (rHandle == robj->globalHandle ? (rsign ? mask000 : mask111) : rHandle->var) + carry);
+    while(rh != rgh || carry){
+        // addition both cells and carry
+        oldcellvar = (lh == lgh ? lmask : lh->var);
+        if(lh == lgh)
+            this->newCell((lh == lgh ? lmask : lh->var) + (rh == rgh ? rmask : rh->var) + carry);
+        else
+            lh += (rh == rgh ? rmask : rh->var) + carry;
         
-    //     // keep carry to next iteration
-    //     if((result.globalHandle->R->var < rHandle->var && result.globalHandle->R->var < lHandle->var) ||
-    //     (result.globalHandle->R->var <= rHandle->var && result.globalHandle->R->var <= lHandle->var && carry == 1)) 
-    //         carry = 1;
-    //     else 
-    //         carry = 0;
+        // keep carry to next iteration
+        if((rh->var < oldcellvar && rh->var < lh->var) ||
+        (rh->var <= oldcellvar && rh->var <= lh->var && carry)) 
+            carry = 1;
+        else 
+            carry = 0;
 
-    //     // change handles to next cell if not reached end variable yet
-    //     if(lHandle != lobj->globalHandle) lHandle = lHandle->L;
-    //     if(rHandle != robj->globalHandle) rHandle = rHandle->L;
-    // }while(lHandle != lobj->globalHandle || rHandle != robj->globalHandle);
-
-    // // overflow can only appear when both operation argument sign values are equal
-    // if(lsign == rsign && lsign != result.isPositive()){
-    //     // if lsign(and rsign) is positive => result is also positive
-    //     if(lsign) result.newCell(mask000);
-    //     // if lsign(and rsign) is negative => result is also negative
-    //     else result.newCell(mask111);
-    // }
+        // change handles to next cell if not reached end variable yet
+        if(lh != lgh) lh = lh->L;
+        if(rh != rgh) rh = rh->L;
+    }
+    // overflow can only appear when both operation argument sign values are equal
+    if(lsign == rsign && lsign != this->sgn())
+        this->newCell(lmask);
     // result.optymize();
+    // printf("end: %llu\nend: %llu\nend: %llu\n\n",this->globalHandle->var, right.globalHandle->var, result.globalHandle->var);
 
-    // return result;
 }
     // #
+    
     // #
+    
     // #
-    // #
-    // #
+    
     // # Subtraction
+    
     // #
+    
     // #
-    // #
-    // #
+    
     // #
 /**
  * @brief increment ALi by one
@@ -1111,15 +1142,17 @@ void ALi::subtractionAssign(const ALi& right){
     this->assignment(this->subtraction(right));
 }
     // #
+    
     // #
+    
     // #
-    // #
-    // #
+    
     // # Multiplication
+    
     // #
+    
     // #
-    // #
-    // #
+    
     // #
 /**
  * @brief 
@@ -1175,15 +1208,17 @@ void ALi::multiplicationAssign(const ALi& right){
 
 }
     // #
+    
     // #
+    
     // #
-    // #
-    // #
+    
     // # Division
+    
     // #
+    
     // #
-    // #
-    // #
+
     // #
 /**
  * @brief 
@@ -1201,15 +1236,17 @@ void ALi::divisionAssign(const ALi& right){
     
 }
     // #
+    
     // #
+    
     // #
-    // #
-    // #
+    
     // # Public
+    
     // #
+    
     // #
-    // #
-    // #
+    
     // #
 /**
  * @brief print variable as a binary or decimal
@@ -1264,15 +1301,17 @@ void ALi::file(const char* path, const char& action, const char& type){
     }
 }
     // #
+    
     // #
+    
     // #
-    // #
-    // #
+    
     // # Get / Set
+    
     // #
+    
     // #
-    // #
-    // #
+    
     // #
 /**
  * @brief set separator sign which should shown every 8 bits (byte)
@@ -1288,8 +1327,6 @@ void ALi::setSeparator(const char& separator){
 const char ALi::getSeparator() const{
     return this->separator;
 }
-
-
 /**
  * @brief check if is empty
  * @return true ALi is empty
@@ -1298,3 +1335,16 @@ const char ALi::getSeparator() const{
 const bool ALi::isEmpty() const{
     return this->is0();
 }
+    // #
+    
+    // #
+    
+    // #
+    
+    // # Operators
+    
+    // #
+    
+    // #
+    
+    // #
