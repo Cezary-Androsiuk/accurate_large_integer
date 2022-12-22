@@ -82,3 +82,5 @@ public:
 
 const std::string toBin(long long src, const std::string& sep);
 // const std::string toByte(const unsigned char&);
+
+CELL_TYPE BCDincrement(CELL_TYPE cell);

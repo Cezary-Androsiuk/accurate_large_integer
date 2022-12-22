@@ -292,7 +292,7 @@ int main(){
     //     printf("assignment ok!\n");
 
 
-    // // 1.88941e+06ms
+    // // 
     // if(!test_addition()){
     //     printf("addition was't finished!\n");
     //     return 1;
@@ -301,22 +301,23 @@ int main(){
     //     printf("addition ok!\n");
 
 
-    // 
-    if(!test_additionAssign()){
-        printf("additionAssign was't finished!\n");
-        return 1;
-    }
-    else
-        printf("additionAssign ok!\n");
-
-
     std::cout << "time : " << (std::clock() - start) / (double)(CLOCKS_PER_SEC/1000) << "ms\n";
+    // BCDincrement(254);
+    unsigned long long v=0;
+    for(unsigned long long i=0; i<16; i++){
+        v <<= 1;
+        v++;
+
+        printf("%s - ",toBin(v," ").c_str());
+        v = BCDincrement(v);
+        printf("%s\n",toBin(v," ").c_str());
+    }
+    // for(unsigned long long i=0; i<256; i++)
+        // printf("%s - %s\n", toBin(i," ").c_str(), toBin(BCDincrement(i)," ").c_str());
+
+
 
     return 0;
-
-
-
-
 
     // std::clock_t start;
     // std::clock_t stop;
