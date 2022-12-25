@@ -7,7 +7,7 @@
     accurate large integer
 */
 class ALi{
-protected:
+protected: public:
     Cell *globalHandle; //   [...11010001] <-
     unsigned long long length;
     char separator; // '/0' means no separator others are printed in print method
@@ -18,7 +18,7 @@ public:
     ALi(const char* sourcePath,const char& type);//
     ~ALi();//
 
-protected:
+protected: public:
     void newCell(const CELL_TYPE&);//
     const bool delCell();//
 
@@ -33,13 +33,13 @@ protected: public:
     const bool is1() const;//
 
     void clear();//
-    void optymize();//?
+    void optymize();//
     void negate();//
     void invert();//
 
 protected: public:
     void printBinary() const;//
-    void printDecimal() const;//!
+    void printDecimal() const;//
 
     void printBinaryApproximation(unsigned long long appPrec) const;//!
     void printDecimalApproximation(unsigned long long appPrec) const;//!
@@ -49,19 +49,18 @@ protected: public:
     void writeFile(const char* path, const char& type) const;//
 
     void readFileBinary(const char* path);//
-    void readFileReadable(const char* path);//!
+    void readFileReadable(const char* path);//
     void readFile(const char* path, const char& type);//
     
 protected: public:
     // Assignment
     void assignment(const ALi& source);//
     void assignment(const signed long long& source);//
-    CELL_TYPE returnglobalHandle() const;
 
     // Bolean
     const bool equal(const ALi& right) const;//
     const bool greaterThan(const ALi& right) const;//
-    const bool smallerThan(const ALi& right) const;//?
+    const bool smallerThan(const ALi& right) const;//
 
     // Addition
     void increment();//

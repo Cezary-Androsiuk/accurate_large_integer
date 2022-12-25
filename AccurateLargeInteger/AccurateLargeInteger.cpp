@@ -7,8 +7,6 @@
 // unfold all Ctrl + K,  Ctrl + J
 
 
-
-
 /**
  * @brief Construct a new ALi object
  */
@@ -239,7 +237,7 @@ void ALi::PLSB(const bool& bit){
  * @return false sign bit is 0 => number is positive
  */
 const bool ALi::sgn() const{
-    return (this->globalHandle->var & mask100 ? true : false);
+    return (this->globalHandle->R->var & mask100 ? true : false);
 }
 /**
  * @brief 
@@ -393,79 +391,47 @@ void ALi::printDecimal() const{
         printf("0");
         return;
     }
+    
+    ALi bcd; // 0
+    const Cell* handle = this->globalHandle;
+    // change binary to binary-coded decimal
+    do{
+        handle = handle->R;
+        CELL_TYPE mask = mask100;
+        while(mask != 0){
+            bcd.PLSB((handle->var & mask ? 1 : 0));
+            const bool old_bcdsgn = bcd.sgn();
+            Cell* bcdhandle = bcd.globalHandle;
+            do{
+                bcdhandle = bcdhandle->R;
+                bcdhandle->var = BCDincrement(bcdhandle->var);
+            }while(bcdhandle != bcd.globalHandle);
+            if(old_bcdsgn != bcd.sgn()) bcd.newCell(mask000);
+            mask >>= 1;
+        }
+    }while(handle != this->globalHandle);
 
-    // ALi copy(*this);
-    // copy.setSeparator(' ');
-    // copy.print('b',"\n");
-    // for(unsigned long long ishr=0; ishr<BITS_PER_VAR*this->length; ishr++){
-    //     Cell* handle = copy.globalHandle;
-    //     for (unsigned long long i=0; i<copy.length-this->length; i++){
-    //         handle = handle->R;
-    //         printf("%s\n",toBin(handle->var,' ').c_str());
-    //         // handle->var = add3tocell(handle->var);
-
-    //         int v;
-    //         CELL_TYPE result = 0;
-    //         for (int i=0; i<BITS_PER_VAR/4; i++){
-    //             v = handle->var & 0b00001111;
-    //             handle->var >>= 4;
-    //             if(v > 4) v += 3;
-    //             for(int j=0; j<15-i; j++) v <<= 4;
-    //             result += v;
-    //         }
-    //         handle->var = result;
-    //         printf(" %s\n",toBin(handle->var,' ').c_str());
-    //     }
-    //     copy.SHL();
-    // }
-
-    // Cell* handle = copy.globalHandle;
-    // for (unsigned long long i=0; i<copy.length-this->length; i++){
-    //     handle = handle->R;
-    //     for (int j=0; j<BITS_PER_VAR/4; j++){
-    //         int v = handle->var;
-    //         for(int h=0; h<15-j; h++) v >>= 4;
-    //         // printf("%d",v)
-    //     }
-    // }
-
-
-    // exists better method called double dabble
-
-    #define divby 10
-
-    ALi slider(*this);
-    Stacker<CELL_TYPE> decimal(new CELL_TYPE(1));
-    unsigned long long sliderBitsCount = 0;
-    while(slider.globalHandle->var != mask000 || slider.length != 1){ // iterate through each decimal digit
-    slider.delCell();
-    //     slider.optymize(); // to keep as short as possible
-    //     if(slider.globalHandle->L != slider.globalHandle || slider.globalHandle->var >= divby){
-    //         sliderBitsCount = BITS_PER_VAR * (slider.length);
-    //         slider.newCell(mask000); // as a buffer
-    //         for(int i=0; i<sliderBitsCount; i++){ // iterate through each SHL using PLSB
-    //             if(slider.globalHandle->R->var >= divby){
-    //                 slider.globalHandle->R->var -= divby;
-    //                 slider.PLSB(mask001);
-    //             }
-    //             else slider.PLSB(mask000);
-    //         }
-    //     }
-    //     if(slider.globalHandle->R->var >= divby){
-    //         decimal.push(slider.globalHandle->R->var - divby);
-    //         slider.PLSB(mask001);
-    //     } 
-    //     else{
-    //         decimal.push(slider.globalHandle->R->var);
-    //         slider.PLSB(mask000);
-    //     }
-    //     slider.delCell();
+    // print binary-coded decimal
+    std::string rev;
+    while(bcd.globalHandle->R->var != 0){ 
+        const char nibble = bcd.globalHandle->R->var & 0b00001111;
+        rev = std::string(1,(nibble > 4 ? nibble+45 : nibble+48)) + rev; 
+        bcd.globalHandle->R->var >>= 4;
     }
+    printf("%s",rev.c_str());
+    bcd.delCell();
+    if(bcd.is0()) return;
 
-    // while(!decimal.isEmpty()){
-    //     printf("%llu",*decimal.top());
-    //     decimal.pop();
-    // }
+    do{
+        std::string rev;
+        for(int i=0; i<16; i++){
+            const char nibble = bcd.globalHandle->R->var & 0b00001111; 
+            rev = std::string(1,(nibble > 4 ? nibble+45 : nibble+48)) + rev; 
+            bcd.globalHandle->R->var >>= 4;
+        }
+        printf("%s",rev.c_str());
+    }while(bcd.delCell());
+
 }
     // #
     
@@ -603,51 +569,27 @@ void ALi::readFileBinary(const char* path){
  */
 void ALi::readFileReadable(const char* path){
     // not need to be idiot proof
-    printf("readFileReadable was not ended\n");
-    return;
-
-
-    // what if number of bits in file is not divided by 8
-    // good way to sovle this will be 
-    // or just leave this like it is, cause user can not use my extention
-    // and it do not must be idiot proof
-    // 1 execute few operations SHR
-    // 2 comunicate user that data is not correctly fomrated and result will be different (larger)
-    // 3 as a user use separators every 8 or even 4 bits
-
 
     FILE* file = fopen(path,"r");
     if(file == NULL){
         printf("File \"%s\" not found!\n",path);
         return;
     }
-    int i=7;
+    std::string fileContent;
     char buffer;
-    CELL_TYPE var = 0;
-    ALi tmp;
-    while(fread(&buffer, 1, 1, file) != 0){
-        if(buffer == '1' || buffer == '0'){
-            if(buffer == '1')
-                var |= mask001 << i;
-            if(i == 0){
-                tmp.newCell(var);
-                i = 8;
-                var = 0;
-            }
-            i--;
-        }
+    while(fread(&buffer, 1, 1, file) != 0)
+        fileContent += buffer;
+    // get first bit as a sign
+    // if first bit is 1 then use delCell
+    for(unsigned long long i=0; i<fileContent.length(); i++){
+        const char v = fileContent[i];
+        if(v == '0')
+            this->PLSB(0);
+        else if(v == '1')
+            this->PLSB(1);
     }
-    // from [6][5][4][3][2][1](0)
-    // to      [1][2][3][4][5](6)
-    this->clear();
-    this->globalHandle->var = tmp.globalHandle->R->var; // add 6 to globalhandle
-    Cell* tmphandle = tmp.globalHandle->R->R;
-    while(tmphandle != tmp.globalHandle){ // iterate from 5 to 1 (including 1)
-        this->newCell(tmphandle->var);
-        tmphandle = tmphandle->R;
-    }
-    this->optymize();
-    fclose(file);
+    
+    return;
 }
 /**
  * @brief copy value from file to variable
@@ -716,9 +658,6 @@ void ALi::assignment(const signed long long& source){
     #ifdef ULL_CELL
         this->globalHandle->var = source;
     #endif
-}
-CELL_TYPE ALi::returnglobalHandle() const{
-    return this->globalHandle->var;
 }
     // #
     
@@ -928,13 +867,13 @@ ALi ALi::addition(const ALi& right){
     
     const ALi* const lobj = this; 
     const Cell* const lgh = lobj->globalHandle;
-    const Cell* lh = lgh;
+    const Cell* lh = lgh->L;
     const bool lsign = lobj->sgn();
     const CELL_TYPE lmask = (lsign ? mask111 : mask000);
 
     const ALi* const robj = &right;
     const Cell* const rgh = robj->globalHandle;
-    const Cell* rh = rgh;
+    const Cell* rh = rgh->L;
     const bool rsign = robj->sgn();
     const CELL_TYPE rmask = (rsign ? mask111 : mask000);
     
@@ -948,7 +887,7 @@ ALi ALi::addition(const ALi& right){
     else 
         carry = 0;
 
-    while(lh != lgh || rh != rgh){
+    while(lh != lgh || rh != rgh){ // continue if both are not their global handles !(lh == lgh && rh == rgh)
         // addition both cells and carry
         result.newCell((lh == lgh ? lmask : lh->var) + (rh == rgh ? rmask : rh->var) + carry);
         

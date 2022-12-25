@@ -15,6 +15,30 @@ void percent(unsigned long long from, unsigned long long current, unsigned long 
 }
 
 
+unsigned long long longRandom(){
+    unsigned long long out = 0;
+    for(int i=0; i<8; i++){
+        out <<= 8;
+        out |= (std::rand()%256);
+    }
+    return out;
+}
+
+ALi GenRandomTestValue(int additionallen){
+    // unsigned long long 8*8
+    // 8 times gen random
+    ALi out;
+    out.globalHandle->var = longRandom();
+    for(int l=0; l<additionallen; l++)
+        out.newCell(longRandom());
+    out.newCell(0);
+    return out;
+}
+
+
+
+
+
 
 const bool test_equal(){
     ALi x,y;
@@ -115,11 +139,11 @@ const bool test_assignment(){
     long long to   =  0xFFFFFFFF;
     for(long long i=from; i<to; i++){
         x.assignment(i);
-        if(x.returnglobalHandle() != i){
-            printf("%lld\n%s\n",i,toBin(i,ULL_VAR_SEP).c_str());
-            x.print('b',"\n");
-            return false;
-        }
+        // if(x.returnglobalHandle() != i){
+        //     printf("%lld\n%s\n",i,toBin(i,ULL_VAR_SEP).c_str());
+        //     x.print('b',"\n");
+        //     return false;
+        // }
         fflush(stdout);
         percent(from, i, to);
     }
@@ -191,6 +215,60 @@ const bool test_addition(){
 }
 
 
+const bool test_addition2(){
+    ALi x,y,z;
+    x.setSeparator(' ');
+    y.setSeparator(' ');
+    z.setSeparator(' ');
+    long long from_pow_2 = 0;
+    long long to_pow_2   = 80;
+
+    for(long long i=from_pow_2; i<to_pow_2; i++){
+        x.PLSB(std::rand()%2);
+        y.clear();
+        for(long long j=from_pow_2; j<to_pow_2; j++){
+            y.PLSB(std::rand()%2);
+            z.assignment(x.addition(y));
+            if(!z.equal(i+j)||1){
+                // printf("\ni:%lld j:%lld \n",i,j);
+                // z.print('d',"\n");
+                x.print('b',"\n");
+                y.print('b',"\n");
+                z.print('b',"\n");
+                x.print('d'," ");
+                y.print('d'," ");
+                z.print('d',"\n\n");
+                // return false;
+            }
+        }
+        fflush(stdout);
+        // percent(from_pow_2, i, to_pow_2);
+    }
+    return true;
+}
+
+
+const bool test_addition3(){
+    ALi x(".dvfiles/128.bit",'r'),y(".dvfiles/128.bit",'r'),z;
+    x.setSeparator('\n');
+    y.setSeparator('\n');
+    z.setSeparator('\n');
+    x.assignment(GenRandomTestValue(1));
+    y.assignment(GenRandomTestValue(1));
+    z.assignment(x.addition(y));
+    z.assignment(y.addition(x));
+
+    x.print('b',"\n");
+    y.print('b',"\n");
+    z.print('b',"\n");
+    x.print('d',"\n");
+    y.print('d',"\n");
+    z.print('d',"\n");
+
+    return true;
+}
+
+
 const bool test_additionAssign(){
     ALi x,y;//z;
     x.setSeparator(' ');
@@ -225,10 +303,11 @@ const bool test_additionAssign(){
 
 
 
-
-
 int main(){
+    std::srand(std::clock());
     std::clock_t start = std::clock();
+    __uint128_t largerint = -1;
+    
     // // 236325ms
     // if(!test_equal()){
     //     printf("equal was't finished!\n");
@@ -301,22 +380,42 @@ int main(){
     //     printf("addition ok!\n");
 
 
+    // // 
+    // if(!test_addition2()){
+    //     printf("addition2 was't finished!\n");
+    //     return 1;
+    // }
+    // else
+    //     printf("addition2 ok!\n");
+
+
+    // // 
+    // if(!test_addition3()){
+    //     printf("addition3 was't finished!\n");
+    //     return 1;
+    // }
+    // else
+    //     printf("addition3 ok!\n");
+
+
+    // // 
+    // if(!test_additionAssign()){
+    //     printf("additionAssign was't finished!\n");
+    //     return 1;
+    // }
+    // else
+    //     printf("additionAssign ok!\n");
+
+    ALi z(".dvfiles/zsrc.bit",'r');
+    // 000000000000000000000000000000000000000000000000000000000000000100100010010100001000111101001010110010100011101101100100100101011001010101111010100110001110100101110100111010001101001010000011
+    // 38589448836353511200071304105047937667
+    // 3858944 883635351120007 1304105047937667
+    // 385894408836353511200071304105047937667
+    // 385894408836353511200071304105047937667
+
+    // z.print('b',"\n");
+    z.print('d',"\n");
     std::cout << "time : " << (std::clock() - start) / (double)(CLOCKS_PER_SEC/1000) << "ms\n";
-    // BCDincrement(254);
-    unsigned long long v=0;
-    for(unsigned long long i=0; i<16; i++){
-        v <<= 1;
-        v++;
-
-        printf("%s - ",toBin(v," ").c_str());
-        v = BCDincrement(v);
-        printf("%s\n",toBin(v," ").c_str());
-    }
-    // for(unsigned long long i=0; i<256; i++)
-        // printf("%s - %s\n", toBin(i," ").c_str(), toBin(BCDincrement(i)," ").c_str());
-
-
-
     return 0;
 
     // std::clock_t start;
