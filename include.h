@@ -40,13 +40,13 @@ public:
     Cell* R;
     
     // seems like without this in overall this won't be taking that much space like with those methods
-    // Cell(){}
-    // Cell(CELL_TYPE variable, Cell* left, Cell* right){
-    //     this->var = variable;
-    //     this->L = left;
-    //     this->R = right;
-    // }
-    // ~Cell(){}
+    Cell(){}
+    Cell(CELL_TYPE variable, Cell* left, Cell* right){
+        this->var = variable;
+        this->L = left;
+        this->R = right;
+    }
+    ~Cell(){}
 };
 
 

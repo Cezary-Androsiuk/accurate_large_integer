@@ -63,7 +63,7 @@ protected: public:
     const bool smallerThan(const ALi& right) const;//
 
     // Addition
-    void increment();//
+    void increment();//*
     ALi addition(const ALi& right); //
     void additionAssign(const ALi& right);
 

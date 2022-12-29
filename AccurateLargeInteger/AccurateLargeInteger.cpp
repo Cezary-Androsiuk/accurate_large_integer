@@ -849,88 +849,129 @@ void ALi::increment(){
  * @return ALi 
  */
 ALi ALi::addition(const ALi& right){
-    // printf("in: %llu\nin: %llu\n\n",this->globalHandle->var, right.globalHandle->var);
-    if(right.is0()) return *this; // x+0 = x
-    else if (this->is0()) return right; // 0+x = x
-    else if (right.is1()){
-        ALi tmp(*this);
-        tmp.increment();
-        return tmp;
+    if(right.is0()){ // L + 0 = L
+        return *this;
     }
-    else if (this->is1()){
-        ALi tmp(right);
-        tmp.increment();
-        return tmp;
+    else if (this->is0()){ // 0 + R = R
+        return right;
+    } 
+    else if (right.is1()){ // L + 1 = L++
+        ALi out(*this);
+        out.increment();
+        return out;
+    }
+    else if (this->is1()){ // 1 + R = R++
+        ALi out(right);
+        out.increment();
+        return out;
     }
 
-    ALi result;
-    
-    const ALi* const lobj = this; 
-    const Cell* const lgh = lobj->globalHandle;
+    ALi out;
+
+    // const ALi* const lobj = this; 
+    const Cell* const lgh = this->globalHandle;
     const Cell* lh = lgh->L;
-    const bool lsign = lobj->sgn();
-    const CELL_TYPE lmask = (lsign ? mask111 : mask000);
+    const bool lsign = this->sgn();
+    Cell lmask((lsign ? mask111 : mask000),&lmask,&lmask);
 
-    const ALi* const robj = &right;
-    const Cell* const rgh = robj->globalHandle;
+    // const ALi* const robj = &right;
+    const Cell* const rgh = right.globalHandle;
     const Cell* rh = rgh->L;
-    const bool rsign = robj->sgn();
-    const CELL_TYPE rmask = (rsign ? mask111 : mask000);
+    const bool rsign = right.sgn();
+    Cell rmask((rsign ? mask111 : mask000),&rmask,&rmask);
     
     CELL_TYPE carry = 0;
+    CELL_TYPE ofldet;
     
-    // case pull out from while cause idk how to implement while which starts from handle and ends on handle iterating through all 
-    result.globalHandle->var = lgh->var + rgh->var; 
-    // keep carry to next iteration
-    if(result.globalHandle->var < rgh->var && result.globalHandle->var < lgh->var)
+    ofldet = lgh->var + rgh->var;
+    out.globalHandle->var = ofldet;
+    if(ofldet < rgh->var && ofldet < lgh->var)
         carry = 1;
-    else 
-        carry = 0;
+    if(lh == lgh) lh = &lmask;
+    if(rh == rgh) rh = &rmask;
 
-    while(lh != lgh || rh != rgh){ // continue if both are not their global handles !(lh == lgh && rh == rgh)
-        // addition both cells and carry
-        result.newCell((lh == lgh ? lmask : lh->var) + (rh == rgh ? rmask : rh->var) + carry);
-        
-        // keep carry to next iteration
-        if((result.globalHandle->R->var < rh->var && result.globalHandle->R->var < lh->var) ||
-        (result.globalHandle->R->var <= rh->var && result.globalHandle->R->var <= lh->var && carry)) 
+    while(lh != &lmask || rh != &rmask){
+        ofldet = lh->var + rh->var + carry;
+        out.newCell(ofldet);
+        if((ofldet < rh->var && ofldet < lh->var) || (ofldet <= rh->var && ofldet <= lh->var && carry))
             carry = 1;
-        else 
+        else
             carry = 0;
 
-        // change handles to next cell if not reached end variable yet
-        if(lh != lgh) lh = lh->L;
-        if(rh != rgh) rh = rh->L;
+        lh = lh->L;
+        rh = rh->L;
+        if(lh == lgh) lh = &lmask;
+        if(rh == rgh) rh = &rmask;
     }
     // overflow can only appear when both operation argument sign values are equal
-    if(lsign == rsign && lsign != result.sgn())
-        result.newCell(lmask);
+    if(lsign == rsign && lsign != out.sgn())
+        out.newCell(lmask.var);
     // result.optymize();
-    // printf("end: %llu\nend: %llu\nend: %llu\n\n",this->globalHandle->var, right.globalHandle->var, result.globalHandle->var);
+    return out;
+    
+    // ALi out;
+    // Cell* oh = out.globalHandle;
 
-    return result;
+    // const ALi* const lobj = this; 
+    // const Cell* const lgh = lobj->globalHandle;
+    // const Cell* lh = lgh->L;
+    // const bool lsign = lobj->sgn();
+    // const CELL_TYPE lmask = (lsign ? mask111 : mask000);
+    // // Cell lmask((lsign ? mask111 : mask000),&lmask,&lmask);
+
+    // const ALi* const robj = &right;
+    // const Cell* const rgh = robj->globalHandle;
+    // const Cell* rh = rgh->L;
+    // const bool rsign = robj->sgn();
+    // const CELL_TYPE rmask = (rsign ? mask111 : mask000);
+    // // Cell rmask((rsign ? mask111 : mask000),&rmask,&rmask);
+    
+    // CELL_TYPE carry = 0;
+    
+    // oh->var = lgh->var + rgh->var;
+    // if(oh->var < rgh->var && oh->var < lgh->var)
+    //     carry = 1;
+
+    // while(lh != lgh || rh != rgh){ // continue if both are not their global handles !(lh == lgh && rh == rgh)
+    //     out.newCell((lh == lgh ? lmask : lh->var) + (rh == rgh ? rmask : rh->var) + carry);
+    //     oh = oh->L;
+    //     if((oh->var < rh->var && oh->var < lh->var) || (oh->var <= rh->var && oh->var <= lh->var && carry))
+    //         carry = 1;
+    //     else
+    //         carry = 0;
+
+    //     if(lh != lgh) lh = lh->L;
+    //     if(rh != rgh) rh = rh->L;
+    // }
+    // // overflow can only appear when both operation argument sign values are equal
+    // if(lsign == rsign && lsign != out.sgn())
+    //     out.newCell(lmask);
+    // // result.optymize();
+    // return out;
 }
 /**
  * @brief 
  * @param right 
  */
 void ALi::additionAssign(const ALi& right){
+    if(right.is0()){ // L + 0 = L
+        return;
+    }
+    else if (this->is0()){ // 0 + R = R
+        this->assignment(right);
+        return;
+    }
+    else if (right.is1()){ // L + 1 = L++
+        this->increment();
+        return;
+    }
+    else if (this->is1()){ // 1 + R = R++
+        this->assignment(right);
+        this->increment();
+        return;
+    }
+    
     // this->assignment(this->addition(right));
-    printf("in: %llu\nin: %llu\n\n",this->globalHandle->var, right.globalHandle->var);
-    if(right.is0()) return; // x+0 = x
-    else if (this->is0()){ // 0+x = x
-        this->assignment(right);
-        return;
-    }
-    else if (right.is1()){
-        this->increment();
-        return;
-    }
-    else if (this->is1()){
-        this->assignment(right);
-        this->increment();
-        return;
-    }
 
     ALi* const lobj = this; 
     Cell* const lgh = lobj->globalHandle;
@@ -943,34 +984,20 @@ void ALi::additionAssign(const ALi& right){
     const Cell* rh = rgh->L;
     const bool rsign = robj->sgn();
     const CELL_TYPE rmask = (rsign ? mask111 : mask000);
-
-    CELL_TYPE oldcellvar = lgh->var;
-    CELL_TYPE carry = 0;
     
-    // case pull out from while cause idk how to implement while which starts from handle and ends on handle iterating through all 
-    lgh->var += rgh->var; 
-    // keep carry to next iteration
-    if(rgh->var < oldcellvar && rgh->var < lgh->var)
-        carry = 1;
-    else 
+    CELL_TYPE carry = 0;
+
+    lgh->var += rgh->var;
+    if(lgh->var < rgh->var)
         carry = 0;
-
-    while(rh != rgh || carry){
-        // addition both cells and carry
-        oldcellvar = (lh == lgh ? lmask : lh->var);
-        if(lh == lgh)
-            this->newCell((lh == lgh ? lmask : lh->var) + (rh == rgh ? rmask : rh->var) + carry);
-        else
-            lh += (rh == rgh ? rmask : rh->var) + carry;
         
-        // keep carry to next iteration
-        if((rh->var < oldcellvar && rh->var < lh->var) ||
-        (rh->var <= oldcellvar && rh->var <= lh->var && carry)) 
-            carry = 1;
-        else 
-            carry = 0;
+    while(lh != lgh || rh != rgh){ // continue if both are not their global handles !(lh == lgh && rh == rgh)
+        if(lh == lgh) this->newCell(lmask + (rh == rgh ? rmask : rh->var) + carry);
+        else lh->var += (rh == rgh ? rmask : rh->var) + carry;
 
-        // change handles to next cell if not reached end variable yet
+        if(lh->var < rh->var || (lh->var <= rh->var && carry)) carry = 1;
+        else carry = 0;
+
         if(lh != lgh) lh = lh->L;
         if(rh != rgh) rh = rh->L;
     }
@@ -978,8 +1005,6 @@ void ALi::additionAssign(const ALi& right){
     if(lsign == rsign && lsign != this->sgn())
         this->newCell(lmask);
     // result.optymize();
-    // printf("end: %llu\nend: %llu\nend: %llu\n\n",this->globalHandle->var, right.globalHandle->var, result.globalHandle->var);
-
 }
     // #
     
@@ -1017,68 +1042,122 @@ void ALi::decrement(){
  * @return ALi 
  */
 ALi ALi::subtraction(const ALi& right){
-    ALi result;
-    if(right.is0()) return *this; // both are 0 or right is 0
-    else if(this->is0()){ // left is 0
-        result.assignment(right);
-        result.invert();
-        return result;
+    if(right.is0()){ // L - 0 = L
+        return *this;
+    }
+    else if(this->is0()){ // 0 - R = -R
+        ALi out(right);
+        out.invert();
+        return out;
+    }
+    else if(right.is1()){ // L - 1 = L--
+        ALi out(*this);
+        out.decrement();
+        return out;
+    }
+    else if(this->is1()){ // 1 - R = (-R)++
+        ALi out(right);
+        out.invert();
+        out.increment();
+        return out;
     }
     
-    ALi const* lobj = this; 
-    ALi const* robj = &right;
+    ALi out;
+    Cell* oh = out.globalHandle;
 
-    CELL_TYPE carry = 1;
-    // case pull out from while cause idk how to implement while which starts from handle and ends on handle iterating through all 
-    result.globalHandle->var = lobj->globalHandle->var + ~robj->globalHandle->var + carry; 
-    // keep carry to next iteration
-    if(result.globalHandle->var <= lobj->globalHandle->var && 
-    result.globalHandle->var <= (CELL_TYPE)(~robj->globalHandle->var) && 
-    carry == 1)
+    const ALi* const lobj = this; 
+    const Cell* const lgh = lobj->globalHandle;
+    const Cell* lh = lgh->L;
+    const bool lsign = lobj->sgn();
+    const CELL_TYPE lmask = (lsign ? mask111 : mask000);
+
+    const ALi* const robj = &right;
+    const Cell* const rgh = robj->globalHandle;
+    const Cell* rh = rgh->L;
+    const bool rsign = robj->sgn();
+    const CELL_TYPE rmask = (rsign ? mask111 : mask000);
+    
+    CELL_TYPE carry = 0;
+    
+    oh->var = lgh->var + ~rgh->var + 1;
+    if(oh->var <= lgh->var && oh->var <= ~rgh->var) //! carry isn't handled
         carry = 1;
-    else 
-        carry = 0;
-    
-    
-    Cell* lHandle = lobj->globalHandle->L;
-    Cell* rHandle = robj->globalHandle->L;
-    const bool lsign = !lobj->sgn();
-    const bool rsign = !robj->sgn();
 
-    do{
-        // addition both cells and carry
-        result.newCell((lHandle == lobj->globalHandle ? (lsign ? mask000 : mask111) : lHandle->var) + 
-        ~(rHandle == robj->globalHandle ? (rsign ? mask000 : mask111) : rHandle->var) + carry);
-        
-        // keep carry to next iteration
-        if((result.globalHandle->R->var < lHandle->var && result.globalHandle->R->var < rHandle->var) ||
-        (result.globalHandle->R->var <= lHandle->var && result.globalHandle->R->var <= rHandle->var && carry == 1)) 
+    while(lh != lgh || rh != rgh){ // continue if both are not their global handles !(lh == lgh && rh == rgh)
+        out.newCell((lh == lgh ? lmask : lh->var) + ~(rh == rgh ? rmask : rh->var) + carry);
+        oh = oh->L;
+        if((oh->var < rh->var && oh->var < lh->var) || (oh->var <= rh->var && oh->var <= lh->var && carry))
             carry = 1;
-        else 
+        else
             carry = 0;
 
-        // change handles to next cell if not reached end variable yet
-        if(lHandle != lobj->globalHandle) lHandle = lHandle->L;
-        if(rHandle != robj->globalHandle) rHandle = rHandle->L;
-    }while(lHandle != lobj->globalHandle || rHandle != robj->globalHandle);
-
-    // overflow can only appear when subtracting oposite signs values
-    if(lsign != rsign){
-        // if lsign is positive => result is also positive
-        if(lsign) result.newCell(mask000);
-        // if lsign is negative => result is also negative
-        else result.newCell(mask111);
+        if(lh != lgh) lh = lh->L;
+        if(rh != rgh) rh = rh->L;
     }
-    result.optymize();
-
-    return result;
+    // overflow can only appear when both operation argument sign values are different
+    if(lsign != rsign && lsign != out.sgn())
+        out.newCell(lmask);
+    // result.optymize();
+    return out;
 }
 /**
  * @brief 
  * @param right 
  */
 void ALi::subtractionAssign(const ALi& right){
-    this->assignment(this->subtraction(right));
+    if(right.is0()){ // L - 0 = L
+        return;
+    }
+    else if (this->is0()){ // 0 - R = -R
+        this->assignment(right);
+        this->invert();
+        return;
+    }
+    else if (right.is1()){ // L - 1 = L--
+        this->decrement();
+        return;
+    }
+    else if (this->is1()){ // 1 - R = (-R)++
+        this->assignment(right);
+        this->invert();
+        this->increment();
+        return;
+    }
+    
+    // this->assignment(this->addition(right));
+
+    ALi* const lobj = this; 
+    Cell* const lgh = lobj->globalHandle;
+    Cell* lh = lgh->L;
+    const bool lsign = lobj->sgn();
+    const CELL_TYPE lmask = (lsign ? mask111 : mask000);
+
+    const ALi* const robj = &right;
+    const Cell* const rgh = robj->globalHandle;
+    const Cell* rh = rgh->L;
+    const bool rsign = robj->sgn();
+    const CELL_TYPE rmask = (rsign ? mask111 : mask000);
+    
+    CELL_TYPE carry = 0;
+
+    lgh->var += rgh->var;
+    if(lgh->var < rgh->var)
+        carry = 0;
+        
+    while(lh != lgh || rh != rgh){ // continue if both are not their global handles !(lh == lgh && rh == rgh)
+        if(lh == lgh) this->newCell(lmask + (rh == rgh ? rmask : rh->var) + carry);
+        else lh->var += (rh == rgh ? rmask : rh->var) + carry;
+
+        if(lh->var < rh->var || (lh->var <= rh->var && carry)) carry = 1;
+        else carry = 0;
+
+        if(lh != lgh) lh = lh->L;
+        if(rh != rgh) rh = rh->L;
+    }
+    // overflow can only appear when both operation argument sign values are different
+    if(lsign != rsign && lsign != this->sgn())
+        this->newCell(lmask);
+    // result.optymize();
 }
     // #
     

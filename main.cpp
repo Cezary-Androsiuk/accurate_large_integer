@@ -132,6 +132,50 @@ const bool test_increment(){
 }
 
 
+const bool test_increment2(){
+    ALi x(".dvfiles/asrc.bit",'r');
+    x.setSeparator(' ');
+    x.print('b',"\n");
+    x.increment();
+    x.print('b',"\n");
+    x.increment();
+    x.print('b',"\n");
+    x.increment();
+    x.print('b',"\n");
+    x.increment();
+    // x.print('d',"\n");
+    return true;
+}
+
+
+const bool test_decrement(){
+    ALi x(".dvfiles/asrc.bit",'r');
+    x.setSeparator(' ');
+    for(int i=0; i<400; i++){
+        x.print('b',"\n");
+        x.decrement();
+    }
+    // x.print('d',"\n");
+    return true;
+}
+
+
+const bool test_decrement2(){
+    ALi x(".dvfiles/asrc.bit",'r');
+    x.setSeparator(' ');
+    x.print('b',"\n");
+    x.increment();
+    x.print('b',"\n");
+    x.increment();
+    x.print('b',"\n");
+    x.increment();
+    x.print('b',"\n");
+    x.increment();
+    // x.print('d',"\n");
+    return true;
+}
+
+
 const bool test_assignment(){
     ALi x;
     x.setSeparator(' ');
@@ -249,23 +293,100 @@ const bool test_addition2(){
 
 
 const bool test_addition3(){
-    ALi x(".dvfiles/128.bit",'r'),y(".dvfiles/128.bit",'r'),z;
-    x.setSeparator('\n');
-    y.setSeparator('\n');
-    z.setSeparator('\n');
-    x.assignment(GenRandomTestValue(1));
-    y.assignment(GenRandomTestValue(1));
-    z.assignment(x.addition(y));
-    z.assignment(y.addition(x));
+    // add only equal numbers
+    ALi x(".dvfiles/asrc.bit",'r'),y(".dvfiles/asrc.bit",'r'),z;
+    x.setSeparator(' ');
+    y.setSeparator(' ');
+    z.setSeparator(' ');
 
-    x.print('b',"\n");
-    y.print('b',"\n");
-    z.print('b',"\n");
-    x.print('d',"\n");
-    y.print('d',"\n");
-    z.print('d',"\n");
+    for(int i=0; i<20; i++){
+        x.print('b',"  x,y\n");
+        z.assignment(x.addition(y));
+        z.print('b',"  x+y\n");
+        z.assignment(y.addition(x));
+        z.print('b',"  y+x\n\n");
+        x.increment();
+        y.increment();
+    }
+    return true;
+}
+
+
+const bool test_addition4(){
 
     return true;
+    ALi x(".dvfiles/asrc.bit",'r'),y(".dvfiles/bsrc.bit",'r'),z;
+    x.setSeparator('\n');
+    // y.invert();
+    y.setSeparator('\n');
+    z.setSeparator('\n');
+    // x.assignment(10);
+    // y.assignment(43);
+    // z.assignment(x.addition(y));
+    x.print('b',"= ");
+    x.print('d',"\n");
+    z.assignment(x.subtraction(y));
+    y.print('b',"= ");
+    y.print('d',"\n");
+    z.print('b',"= ");
+    z.print('d',"\n\n");
+    // x.print('b',"\n");
+    // y.print('b',"\n");
+    // z.print('b',"\n\n");
+
+// x - y
+//                                                                                                                                                 00000000_00000000_00000000_00000000_00000000_00000001_00000000_00000000 - 
+// 00000000_00000000_00000000_00000000_00000000_00000001_00000000_00000000 00000000_00000000_00000000_00000000_00000000_00000000_00000000_00000000 00000000_00000000_00000000_00000000_00000000_00000000_00000000_00000000 = 
+// 11111111_11111111_11111111_11111111_11111111_11111111_00000000_00000000 00000000_00000000_00000000_00000000_00000000_00000000_00000000_00000000 00000000_00000000_00000000_00000000_00000000_00000000_00000000_00000000 = 
+// 11111111_11111111_11111111_11111111_11111111_11111110_11111111_11111111 11111111_11111111_11111111_11111111_11111111_11111111_11111111_11111111 00000000_00000000_00000000_00000000_00000000_00000001_00000000_00000000
+//
+//                                         65536 -
+//  22300745198530623141535718272648361505980416 =
+// -22300745198530623141535736719392435215466496
+
+
+// y - x
+// 00000000_00000000_00000000_00000000_00000000_00000001_00000000_00000000 00000000_00000000_00000000_00000000_00000000_00000000_00000000_00000000 00000000_00000000_00000000_00000000_00000000_00000000_00000000_00000000
+//                                                                                                                                                 00000000_00000000_00000000_00000000_00000000_00000001_00000000_00000000 
+// 11111111_11111111_11111111_11111111_11111111_11111111_11111111_11111111 11111111_11111111_11111111_11111111_11111111_11111111_11111111_11111111 11111111_11111111_11111111_11111111_11111111_11111111_00000000_00000000
+
+// 00000000_00000000_00000000_00000000_00000000_00000000_11111111_11111111 11111111_11111111_11111111_11111111_11111111_11111111_11111111_11111111 11111111_11111111_11111111_11111111_11111111_11111111_00000000_00000000
+
+// 223007451985306231415357182726483615059 80416 -
+//                                         65536 =
+// 223007451985306231415357182726483615059 14880
+
+    // 65536
+    //  22300745198530623141535718272648361505980416
+    // -22300745198530623141535736719392435215466496
+
+    // -22300745198530623141535718272648361505914880
+    //  22300745198530623141535718272648361505914880
+    return false;
+}
+
+
+const bool test_addition_subtraction(){
+    /*
+    target:
+        x,y = random
+        z1 = x+y
+        z2 = y+x
+        compare1:
+            z1 == z2
+        compare2:
+            x == z1-y
+            y == z1-x
+        additional:
+            z1 -= 2
+            x--
+            y--
+            z2 = x+y
+            compare3:
+                z1 == z2 // if (x-1)+(y-1)==(x+y)-2 then with multiple combinations will be ok
+
+    */
+   return false;
 }
 
 
@@ -302,49 +423,124 @@ const bool test_additionAssign(){
 
 
 
+std::string func(int x){
+    if(x<10)
+        return "0" + x+48;
+    else
+        return std::to_string(x);
+}
+
 
 int main(){
+
+
+    // for(int i=0; i<100; i++){
+    //     for(int j=0; j<100; j++){
+    //         printf("%d\t+\t%d\t=\t",i,j);
+    //         if(i+j > 99)
+    //             printf("(1)%d \n",i+j-100);
+    //             // printf("%s + %s = (1)%s \n",func(i).c_str(),func(j).c_str(),func(i+j-100).c_str());
+    //         // else if(i+j < -99)
+    //         //     printf("(1)%d \n",i+j+100);
+    //             // printf("%s + %s = (1)%s \n",func(i).c_str(),func(j).c_str(),func(i+j-100).c_str());
+    //         else
+    //             printf("(0)%d \n",i+j);
+    //             // printf("%s + %s = (0)%s \n",func(i).c_str(),func(j).c_str(),func(i+j).c_str());
+    //     }
+    //     printf("\n");
+    // }
+    // printf("\n\n");
+    // for(int i=0; i<100; i++){
+    //     for(int j=0; j<100; j++){
+    //         printf("%d\t+\t%d\t+\t1\t=\t",i,j);
+    //         if(i+j > 98)
+    //             printf("(1)%d \n",i+j-99);
+    //             // printf("%s + %s = (1)%s \n",func(i).c_str(),func(j).c_str(),func(i+j-100).c_str());
+    //         // else if(i+j < -98)
+    //         //     printf("(1)%d \n",i+j+99);
+    //             // printf("%s + %s = (1)%s \n",func(i).c_str(),func(j).c_str(),func(i+j-100).c_str());
+    //         else
+    //             printf("(0)%d \n",i+j+1);
+    //             // printf("%s + %s = (0)%s \n",func(i).c_str(),func(j).c_str(),func(i+j).c_str());
+    //     }
+    //     printf("\n");
+    // }
+
+    for(int i=0; i<10; i++){
+        for(int j=0; j<10; j++){
+            if(i+j > 9)
+                // printf("");
+                printf("%d\t+\t%d\t=\t(1)%d \n",i,j,i+j-10);
+            else
+                printf("%d\t+\t%d\t=\t(0)%d \n",i,j,i+j);
+        }
+        printf("\n");
+    }
+    printf("\n\n");
+    for(int i=0; i<10; i++){
+        for(int j=0; j<10; j++){
+            if(i+j > 8)
+                // printf("");
+                printf("%d\t+\t%d\t+\t1\t=\t(1)%d \n",i,j,i+j-9);
+            else
+                printf("%d\t+\t%d\t+\t1\t=\t(0)%d \n",i,j,i+j+1);
+        }
+        printf("\n");
+    }
+return 0;
+
     std::srand(std::clock());
     std::clock_t start = std::clock();
-    __uint128_t largerint = -1;
     
-    // // 236325ms
-    // if(!test_equal()){
+    // if(!test_equal()){ // 236325ms
     //     printf("equal was't finished!\n");
     //     return 1;
     // }
     // else
     //     printf("equal ok!\n");
 
-
-    // // 238068ms
-    // if(!test_greaterThan()){
+    // if(!test_greaterThan()){ // 238068ms
     //     printf("test_greaterThan was't finished!\n");
     //     return 1;
     // }
     // else
     //     printf("test_greaterThan ok!\n");
 
-
-    // // 237135ms
-    // if(!test_smallerThan()){
+    // if(!test_smallerThan()){ // 237135ms
     //     printf("smallerThan was't finished!\n");
     //     return 1;
     // }
     // else
     //     printf("smallerThan ok!\n");
 
-
-    // // 218291ms
-    // if(!test_increment()){
+    // if(!test_increment()){ // 218291ms
     //     printf("increment was't finished!\n");
     //     return 1;
     // }
     // else
     //     printf("increment ok!\n");
 
+    // if(!test_increment2()){
+    //     printf("increment was't finished!\n");
+    //     return 1;
+    // }
+    // else
+    //     printf("increment ok!\n");
 
-    // // 
+    // if(!test_decrement()){
+    //     printf("decrement was't finished!\n");
+    //     return 1;
+    // }
+    // else
+    //     printf("decrement ok!\n");
+
+    // if(!test_increment2()){
+    //     printf("increment was't finished!\n");
+    //     return 1;
+    // }
+    // else
+    //     printf("increment ok!\n");
+
     // if(!test_assignment()){
     //     printf("assignment was't finished!\n");
     //     return 1;
@@ -352,8 +548,6 @@ int main(){
     // else
     //     printf("assignment ok!\n");
 
-
-    // 
     // if(!test_assignment2()){
     //     printf("assignment2 was't finished!\n");
     //     return 1;
@@ -361,8 +555,6 @@ int main(){
     // else
     //     printf("assignment2 ok!\n");
 
-
-    // // 
     // if(!test_print()){
     //     printf("assignment was't finished!\n");
     //     return 1;
@@ -370,8 +562,6 @@ int main(){
     // else
     //     printf("assignment ok!\n");
 
-
-    // // 
     // if(!test_addition()){
     //     printf("addition was't finished!\n");
     //     return 1;
@@ -379,8 +569,6 @@ int main(){
     // else
     //     printf("addition ok!\n");
 
-
-    // // 
     // if(!test_addition2()){
     //     printf("addition2 was't finished!\n");
     //     return 1;
@@ -388,8 +576,6 @@ int main(){
     // else
     //     printf("addition2 ok!\n");
 
-
-    // // 
     // if(!test_addition3()){
     //     printf("addition3 was't finished!\n");
     //     return 1;
@@ -397,8 +583,20 @@ int main(){
     // else
     //     printf("addition3 ok!\n");
 
+    // if(!test_addition4()){
+    //     printf("addition4 was't finished!\n");
+    //     return 1;
+    // }
+    // else
+    //     printf("addition4 ok!\n");
 
-    // // 
+    // if(!test_addition_subtraction()){
+    //     printf("addition_subtraction was't finished!\n");
+    //     return 1;
+    // }
+    // else
+    //     printf("addition_subtraction ok!\n");
+
     // if(!test_additionAssign()){
     //     printf("additionAssign was't finished!\n");
     //     return 1;
@@ -406,7 +604,15 @@ int main(){
     // else
     //     printf("additionAssign ok!\n");
 
-    ALi z(".dvfiles/zsrc.bit",'r');
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+    // ALi z(".dvfiles/zsrc.bit",'r');
     // 000000000000000000000000000000000000000000000000000000000000000100100010010100001000111101001010110010100011101101100100100101011001010101111010100110001110100101110100111010001101001010000011
     // 38589448836353511200071304105047937667
     // 3858944 883635351120007 1304105047937667
@@ -414,7 +620,7 @@ int main(){
     // 385894408836353511200071304105047937667
 
     // z.print('b',"\n");
-    z.print('d',"\n");
+    // z.print('d',"\n");
     std::cout << "time : " << (std::clock() - start) / (double)(CLOCKS_PER_SEC/1000) << "ms\n";
     return 0;
 

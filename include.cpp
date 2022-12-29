@@ -18,8 +18,12 @@
 //     }
 //     return bin;
 // }
+    
+    
+#define NEW_PRINT false
+
+
 const std::string toBin(long long src, const std::string& sep){
-    #define NEW_PRINT false
     std::string bin;
     for(int i=0; i<8; i++){
         std::string byte = "00000000";
