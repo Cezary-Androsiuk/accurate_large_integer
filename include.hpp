@@ -6,7 +6,7 @@
 #include <string>
 #include <random>
 
-#include "BPrint/BPrint.h"
+#include "BPrint/BPrint.hpp"
 
 
 // #define UC_CELL
@@ -39,7 +39,6 @@ public:
     Cell* L;
     Cell* R;
     
-    // seems like without this in overall this won't be taking that much space like with those methods
     Cell(){}
     Cell(CELL_TYPE variable, Cell* left, Cell* right){
         this->var = variable;

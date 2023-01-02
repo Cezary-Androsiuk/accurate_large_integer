@@ -1,5 +1,5 @@
-#include "include.h"
-#include "AccurateLargeInteger/AccurateLargeInteger.h"
+#include "include.hpp"
+#include "AccurateLargeInteger/AccurateLargeInteger.hpp"
 
 int prev = -1;
 
@@ -205,7 +205,7 @@ const bool test_assignment2(){
         x.assignment(i);
         y.assignment(x);
         if(!x.equal(y)){
-            printf("%lld\n%s\n",i,toBin(i,ULL_VAR_SEP).c_str());
+            printf("%lld\n%s\n",i,BPrint::binary_x64(i,ULL_VAR_SEP).c_str());
             x.print('b',"\n");
             return false;
         }
@@ -222,7 +222,7 @@ const bool test_print(){
     long long from = -0xFFe;
     long long to   =  0xFFF;
     for(long long i=from; i<to; i++){
-        printf("%lld = %s = ",i, toBin(i,ULL_VAR_SEP).c_str());
+        printf("%lld = %s = ",i, BPrint::binary_x64(i,ULL_VAR_SEP).c_str());
         x.assignment(i);
         x.print('b',"\n");
     }
