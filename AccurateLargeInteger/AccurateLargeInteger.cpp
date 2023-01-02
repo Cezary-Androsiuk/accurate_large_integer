@@ -370,7 +370,7 @@ void ALi::invert(){
 void ALi::printBinary() const{
     const Cell* handle = this->globalHandle->R;
     do{
-        printf("%s%c",toBin(handle->var, ULL_VAR_SEP).c_str(),this->separator);
+        printf("%s%c", BPrint::binary_x64(handle->var, ULL_VAR_SEP).c_str(),this->separator);
         handle = handle->R;
     }while(handle != this->globalHandle->R);
 }
@@ -512,7 +512,7 @@ void ALi::writeFileReadable(const char* path) const{
     }
     Cell* handle = this->globalHandle->R;
     do{
-        std::string binary = toBin(handle->var,ULL_VAR_SEP);
+        std::string binary = BPrint::binary_x64(handle->var,ULL_VAR_SEP);
         fwrite(binary.c_str(), sizeof(char), binary.length(), file); // bufer, size of cell, cell amout, source
         handle = handle->R;
     }while(handle != this->globalHandle->R);

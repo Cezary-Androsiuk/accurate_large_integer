@@ -5,8 +5,8 @@
 #include <ctime>
 #include <string>
 #include <random>
-// #include <optional>
-// #include <stdlib.h>
+
+#include "BPrint/BPrint.h"
 
 
 // #define UC_CELL
@@ -77,9 +77,5 @@ public:
 #define mask111 (0b11111111)
 #endif
 
-
-
-const std::string toBin(long long src, const std::string& sep);
-// const std::string toByte(const unsigned char&);
 
 CELL_TYPE BCDincrement(CELL_TYPE cell);
