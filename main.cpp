@@ -117,7 +117,7 @@ const bool test_increment(){
     x.setSeparator(' ');
     long long from = -0xFFFFFFFe;
     long long to   =  0xFFFFFFFF;
-    x.assignment(from);
+    x = from;
     for(long long i=from; i<to; i++){
         if(!x.equal(i)){
             ALi(i).print('b',"\n");
@@ -205,7 +205,7 @@ const bool test_assignment2(){
         x.assignment(i);
         y.assignment(x);
         if(!x.equal(y)){
-            printf("%lld\n%s\n",i,BPrint::binary_x64(i,ULL_VAR_SEP).c_str());
+            // printf("%lld\n%s\n",i,BPrint::binary_x64(i,ULL_VAR_SEP).c_str());
             x.print('b',"\n");
             return false;
         }
@@ -222,7 +222,7 @@ const bool test_print(){
     long long from = -0xFFe;
     long long to   =  0xFFF;
     for(long long i=from; i<to; i++){
-        printf("%lld = %s = ",i, BPrint::binary_x64(i,ULL_VAR_SEP).c_str());
+        // printf("%lld = %s = ",i, BPrint::binary_x64(i,ULL_VAR_SEP).c_str());
         x.assignment(i);
         x.print('b',"\n");
     }
@@ -434,6 +434,8 @@ std::string func(int x){
 int main(){
 
 
+
+
     // for(int i=0; i<100; i++){
     //     for(int j=0; j<100; j++){
     //         printf("%d\t+\t%d\t=\t",i,j);
@@ -466,28 +468,6 @@ int main(){
     //     printf("\n");
     // }
 
-    for(int i=0; i<10; i++){
-        for(int j=0; j<10; j++){
-            if(i+j > 9)
-                // printf("");
-                printf("%d\t+\t%d\t=\t(1)%d \n",i,j,i+j-10);
-            else
-                printf("%d\t+\t%d\t=\t(0)%d \n",i,j,i+j);
-        }
-        printf("\n");
-    }
-    printf("\n\n");
-    for(int i=0; i<10; i++){
-        for(int j=0; j<10; j++){
-            if(i+j > 8)
-                // printf("");
-                printf("%d\t+\t%d\t+\t1\t=\t(1)%d \n",i,j,i+j-9);
-            else
-                printf("%d\t+\t%d\t+\t1\t=\t(0)%d \n",i,j,i+j+1);
-        }
-        printf("\n");
-    }
-return 0;
 
     std::srand(std::clock());
     std::clock_t start = std::clock();
@@ -513,12 +493,12 @@ return 0;
     // else
     //     printf("smallerThan ok!\n");
 
-    // if(!test_increment()){ // 218291ms
-    //     printf("increment was't finished!\n");
-    //     return 1;
-    // }
-    // else
-    //     printf("increment ok!\n");
+    if(!test_increment()){ // 218291ms
+        printf("increment was't finished!\n");
+        return 1;
+    }
+    else
+        printf("increment ok!\n");
 
     // if(!test_increment2()){
     //     printf("increment was't finished!\n");

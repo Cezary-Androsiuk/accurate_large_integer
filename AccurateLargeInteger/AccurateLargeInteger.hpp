@@ -8,16 +8,6 @@
 */
 class ALi{
 protected: public:
-    // class Cell{
-    // public:
-    //     CELL_TYPE var;
-    //     Cell* L;
-    //     Cell* R;
-    //     // Cell(){}
-    //     // Cell(CELL_TYPE v, Cell* l, Cell* r){var=v;L=l;R=r;}
-    //     // ~Cell(){}
-    // };
-
     /**
      * @brief single cell containing:
      * var (CELL_TYPE) store byte of information
@@ -116,5 +106,29 @@ public:
     const bool isEmpty() const;
 
     // Operators
+    void operator =  (const ALi& right);
+
+    bool operator == (const ALi& right) const;
+    bool operator != (const ALi& right) const;
+    bool operator >  (const ALi& right) const;
+    bool operator <= (const ALi& right) const;
+    bool operator <  (const ALi& right) const;
+    bool operator >= (const ALi& right) const;
+    
+    ALi  operator ++ (int);
+    ALi  operator ++ ();
+    ALi  operator +  (const ALi& right) const;
+    void operator += (const ALi& right);
+    
+    ALi  operator -- (int);
+    ALi  operator -- ();
+    ALi  operator -  (const ALi& right) const;
+    void operator -= (const ALi& right);
+
+    ALi  operator *  (const ALi& right) const;
+    void operator *= (const ALi& right);
+    // vvvv need to return accurate large rational number
+    // ALi  operator /  (const ALi& right) const;
+    // void operator /= (const ALi& right);
 };
 

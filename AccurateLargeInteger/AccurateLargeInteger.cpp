@@ -1478,3 +1478,73 @@ const bool ALi::isEmpty() const{
     // #
     
     // #
+/**
+ * @brief 
+ * @param right 
+ */
+void ALi::operator =  (const ALi& right){
+    this->assignment(right);
+}
+
+bool ALi::operator == (const ALi& right) const{
+    return this->equal(right);
+}
+bool ALi::operator != (const ALi& right) const{
+    return !this->equal(right);
+}
+bool ALi::operator >  (const ALi& right) const{
+    return this->greaterThan(right);
+}
+bool ALi::operator <= (const ALi& right) const{
+    return !this->greaterThan(right);
+}
+bool ALi::operator <  (const ALi& right) const{
+    return this->smallerThan(right);
+}
+bool ALi::operator >= (const ALi& right) const{
+    return !this->smallerThan(right);
+}
+
+ALi  ALi::operator ++ (int){
+    this->increment();
+    return *this;
+}
+ALi  ALi::operator ++ (){
+    this->increment();
+    return *this;
+}
+ALi  ALi::operator +  (const ALi& right) const{
+    return this->addition(right);
+}
+void ALi::operator += (const ALi& right){
+    this->additionAssign(right);
+}
+
+ALi  ALi::operator -- (int){
+    this->decrement();
+    return *this;
+}
+ALi  ALi::operator -- (){
+    this->decrement();
+    return *this;
+}
+ALi  ALi::operator -  (const ALi& right) const{
+    return this->subtraction(right);
+}
+void ALi::operator -= (const ALi& right){
+    this->subtractionAssign(right);
+}
+
+ALi  ALi::operator *  (const ALi& right) const{
+    return this->multiplication(right);
+}
+void ALi::operator *= (const ALi& right){
+    this->multiplicationAssign(right);
+}
+
+// ALi  ALi::operator /  (const ALi& right){
+//     return this->division(right);
+// }
+// void ALi::operator /= (const ALi& right){
+//     this->divisionAssign(right);
+// }
