@@ -113,22 +113,30 @@ const bool test_smallerThan(){
 
 
 const bool test_increment(){
-    ALi x;
-    x.setSeparator(' ');
-    long long from = -0xFFFFFFFe;
-    long long to   =  0xFFFFFFFF;
-    x = from;
-    for(long long i=from; i<to; i++){
-        if(!x.equal(i)){
-            ALi(i).print('b',"\n");
-            x.print('b',"\n");
-            return false;
-        }
-        fflush(stdout);
-        percent(from, i, to);
-        x.increment();
-    }
-    return true;
+    ALi x,y;
+    x = 10;
+    x.increment();
+    x.print('d',"\n");
+    x = 10;
+    y = x++;
+    x.print('d',"\n");
+    y.print('d',"\n");
+    return false;
+    // x.setSeparator(' ');
+    // long long from = -0xFFFFFFFe;
+    // long long to   =  0xFFFFFFFF;
+    // x = from;
+    // for(long long i=from; i<to; i++){
+    //     if(!x.equal(i)){
+    //         ALi(i).print('b',"\n");
+    //         x.print('b',"\n");
+    //         return false;
+    //     }
+    //     fflush(stdout);
+    //     percent(from, i, to);
+    //     x.increment();
+    // }
+    // return true;
 }
 
 
@@ -231,19 +239,38 @@ const bool test_print(){
 
 
 const bool test_addition(){
-    ALi x,y,z;
+    ALi x(".dvfiles/addition_input_1",'r'),
+    y(".dvfiles/addition_input_2",'r'),
+    z;
     x.setSeparator(' ');
     y.setSeparator(' ');
     z.setSeparator(' ');
+
+    z = x + y;
+
+    x.print('d'," + ");
+    y.print('d'," = ");
+    z.print('d',"\n");
+
+    // x.print('b',"\n");
+    // y.print('b',"\n");
+    // z.print('b',"\n");
+    
+    return false;
+
+
+
+
+
     long long from = -0xFFFe;
     long long to   =  0xFFFF;
 
     for(long long i=from; i<to; i++){
-        x.assignment(i);
+        x = i;
         for(long long j=from; j<to; j++){
-            y.assignment(j);
-            z.assignment(x.addition(y));
-            if(!z.equal(i+j)){
+            y = j;
+            z = x + y;
+            if(z != i+j){
                 printf("\n%lld + %lld = %lld = ",i,j,i+j);
                 z.print('d',"\n");
                 x.print('b',"\n");
@@ -493,12 +520,12 @@ int main(){
     // else
     //     printf("smallerThan ok!\n");
 
-    if(!test_increment()){ // 218291ms
-        printf("increment was't finished!\n");
-        return 1;
-    }
-    else
-        printf("increment ok!\n");
+    // if(!test_increment()){ // 218291ms
+    //     printf("increment was't finished!\n");
+    //     return 1;
+    // }
+    // else
+    //     printf("increment ok!\n");
 
     // if(!test_increment2()){
     //     printf("increment was't finished!\n");
@@ -542,12 +569,12 @@ int main(){
     // else
     //     printf("assignment ok!\n");
 
-    // if(!test_addition()){
-    //     printf("addition was't finished!\n");
-    //     return 1;
-    // }
-    // else
-    //     printf("addition ok!\n");
+    if(!test_addition()){
+        printf("addition was't finished!\n");
+        return 1;
+    }
+    else
+        printf("addition ok!\n");
 
     // if(!test_addition2()){
     //     printf("addition2 was't finished!\n");

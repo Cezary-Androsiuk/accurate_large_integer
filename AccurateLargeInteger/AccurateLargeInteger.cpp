@@ -920,7 +920,7 @@ void ALi::increment(){
  * @param right 
  * @return ALi 
  */
-ALi ALi::addition(const ALi& right){
+ALi ALi::addition(const ALi& right) const{
     if(right.is0()){ // L + 0 = L
         return *this;
     }
@@ -1089,7 +1089,7 @@ void ALi::decrement(){
  * @param right 
  * @return ALi 
  */
-ALi ALi::subtraction(const ALi& right){
+ALi ALi::subtraction(const ALi& right) const{
     if(right.is0()){ // L - 0 = L
         return *this;
     }
@@ -1289,7 +1289,7 @@ void ALi::subtractionAssign(const ALi& right){
  * @param right 
  * @return ALi 
  */
-ALi ALi::multiplication(const ALi& right){
+ALi ALi::multiplication(const ALi& right) const{
     if(this->is0() || right.is0()) return 0;
     else if(right.is1()) return *this;
     else if(this->is1()) return right;
@@ -1355,7 +1355,7 @@ void ALi::multiplicationAssign(const ALi& right){
  * @param right 
  * @return ALi 
  */
-ALi ALi::division(const ALi& right){
+ALi ALi::division(const ALi& right) const{
     return 0;
 }
 /**
@@ -1505,14 +1505,22 @@ bool ALi::operator >= (const ALi& right) const{
     return !this->smallerThan(right);
 }
 
+#if false
 ALi  ALi::operator ++ (int){
+    ALi out(*this);
     this->increment();
-    return *this;
+    return out;
 }
 ALi  ALi::operator ++ (){
     this->increment();
     return *this;
 }
+#else
+ALi  ALi::operator ++ (int){
+    this->increment();
+    return *this;
+}
+#endif
 ALi  ALi::operator +  (const ALi& right) const{
     return this->addition(right);
 }

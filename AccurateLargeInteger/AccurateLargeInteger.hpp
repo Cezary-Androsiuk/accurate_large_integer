@@ -79,20 +79,20 @@ protected: public:
 
     // Addition
     void increment();//*
-    ALi addition(const ALi& right); //
+    ALi addition(const ALi& right) const; //
     void additionAssign(const ALi& right);
 
     // Subtraction
     void decrement();
-    ALi subtraction(const ALi& right);
+    ALi subtraction(const ALi& right) const;
     void subtractionAssign(const ALi& right);
 
     // Multiplication
-    ALi multiplication(const ALi& right);
+    ALi multiplication(const ALi& right) const;
     void multiplicationAssign(const ALi& right);
 
     // Division
-    ALi division(const ALi& right);
+    ALi division(const ALi& right) const;
     void divisionAssign(const ALi& right);
 
 public:
@@ -116,7 +116,7 @@ public:
     bool operator >= (const ALi& right) const;
     
     ALi  operator ++ (int);
-    ALi  operator ++ ();
+    // ALi  operator ++ ();
     ALi  operator +  (const ALi& right) const;
     void operator += (const ALi& right);
     
