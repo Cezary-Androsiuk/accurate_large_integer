@@ -9,18 +9,12 @@
 #include "BPrint/BPrint.hpp"
 
 
-// #define UC_CELL
+#define ULL_CELL
 
-// #ifndef UC_CELL
-    #define ULL_CELL
-// #endif
-
-// need to implement, to easier change to ull in future
-#ifdef UC_CELL
-    #define CELL_TYPE unsigned char 
-#endif
 #ifdef ULL_CELL
     #define CELL_TYPE unsigned long long
+#else
+    #define CELL_TYPE unsigned char 
 #endif
 // i know this is not the best pleace to store cell definition class
 // but if it is here might be easier with switching unsigned char and unsigned long long
@@ -33,20 +27,6 @@
  * L (Cell*) pointer to cell on the left side 
  * R (Cell*) pointer to cell on the right side
  */
-class Cell{ // i like more classes than structs 
-public:
-    CELL_TYPE var;
-    Cell* L;
-    Cell* R;
-    
-    Cell(){}
-    Cell(CELL_TYPE variable, Cell* left, Cell* right){
-        this->var = variable;
-        this->L = left;
-        this->R = right;
-    }
-    ~Cell(){}
-};
 
 
 #define BITS_PER_BYTE 8
@@ -75,6 +55,3 @@ public:
 #define mask110 (0b11111110)
 #define mask111 (0b11111111)
 #endif
-
-
-CELL_TYPE BCDincrement(CELL_TYPE cell);

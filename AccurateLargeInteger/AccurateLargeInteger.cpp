@@ -281,10 +281,10 @@ void ALi::clear(){
  * @brief removes cells from begin which are not include any new information like 00000000 or 11111111
  */
 void ALi::optymize(){
-    // should remove left cells untill paterns like this represented as a regular expesions exists:
-    // ^[1111111111111111111111111111111111111111111111111111111111111111] [1.*]
-    // ^[0000000000000000000000000000000000000000000000000000000000000000] [0.*]
-    // and variable has more than one cell
+    // should remove left cells until one of these paterns exists at the beginning (IMPROVED_PRINT): 
+    // 1_1_1_1_1_1_1_1 1XXXXXXX_XXXXXXXX_XXXXXXXX_XXXXXXXX_XXXXXXXX_XXXXXXXX_XXXXXXXX_XXXXXXXX
+    // 0_0_0_0_0_0_0_0 0XXXXXXX_XXXXXXXX_XXXXXXXX_XXXXXXXX_XXXXXXXX_XXXXXXXX_XXXXXXXX_XXXXXXXX
+    // and variable has more than one cell 
 
     // -- 1 -- // 
     // const Cell* const handle = this->globalHandle->R;
@@ -304,8 +304,8 @@ void ALi::optymize(){
     // }
 
     // -- 3 -- //
-    const Cell* const handle = this->globalHandle->R;
-    if(handle != this->globalHandle && 
+    const Cell* const handle = this->globalHandle->R; //last cell
+    if(handle != this->globalHandle &&
     ((handle->var == mask111 && handle->R->var & mask100) || (handle->var == mask000 && ~handle->R->var & mask100))){
             this->delCell();
             this->optymize();
@@ -404,12 +404,59 @@ void ALi::printDecimal() const{
             Cell* bcdhandle = bcd.globalHandle;
             do{
                 bcdhandle = bcdhandle->R;
-                bcdhandle->var = BCDincrement(bcdhandle->var);
+
+                // keep BCD formation on each nibble
+                // 0000(0000) 0001(0001) 0010(0010) 0011(0011) 0100(0100)
+                // 0101(1000) 0110(1001) 0111(1010) 1000(1011) 1001(1100)
+                CELL_TYPE result = 0;
+                int i=0;
+                while(bcdhandle->var != 0){
+                    CELL_TYPE nibble = bcdhandle->var & 0b00001111;
+                    bcdhandle->var >>= 4;
+                    if(nibble > 4) nibble += 3;
+                    for(int j=0; j<i; j++) nibble <<= 4;
+                    
+                    result |= nibble;
+                    i++;
+                }
+                bcdhandle->var = result;
             }while(bcdhandle != bcd.globalHandle);
             if(old_bcdsgn != bcd.sgn()) bcd.newCell(mask000);
             mask >>= 1;
         }
     }while(handle != this->globalHandle);
+
+
+    // CELL_TYPE BCDincrement(CELL_TYPE cell){
+    //     // result can't exceed the range of CELL_TYPE
+    //     // and assume there won't be nibble(4bits) greater than 1001 to save one if statement
+    //     CELL_TYPE result = 0;
+    //     int i=0;
+    //     while(cell != 0){
+    //         CELL_TYPE nibble = cell & 0b00001111;
+    //         cell >>= 4;
+    //         if(nibble > 4) nibble += 3;
+    //         for(int j=0; j<i; j++) nibble <<= 4;
+    //         result |= nibble;
+    //         i++;
+    //     }
+    //     return result;
+    // }
+    // do{
+    //     handle = handle->R;
+    //     CELL_TYPE mask = mask100;
+    //     while(mask != 0){
+    //         bcd.PLSB((handle->var & mask ? 1 : 0));
+    //         const bool old_bcdsgn = bcd.sgn();
+    //         Cell* bcdhandle = bcd.globalHandle;
+    //         do{
+    //             bcdhandle = bcdhandle->R;
+    //             bcdhandle->var = BCDincrement(bcdhandle->var);
+    //         }while(bcdhandle != bcd.globalHandle);
+    //         if(old_bcdsgn != bcd.sgn()) bcd.newCell(mask000);
+    //         mask >>= 1;
+    //     }
+    // }while(handle != this->globalHandle);
 
     // print binary-coded decimal
     std::string rev;
@@ -831,17 +878,42 @@ const bool ALi::smallerThan(const ALi& right) const{
  * 
  */
 void ALi::increment(){
+    // incrementing binary is acctually easy:
+    // going through each bit from right
+    // if is 1 then set to 0
+    // if is 0 then set to 1 exit
+    
+    this->optymize();
     Cell *handle = this->globalHandle;
+    // set handle on first cell that can store additional bit
+    // 10101101  11111111  11111111  11111111  11111111 -> [10101101] 00000000  00000000  00000000  00000000
+    // 11111111                                         -> [11111111]
+    // 10101101  11111111  11100011  11111111  11111111 ->  10101101  11111111 [11100011] 00000000  00000000
+    // 00000010                                         -> [00000010]
+    // 01111111  11111111                               -> [01111111] 00000000
+    // 01111111  11110011                               ->  01111111 [11110011]
     while(handle->var == mask111 && handle != this->globalHandle->R){
         handle->var = mask000; // 11111111 -> (1)00000000
         handle = handle->L;
     }
-    // protect from overflow, if we adding two positive values (*this + 1)
-    if(!this->sgn() && (handle->var == mask011 && handle == this->globalHandle->R)){
+    // if number is positive, overflow can occur cause we are adding two positive numbers
+    // 10101101  11111111  11111111  11111111  11111111 -> [10101101] 00000000  00000000  00000000  00000000
+    // 11111111                                         -> [11111111]
+    // 10101101  11111111  11100011  11111111  11111111 ->  10101101  11111111 [11100011] 00000000  00000000
+    // 00000010                                         -> [00000010]
+    // 01111111  11111111                               ->  00000000 [01111111] 00000000
+    // 01111111  11110011                               ->  01111111 [11110011]
+    if(!this->sgn() && handle->var == mask011 && handle == this->globalHandle->R){
         this->newCell(mask000);
     }
+    // 10101101  11111111  11111111  11111111  11111111 -> [10101110] 00000000  00000000  00000000  00000000
+    // 11111111                                         -> [00000000]
+    // 10101101  11111111  11100011  11111111  11111111 ->  10101101  11111111 [11100100] 00000000  00000000
+    // 00000010                                         -> [00000011]
+    // 01111111  11111111                               ->  00000000 [10000000] 00000000
+    // 01111111  11110011                               ->  01111111 [11110100]
     handle->var++;
-    this->optymize();
+    // this->optymize();
 }
 /**
  * @brief 
@@ -871,15 +943,32 @@ ALi ALi::addition(const ALi& right){
     const Cell* const lgh = this->globalHandle;
     const Cell* lh = lgh->L;
     const bool lsign = this->sgn();
-    Cell lmask((lsign ? mask111 : mask000),&lmask,&lmask);
+    Cell lmask{
+        lmask.var = (lsign ? mask111 : mask000),
+        lmask.L = &lmask,
+        lmask.R = &lmask
+    };
+    // Cell lmask;
+    // lmask.var = (lsign ? mask111 : mask000);
+    // lmask.L = &lmask;
+    // lmask.R = &lmask;
 
     const Cell* const rgh = right.globalHandle;
     const Cell* rh = rgh->L;
     const bool rsign = right.sgn();
-    Cell rmask((rsign ? mask111 : mask000),&rmask,&rmask);
+    Cell rmask{
+        rmask.var = (rsign ? mask111 : mask000),
+        rmask.L = &rmask,
+        rmask.R = &rmask
+    };
+
+    // Cell rmask;
+    // rmask.var = (rsign ? mask111 : mask000);
+    // rmask.L = &rmask;
+    // rmask.R = &rmask;
     
     CELL_TYPE carry = 0;
-    CELL_TYPE ofldet;
+    CELL_TYPE ofldet; // just keep equation result, instead of computing it every time while comparing
     
     ofldet = lgh->var + rgh->var;
     out.globalHandle->var = ofldet;
@@ -891,6 +980,7 @@ ALi ALi::addition(const ALi& right){
     while(lh != &lmask || rh != &rmask){
         ofldet = lh->var + rh->var + carry;
         out.newCell(ofldet);
+        // vvvv           carry is 0              ||               carry is 1                     vvvv
         if((ofldet < lh->var && ofldet < rh->var) || (ofldet <= lh->var && ofldet <= rh->var && carry))
             carry = 1;
         else
@@ -904,66 +994,26 @@ ALi ALi::addition(const ALi& right){
     // overflow can only appear when both operation argument sign values are equal
     if(lsign == rsign && lsign != out.sgn())
         out.newCell(lmask.var);
-    // result.optymize();
+    out.optymize();
     return out;
-    
-    // ALi out;
-    // Cell* oh = out.globalHandle;
-
-    // const ALi* const lobj = this; 
-    // const Cell* const lgh = lobj->globalHandle;
-    // const Cell* lh = lgh->L;
-    // const bool lsign = lobj->sgn();
-    // const CELL_TYPE lmask = (lsign ? mask111 : mask000);
-    // // Cell lmask((lsign ? mask111 : mask000),&lmask,&lmask);
-
-    // const ALi* const robj = &right;
-    // const Cell* const rgh = robj->globalHandle;
-    // const Cell* rh = rgh->L;
-    // const bool rsign = robj->sgn();
-    // const CELL_TYPE rmask = (rsign ? mask111 : mask000);
-    // // Cell rmask((rsign ? mask111 : mask000),&rmask,&rmask);
-    
-    // CELL_TYPE carry = 0;
-    
-    // oh->var = lgh->var + rgh->var;
-    // if(oh->var < rgh->var && oh->var < lgh->var)
-    //     carry = 1;
-
-    // while(lh != lgh || rh != rgh){ // continue if both are not their global handles !(lh == lgh && rh == rgh)
-    //     out.newCell((lh == lgh ? lmask : lh->var) + (rh == rgh ? rmask : rh->var) + carry);
-    //     oh = oh->L;
-    //     if((oh->var < rh->var && oh->var < lh->var) || (oh->var <= rh->var && oh->var <= lh->var && carry))
-    //         carry = 1;
-    //     else
-    //         carry = 0;
-
-    //     if(lh != lgh) lh = lh->L;
-    //     if(rh != rgh) rh = rh->L;
-    // }
-    // // overflow can only appear when both operation argument sign values are equal
-    // if(lsign == rsign && lsign != out.sgn())
-    //     out.newCell(lmask);
-    // // result.optymize();
-    // return out;
 }
 /**
  * @brief 
  * @param right 
  */
 void ALi::additionAssign(const ALi& right){
-    if(right.is0()){ // L + 0 = L
+    if(right.is0()){ // L += 0 == L
         return;
     }
-    else if (this->is0()){ // 0 + R = R
+    else if (this->is0()){ // 0 += R == R
         this->assignment(right);
         return;
     }
-    else if (right.is1()){ // L + 1 = L++
+    else if (right.is1()){ // L += 1 == L++
         this->increment();
         return;
     }
-    else if (this->is1()){ // 1 + R = R++
+    else if (this->is1()){ // 1 += R == R++
         this->assignment(right);
         this->increment();
         return;
@@ -1002,7 +1052,7 @@ void ALi::additionAssign(const ALi& right){
     // overflow can only appear when both operation argument sign values are equal
     if(lsign == rsign && lsign != this->sgn())
         this->newCell(lmask);
-    // result.optymize();
+    this->optymize();
 }
     // #
     
@@ -1027,7 +1077,7 @@ void ALi::decrement(){
         handle->var = mask111; // (1)00000000 -> (0)11111111
         handle = handle->L;
     }
-    // protect from overflow, cause we adding two positive values (*this + 1)
+    // if number is negative, overflow can occur cause we are adding two negative numbers
     if(this->sgn() && (handle->var == mask100 && handle == this->globalHandle->R)){
         this->newCell(mask111);
     }

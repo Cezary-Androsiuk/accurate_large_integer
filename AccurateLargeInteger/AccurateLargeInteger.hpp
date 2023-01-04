@@ -1,5 +1,5 @@
 #pragma once
-#include "../include.h"
+#include "../include.hpp"
 
 /*
     ALi
@@ -8,6 +8,24 @@
 */
 class ALi{
 protected: public:
+    // class Cell{ // i like more classes than structs 
+    // public:
+    //     CELL_TYPE var;
+    //     Cell* L;
+    //     Cell* R;
+        
+    //     // addition usage
+    //     // Cell(){}
+    //     // Cell(CELL_TYPE v, Cell* l, Cell* r){var=v;L=l;R=r;}
+    //     // ~Cell(){}
+    // };
+
+    struct Cell{
+        CELL_TYPE var;
+        Cell* L;
+        Cell* R;
+    };
+
     Cell *globalHandle; //   [...11010001] <-
     unsigned long long length;
     char separator; // '/0' means no separator others are printed in print method
