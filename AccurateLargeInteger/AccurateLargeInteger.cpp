@@ -1119,7 +1119,7 @@ ALi ALi::subtraction(const ALi& right){
 
     return this->addition(right_);
     //#############################
-
+    if(0){
     // ALi out;
 
     // const Cell* const lgh = this->globalHandle;
@@ -1199,6 +1199,7 @@ ALi ALi::subtraction(const ALi& right){
     // // result.optymize();
     // return out;
 }
+}
 /**
  * @brief 
  * @param right 
@@ -1223,7 +1224,8 @@ void ALi::subtractionAssign(const ALi& right){
         return;
     }
     else if(this->equal(right)){ // L -= R == 0    L==R
-
+        this->clear();
+        return;
     }
     
     //############################# not large impact to efficiency (+x)-=(+y) == (+x)+=(-y)
@@ -1233,7 +1235,7 @@ void ALi::subtractionAssign(const ALi& right){
     this->additionAssign(right_);
     //#############################
 
-
+    if(0){
     // this->assignment(this->addition(right));
     // ALi* const lobj = this; 
     // Cell* const lgh = lobj->globalHandle;
@@ -1267,6 +1269,7 @@ void ALi::subtractionAssign(const ALi& right){
     // if(lsign != rsign && lsign != this->sgn())
     //     this->newCell(lmask);
     // // result.optymize();
+}
 }
     // #
     

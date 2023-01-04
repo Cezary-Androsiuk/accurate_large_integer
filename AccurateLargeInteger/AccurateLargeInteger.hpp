@@ -8,18 +8,25 @@
 */
 class ALi{
 protected: public:
-    // class Cell{ // i like more classes than structs 
+    // class Cell{
     // public:
     //     CELL_TYPE var;
     //     Cell* L;
     //     Cell* R;
-        
-    //     // addition usage
     //     // Cell(){}
     //     // Cell(CELL_TYPE v, Cell* l, Cell* r){var=v;L=l;R=r;}
     //     // ~Cell(){}
     // };
 
+    /**
+     * @brief single cell containing:
+     * var (CELL_TYPE) store byte of information
+     *      soon unsigned char will be changed to unsigned long long to save space like:
+     *      if one cell can contain 8 times more bits(64 instead 8) then less cell are needed. 
+     *      Cause every single cell one contains two pointers reduce 8 cells to just one remove 14 to Cell* saving a lot of space 
+     * L (Cell*) pointer to cell on the left side 
+     * R (Cell*) pointer to cell on the right side
+     */
     struct Cell{
         CELL_TYPE var;
         Cell* L;
