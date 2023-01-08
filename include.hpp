@@ -1,12 +1,13 @@
-#pragma once
+#ifndef INCLUDE_HPP
+#define INCLUDE_HPP
 
 #include <cstdio>
 #include <string>
 #include "BPrint/BPrint.hpp"
+#include "time/time.hpp"
 
 
 #include <iostream> // unit tests
-#include <ctime> // unit tests
 #include <random> // unit tests
 
 
@@ -44,4 +45,6 @@
     #define mask101 (0b10000001)
     #define mask110 (0b11111110)
     #define mask111 (0b11111111)
+#endif
+
 #endif

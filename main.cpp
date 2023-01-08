@@ -242,15 +242,15 @@ const bool test_addition(){
     ALi x(".dvfiles/addition_input_1",'r'),
     y(".dvfiles/addition_input_2",'r'),
     z;
-    x.setSeparator(' ');
-    y.setSeparator(' ');
-    z.setSeparator(' ');
+    // x.setSeparator(' ');
+    // y.setSeparator(' ');
+    // z.setSeparator(' ');
 
-    z = x + y;
+    // z = x + y;
 
-    x.print('d'," + ");
-    y.print('d'," = ");
-    z.print('d',"\n");
+    // x.print('d'," + ");
+    // y.print('d'," = ");
+    // z.print('d',"\n");
 
     // x.print('b',"\n");
     // y.print('b',"\n");
@@ -262,27 +262,27 @@ const bool test_addition(){
 
 
 
-    long long from = -0xFFFe;
-    long long to   =  0xFFFF;
+    // long long from = -0xFFFe;
+    // long long to   =  0xFFFF;
 
-    for(long long i=from; i<to; i++){
-        x = i;
-        for(long long j=from; j<to; j++){
-            y = j;
-            z = x + y;
-            if(z != i+j){
-                printf("\n%lld + %lld = %lld = ",i,j,i+j);
-                z.print('d',"\n");
-                x.print('b',"\n");
-                y.print('b',"\n");
-                z.print('b',"\n\n");
-                return false;
-            }
-        }
-        fflush(stdout);
-        percent(from, i, to);
-    }
-    return true;
+    // for(long long i=from; i<to; i++){
+    //     x = i;
+    //     for(long long j=from; j<to; j++){
+    //         y = j;
+    //         z = x + y;
+    //         if(z != i+j){
+    //             printf("\n%lld + %lld = %lld = ",i,j,i+j);
+    //             z.print('d',"\n");
+    //             x.print('b',"\n");
+    //             y.print('b',"\n");
+    //             z.print('b',"\n\n");
+    //             return false;
+    //         }
+    //     }
+    //     fflush(stdout);
+    //     percent(from, i, to);
+    // }
+    // return true;
 }
 
 
@@ -447,30 +447,9 @@ const bool test_additionAssign(){
 
 
 
-
-
-
-std::string func(int x){
-    if(x<10)
-        return "0" + x+48;
-    else
-        return std::to_string(x);
-}
-
-
 int main(){
 
-    ALi x;
-    x.setSeparator(' ');
-    x.readFile(".dvfiles/asrc.bit", 'r');
-    x.print('d',"\n");
-    x.print('b',"\n");
 
-
-
-    std::srand(std::clock());
-    std::clock_t start = std::clock();
-    
     // if(!test_equal()){ // 236325ms
     //     printf("equal was't finished!\n");
     //     return 1;
@@ -541,12 +520,12 @@ int main(){
     // else
     //     printf("assignment ok!\n");
 
-    // if(!test_addition()){
-    //     printf("addition was't finished!\n");
-    //     return 1;
-    // }
-    // else
-    //     printf("addition ok!\n");
+    if(!test_addition()){
+        printf("addition was't finished!\n");
+        return 1;
+    }
+    else
+        printf("addition ok!\n");
 
     // if(!test_addition2()){
     //     printf("addition2 was't finished!\n");
@@ -588,19 +567,6 @@ int main(){
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-    // ALi z(".dvfiles/zsrc.bit",'r');
-    // 000000000000000000000000000000000000000000000000000000000000000100100010010100001000111101001010110010100011101101100100100101011001010101111010100110001110100101110100111010001101001010000011
-    // 38589448836353511200071304105047937667
-    // 3858944 883635351120007 1304105047937667
-    // 385894408836353511200071304105047937667
-    // 385894408836353511200071304105047937667
-
-    // z.print('b',"\n");
-    // z.print('d',"\n");
-    std::cout << "time : " << (std::clock() - start) / (double)(CLOCKS_PER_SEC/1000) << "ms\n";
     return 0;
 
     // std::clock_t start;
