@@ -623,17 +623,55 @@ void ALi::readFileReadable(const char* path){
         return;
     }
     std::string fileContent;
+    std::string additional_text;
     char buffer;
-    while(fread(&buffer, 1, 1, file) != 0)
-        fileContent += buffer;
-    // get first bit as a sign
-    // if first bit is 1 then use delCell
+    char sign;
+
+    if(fread(&buffer, 1, 1, file) != 0){
+        if(buffer == '1') sign = '1';
+        else sign = '0';
+        
+        if(buffer == '0' || buffer == '1' || buffer == ' '){
+            additional_text += buffer;
+            if(buffer == '0' || buffer == '1')
+                fileContent += buffer;
+        }
+    }
+
+
+    while(fread(&buffer, 1, 1, file) != 0){
+        if(buffer == '0' || buffer == '1' || buffer == ' '){
+            additional_text += buffer;
+            if(buffer == '0' || buffer == '1')
+                fileContent += buffer;
+        }
+    }
+    
+    this->clear();
+    if(sign == '1'){
+        if(fileContent.length() % BITS_PER_VAR != 0){
+            unsigned long long len = (fileContent.length() / BITS_PER_VAR) + 1;
+            unsigned long long add = len * BITS_PER_VAR - fileContent.length();
+            for(int i=0; i<add; i++){
+                fileContent = '1' + fileContent;
+            }
+        }
+    }
+    printf("%s\n",fileContent.c_str());
+    printf("%s\n",additional_text.c_str());
+
+    
+
     for(unsigned long long i=0; i<fileContent.length(); i++){
         const char v = fileContent[i];
         if(v == '0')
             this->PLSB(0);
         else if(v == '1')
             this->PLSB(1);
+    }
+    if(sign == '1'){
+        this->delCell();
+        // this->decrement();
     }
     
     return;
@@ -1119,86 +1157,6 @@ ALi ALi::subtraction(const ALi& right) const{
 
     return this->addition(right_);
     //#############################
-    if(0){
-    // ALi out;
-
-    // const Cell* const lgh = this->globalHandle;
-    // const Cell* lh = lgh->L;
-    // const bool lsign = this->sgn();
-    // Cell lmask((lsign ? mask111 : mask000),&lmask,&lmask);
-
-    // const Cell* const rgh = right.globalHandle;
-    // const Cell* rh = rgh->L;
-    // const bool rsign = right.sgn();
-    // Cell rmask((rsign ? mask111 : mask000),&rmask,&rmask);
-    
-    // CELL_TYPE carry = 0;
-    // CELL_TYPE ofldet;
-    
-    // ofldet = lgh->var + ~rgh->var + 1;
-    // out.globalHandle->var = ofldet;
-    // if(ofldet < rgh->var && ofldet < lgh->var)
-    //     carry = 1;
-    // if(lh == lgh) lh = &lmask;
-    // if(rh == rgh) rh = &rmask;
-
-    // while(lh != &lmask || rh != &rmask){
-    //     ofldet = lh->var + ~rh->var + carry;
-    //     out.newCell(ofldet);
-    //     if((ofldet < lh->var && ofldet < ~rh->var) || (ofldet <= lh->var && ofldet <= ~rh->var && carry))
-    //         carry = 1;
-    //     else
-    //         carry = 0;
-
-    //     lh = lh->L;
-    //     rh = rh->L;
-    //     if(lh == lgh) lh = &lmask;
-    //     if(rh == rgh) rh = &rmask;
-    // }
-    // // overflow can only appear when both operation argument sign values are different (x-(-x) => x+x) ((-x)-x => (-x)+(-x)) 
-    // // if(lsign == rsign && lsign != out.sgn())
-    // //     out.newCell(lmask.var);
-    // // result.optymize();
-    // return out;
-    
-    // ALi out;
-    // Cell* oh = out.globalHandle;
-
-    // const ALi* const lobj = this; 
-    // const Cell* const lgh = lobj->globalHandle;
-    // const Cell* lh = lgh->L;
-    // const bool lsign = lobj->sgn();
-    // const CELL_TYPE lmask = (lsign ? mask111 : mask000);
-
-    // const ALi* const robj = &right;
-    // const Cell* const rgh = robj->globalHandle;
-    // const Cell* rh = rgh->L;
-    // const bool rsign = robj->sgn();
-    // const CELL_TYPE rmask = (rsign ? mask111 : mask000);
-    
-    // CELL_TYPE carry = 0;
-    
-    // oh->var = lgh->var + ~rgh->var + 1;
-    // if(oh->var <= lgh->var && oh->var <= ~rgh->var) //! carry isn't handled
-    //     carry = 1;
-
-    // while(lh != lgh || rh != rgh){ // continue if both are not their global handles !(lh == lgh && rh == rgh)
-    //     out.newCell((lh == lgh ? lmask : lh->var) + ~(rh == rgh ? rmask : rh->var) + carry);
-    //     oh = oh->L;
-    //     if((oh->var < rh->var && oh->var < lh->var) || (oh->var <= rh->var && oh->var <= lh->var && carry))
-    //         carry = 1;
-    //     else
-    //         carry = 0;
-
-    //     if(lh != lgh) lh = lh->L;
-    //     if(rh != rgh) rh = rh->L;
-    // }
-    // // overflow can only appear when both operation argument sign values are different
-    // if(lsign != rsign && lsign != out.sgn())
-    //     out.newCell(lmask);
-    // // result.optymize();
-    // return out;
-}
 }
 /**
  * @brief 
@@ -1234,42 +1192,6 @@ void ALi::subtractionAssign(const ALi& right){
 
     this->additionAssign(right_);
     //#############################
-
-    if(0){
-    // this->assignment(this->addition(right));
-    // ALi* const lobj = this; 
-    // Cell* const lgh = lobj->globalHandle;
-    // Cell* lh = lgh->L;
-    // const bool lsign = lobj->sgn();
-    // const CELL_TYPE lmask = (lsign ? mask111 : mask000);
-
-    // const ALi* const robj = &right;
-    // const Cell* const rgh = robj->globalHandle;
-    // const Cell* rh = rgh->L;
-    // const bool rsign = robj->sgn();
-    // const CELL_TYPE rmask = (rsign ? mask111 : mask000);
-    
-    // CELL_TYPE carry = 0;
-
-    // lgh->var += rgh->var;
-    // if(lgh->var < rgh->var)
-    //     carry = 0;
-        
-    // while(lh != lgh || rh != rgh){ // continue if both are not their global handles !(lh == lgh && rh == rgh)
-    //     if(lh == lgh) this->newCell(lmask + (rh == rgh ? rmask : rh->var) + carry);
-    //     else lh->var += (rh == rgh ? rmask : rh->var) + carry;
-
-    //     if(lh->var < rh->var || (lh->var <= rh->var && carry)) carry = 1;
-    //     else carry = 0;
-
-    //     if(lh != lgh) lh = lh->L;
-    //     if(rh != rgh) rh = rh->L;
-    // }
-    // // overflow can only appear when both operation argument sign values are different
-    // if(lsign != rsign && lsign != this->sgn())
-    //     this->newCell(lmask);
-    // // result.optymize();
-}
 }
     // #
     
@@ -1505,7 +1427,6 @@ bool ALi::operator >= (const ALi& right) const{
     return !this->smallerThan(right);
 }
 
-#if false
 ALi  ALi::operator ++ (int){
     ALi out(*this);
     this->increment();
@@ -1515,12 +1436,6 @@ ALi  ALi::operator ++ (){
     this->increment();
     return *this;
 }
-#else
-ALi  ALi::operator ++ (int){
-    this->increment();
-    return *this;
-}
-#endif
 ALi  ALi::operator +  (const ALi& right) const{
     return this->addition(right);
 }

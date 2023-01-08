@@ -460,7 +460,11 @@ std::string func(int x){
 
 int main(){
 
-
+    ALi x;
+    x.setSeparator(' ');
+    x.readFile(".dvfiles/asrc.bit", 'r');
+    x.print('d',"\n");
+    x.print('b',"\n");
 
 
     // for(int i=0; i<100; i++){
@@ -569,12 +573,12 @@ int main(){
     // else
     //     printf("assignment ok!\n");
 
-    if(!test_addition()){
-        printf("addition was't finished!\n");
-        return 1;
-    }
-    else
-        printf("addition ok!\n");
+    // if(!test_addition()){
+    //     printf("addition was't finished!\n");
+    //     return 1;
+    // }
+    // else
+    //     printf("addition ok!\n");
 
     // if(!test_addition2()){
     //     printf("addition2 was't finished!\n");

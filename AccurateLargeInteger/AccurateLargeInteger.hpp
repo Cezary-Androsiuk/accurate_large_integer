@@ -78,9 +78,9 @@ protected: public:
     const bool smallerThan(const ALi& right) const;//
 
     // Addition
-    void increment();//*
+    void increment();//
     ALi addition(const ALi& right) const; //
-    void additionAssign(const ALi& right);
+    void additionAssign(const ALi& right); //
 
     // Subtraction
     void decrement();
@@ -116,7 +116,7 @@ public:
     bool operator >= (const ALi& right) const;
     
     ALi  operator ++ (int);
-    // ALi  operator ++ ();
+    ALi  operator ++ ();
     ALi  operator +  (const ALi& right) const;
     void operator += (const ALi& right);
     

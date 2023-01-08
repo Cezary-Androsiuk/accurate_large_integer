@@ -2,7 +2,7 @@
 #define BPrint_HPP
 #include <string>
 
-#define IMPROVED_PRINT
+// #define IMPROVED_PRINT
 
 namespace BPrint{
     const std::string binary_x8(unsigned char src);
