@@ -467,38 +467,6 @@ int main(){
     x.print('b',"\n");
 
 
-    // for(int i=0; i<100; i++){
-    //     for(int j=0; j<100; j++){
-    //         printf("%d\t+\t%d\t=\t",i,j);
-    //         if(i+j > 99)
-    //             printf("(1)%d \n",i+j-100);
-    //             // printf("%s + %s = (1)%s \n",func(i).c_str(),func(j).c_str(),func(i+j-100).c_str());
-    //         // else if(i+j < -99)
-    //         //     printf("(1)%d \n",i+j+100);
-    //             // printf("%s + %s = (1)%s \n",func(i).c_str(),func(j).c_str(),func(i+j-100).c_str());
-    //         else
-    //             printf("(0)%d \n",i+j);
-    //             // printf("%s + %s = (0)%s \n",func(i).c_str(),func(j).c_str(),func(i+j).c_str());
-    //     }
-    //     printf("\n");
-    // }
-    // printf("\n\n");
-    // for(int i=0; i<100; i++){
-    //     for(int j=0; j<100; j++){
-    //         printf("%d\t+\t%d\t+\t1\t=\t",i,j);
-    //         if(i+j > 98)
-    //             printf("(1)%d \n",i+j-99);
-    //             // printf("%s + %s = (1)%s \n",func(i).c_str(),func(j).c_str(),func(i+j-100).c_str());
-    //         // else if(i+j < -98)
-    //         //     printf("(1)%d \n",i+j+99);
-    //             // printf("%s + %s = (1)%s \n",func(i).c_str(),func(j).c_str(),func(i+j-100).c_str());
-    //         else
-    //             printf("(0)%d \n",i+j+1);
-    //             // printf("%s + %s = (0)%s \n",func(i).c_str(),func(j).c_str(),func(i+j).c_str());
-    //     }
-    //     printf("\n");
-    // }
-
 
     std::srand(std::clock());
     std::clock_t start = std::clock();
