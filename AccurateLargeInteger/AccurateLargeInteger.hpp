@@ -71,6 +71,7 @@ protected: public:
     // Assignment
     void assignment(const ALi& source);//
     void assignment(const signed long long& source);//
+    // void assignment
 
     // Bolean
     const bool equal(const ALi& right) const;//
@@ -106,6 +107,9 @@ public:
     const bool isEmpty() const;
 
     // Operators
+    void operator >> (const char* right);
+    void operator << (const char* right);
+
     void operator =  (const ALi& right);
 
     bool operator == (const ALi& right) const;

@@ -227,6 +227,9 @@ const bool test_assignment2(){
 const bool test_print(){
     ALi x;
     x.setSeparator(' ');
+    x << "r.dvfiles/128.bit";
+    x >> "d\n";
+    return true;
     long long from = -0xFFe;
     long long to   =  0xFFF;
     for(long long i=from; i<to; i++){
@@ -513,19 +516,19 @@ int main(){
     // else
     //     printf("assignment2 ok!\n");
 
-    // if(!test_print()){
-    //     printf("assignment was't finished!\n");
-    //     return 1;
-    // }
-    // else
-    //     printf("assignment ok!\n");
-
-    if(!test_addition()){
-        printf("addition was't finished!\n");
+    if(!test_print()){
+        printf("assignment was't finished!\n");
         return 1;
     }
     else
-        printf("addition ok!\n");
+        printf("assignment ok!\n");
+
+    // if(!test_addition()){
+    //     printf("addition was't finished!\n");
+    //     return 1;
+    // }
+    // else
+    //     printf("addition ok!\n");
 
     // if(!test_addition2()){
     //     printf("addition2 was't finished!\n");

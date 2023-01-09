@@ -1390,6 +1390,29 @@ const bool ALi::isEmpty() const{
     // #
     
     // #
+
+/**
+ * @brief 
+ * @param right "xtext" x-type of print (b/d), text-additional text
+ * @example "d\n" - decimal print with new line 
+ */
+void ALi::operator >> (const char* right){
+    this->print(right[0]);
+    while(*right != '\0'){
+        ++right;
+        printf("%c",*right);
+    }
+}
+/**
+ * @brief read from file
+ * @param right "xpath" x-type of file (r/b), path-path to file
+ * @example "r.dvfiles/128.bit" - readable file in ".dvfiles/128.bit" path
+ */
+void ALi::operator << (const char* right){
+    std::string _right(right);
+    _right.erase(_right.begin());
+    this->readFile(_right.c_str(),right[0]);
+}
 /**
  * @brief 
  * @param right 
