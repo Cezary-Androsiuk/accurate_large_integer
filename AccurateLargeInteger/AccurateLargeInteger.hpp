@@ -71,7 +71,7 @@ protected: public:
     // Assignment
     void assignment(const ALi& source);//
     void assignment(const signed long long& source);//
-    // void assignment
+    void assignment(const std::string& source);
 
     // Bolean
     const bool equal(const ALi& right) const;//

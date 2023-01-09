@@ -734,6 +734,9 @@ void ALi::assignment(const signed long long& source){
         this->globalHandle->var = source;
     #endif
 }
+void ALi::assignment(const std::string& source){
+    // decimal / binary "b1010101010101" or "d76523874562983432"
+}
     // #
     
     // #
