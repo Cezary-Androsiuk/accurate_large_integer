@@ -623,31 +623,25 @@ void ALi::readFileReadable(const char* path){
         return;
     }
     std::string fileContent;
-    std::string additional_text;
     char buffer;
     char sign;
 
+    // read sign 
     if(fread(&buffer, 1, 1, file) != 0){
         if(buffer == '1') sign = '1';
         else sign = '0';
-        
-        if(buffer == '0' || buffer == '1' || buffer == ' '){
-            additional_text += buffer;
-            if(buffer == '0' || buffer == '1')
-                fileContent += buffer;
-        }
+        if(buffer == '0' || buffer == '1')
+            fileContent += buffer;
     }
 
-
+    // read rest of file
     while(fread(&buffer, 1, 1, file) != 0){
-        if(buffer == '0' || buffer == '1' || buffer == ' '){
-            additional_text += buffer;
-            if(buffer == '0' || buffer == '1')
-                fileContent += buffer;
-        }
+        if(buffer == '0' || buffer == '1')
+            fileContent += buffer;
     }
     
     this->clear();
+    // if number is negative then execute few operations
     if(sign == '1'){
         if(fileContent.length() % BITS_PER_VAR != 0){
             unsigned long long len = (fileContent.length() / BITS_PER_VAR) + 1;
@@ -657,11 +651,8 @@ void ALi::readFileReadable(const char* path){
             }
         }
     }
-    printf("%s\n",fileContent.c_str());
-    printf("%s\n",additional_text.c_str());
 
-    
-
+    // move string to variable
     for(unsigned long long i=0; i<fileContent.length(); i++){
         const char v = fileContent[i];
         if(v == '0')
@@ -671,9 +662,8 @@ void ALi::readFileReadable(const char* path){
     }
     if(sign == '1'){
         this->delCell();
-        // this->decrement();
     }
-    
+    this->optymize();
     return;
 }
 /**
