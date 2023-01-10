@@ -130,6 +130,7 @@ void ALi::SHR(){
         buffer[1] = buffer[0]; 
         handle = handle->R;
     } while (handle != this->globalHandle->R);
+    this->optymize();
 }
 /**
  * @brief execute shift left operation
@@ -1229,39 +1230,27 @@ ALi ALi::multiplication(const ALi& right) const{
     else if(right.is1()) return *this;
     else if(this->is1()) return right;
 
-    const ALi*const greater = (this->length > right.length ? this : &right);
-    const ALi*const  smaller = (this->length > right.length ? &right : this);
-    
-    ALi snegate(*smaller);
-    snegate.invert();
-    
-    ALi* lhalf = new ALi();
-    ALi* rhalf = new ALi(*greater);
-    for(unsigned long long i=0; i<greater->length-1; i++)
-        lhalf->newCell(0);
-    
-    CELL_TYPE carry = 0;
-    for(unsigned long long i=0; i<greater->length-1; i++){
-        if(rhalf->globalHandle->var & mask001 == 1 && carry == 0)
-            lhalf->additionAssign(*smaller);
-        else if(rhalf->globalHandle->var & mask001 == 0 && carry == 1)
-            lhalf->additionAssign(snegate);
+    ALi _left(*this);
+    ALi _right(right);
+    ALi result;
 
-        if(rhalf->globalHandle->var & mask001) carry = 1;
-        else carry = 0;
-
-        if(lhalf->globalHandle->var & mask001) rhalf->PMSB(1);
-        else rhalf->PMSB(0);
-
-        if(lhalf->globalHandle->R->var & mask100) lhalf->PMSB(1);
-        else lhalf->PMSB(1);
+    _left.PLSB(0);
+    _left.PMSB(0);
+    _left.print('b',"\n");
+    while(!_left.is0()){
+        switch (_left.globalHandle->var & 0b11){
+        case 1: // 01
+            result.additionAssign(_right);
+            break;
+        case 2: // 10
+            result.subtractionAssign(_right);
+            break;
+        // 00 & 11
+        }
+        // store lsb and shr result or shl _right
+        _right.SHL();
+        _left.SHR();
     }
-    ALi result(*rhalf);
-    // const Cell* lhalfhandle = lhalf->globalHandle;
-    // for(unsigned long long i=0; i<greater->length-1; i++){
-    //     result.newCell(lhalfhandle->var);
-    //     lhalfhandle = lhalfhandle->L;
-    // }
 
     return result;
 }

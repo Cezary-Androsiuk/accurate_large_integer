@@ -63,6 +63,27 @@ const bool test_equal(){
     return true;
 }
 
+const bool test_PLSB_PMSB(){
+    ALi x,y;
+    x.setSeparator(' ');
+    x << "r.dvfiles/128.bit";
+    for(long long i=from; i<to; i++){
+        x.assignment(i);
+        for(long long j=from; j<to; j++){
+            y.assignment(j);
+            if(x.equal(y) != (i==j)){
+                printf("\n%llu == %llu = %d = %d\n",i,j,i==j,x.equal(y));
+                x.print('b',"\n");
+                y.print('b',"\n\n");
+                return false;
+            }
+        }
+        fflush(stdout);
+        percent(from, i, to);
+    }
+    return true;
+}
+
 
 const bool test_greaterThan(){
     ALi x,y;
@@ -447,6 +468,20 @@ const bool test_additionAssign(){
     return true;
 }
 
+const bool test_multiplication(){
+    ALi x(-6),y(7),z;
+    x.setSeparator(' ');
+    y.setSeparator(' ');
+    z.setSeparator(' ');
+    // x << "r.dvfiles/128.bit";
+    x.print('b',"\n");
+    y.print('b',"\n");
+    z = x.multiplication(y);
+    z.print('b',"\n");
+
+    return false;
+}
+
 
 
 
@@ -516,12 +551,12 @@ int main(){
     // else
     //     printf("assignment2 ok!\n");
 
-    if(!test_print()){
-        printf("assignment was't finished!\n");
-        return 1;
-    }
-    else
-        printf("assignment ok!\n");
+    // if(!test_print()){
+    //     printf("assignment was't finished!\n");
+    //     return 1;
+    // }
+    // else
+    //     printf("assignment ok!\n");
 
     // if(!test_addition()){
     //     printf("addition was't finished!\n");
@@ -564,6 +599,13 @@ int main(){
     // }
     // else
     //     printf("additionAssign ok!\n");
+
+    if(!test_multiplication()){
+        printf("multiplication was't finished!\n");
+        return 1;
+    }
+    else
+        printf("multiplication ok!\n");
 
 
 
