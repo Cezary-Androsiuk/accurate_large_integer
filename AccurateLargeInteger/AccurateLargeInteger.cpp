@@ -734,8 +734,28 @@ void ALi::assignment(const signed long long& source){
         this->globalHandle->var = source;
     #endif
 }
+/**
+ * @brief 
+ * @param source 
+ * @example "b010101010101"
+ * @example "d765238745629"
+ * @example "b1110101010101"
+ * @example "d-765238745629"
+ */
 void ALi::assignment(const std::string& source){
-    // decimal / binary "b1010101010101" or "d76523874562983432"
+    const char type = source[0];
+    std::string value(source);
+    value.erase(value.begin());
+    switch(type){
+        case 'b':
+
+        break;
+        case 'd':
+
+        break;
+        default: printf("unknown action!\nnot attempted to assign the value\n"); return;
+    }
+    
 }
     // #
     
