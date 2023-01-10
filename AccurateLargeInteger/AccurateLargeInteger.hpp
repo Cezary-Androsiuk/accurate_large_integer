@@ -64,14 +64,14 @@ protected: public:
     void writeFile(const char* path, const char& type) const;//
 
     void readFileBinary(const char* path);//
-    void readFileReadable(const char* path);//
+    void readFileReadable(const char* path);//! need d12031823712 and b1010010101001 and some better way to choose if binary, binaryr eadable or decimal
     void readFile(const char* path, const char& type);//
     
 protected: public:
     // Assignment
     void assignment(const ALi& source);//
     void assignment(const signed long long& source);//
-    void assignment(const std::string& source);
+    void assignment(const std::string& source); //! 
 
     // Bolean
     const bool equal(const ALi& right) const;//
