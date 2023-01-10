@@ -1235,9 +1235,11 @@ ALi ALi::multiplication(const ALi& right) const{
     ALi result;
 
     _left.PLSB(0);
-    _left.PMSB(0);
-    _left.print('b',"\n");
-    while(!_left.is0()){
+    // _left.print('b',"\n");
+    for(unsigned long long i=0; i<_left.length*BITS_PER_VAR-1; i++){
+        // _left.print('b',"\n");
+        // result.print('b',"\n\n");
+
         switch (_left.globalHandle->var & 0b11){
         case 1: // 01
             result.additionAssign(_right);
@@ -1250,6 +1252,7 @@ ALi ALi::multiplication(const ALi& right) const{
         // store lsb and shr result or shl _right
         _right.SHL();
         _left.SHR();
+        _left.globalHandle->R->var = _left.globalHandle->R->var & mask011; // treat whole number as a unsigned shr
     }
 
     return result;

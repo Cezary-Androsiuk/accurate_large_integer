@@ -40,8 +40,8 @@ protected: public:
 protected: public:
     void SHR();//
     void SHL();//
-    void PMSB(const bool& bit);//
-    void PLSB(const bool& bit);//
+    void PMSB(const bool& bit);//! 11111011
+    void PLSB(const bool& bit);//!
 
     const bool sgn() const;//
     const bool is0() const;//
