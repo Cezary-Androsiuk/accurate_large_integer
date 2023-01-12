@@ -489,12 +489,12 @@ int main(){
     // else
     //     printf("equal ok!\n");
 
-    if(!test_PLSB_PMSB()){ 
-        printf("test_PLSB_PMSB was't finished!\n");
-        return 1;
-    }
-    else
-        printf("test_PLSB_PMSB ok!\n");
+    // if(!test_PLSB_PMSB()){ 
+    //     printf("test_PLSB_PMSB was't finished!\n");
+    //     return 1;
+    // }
+    // else
+    //     printf("test_PLSB_PMSB ok!\n");
 
     // if(!test_greaterThan()){ // 238068ms
     //     printf("test_greaterThan was't finished!\n");
@@ -601,12 +601,12 @@ int main(){
     // else
     //     printf("additionAssign ok!\n");
 
-    // if(!test_multiplication()){
-    //     printf("multiplication was't finished!\n");
-    //     return 1;
-    // }
-    // else
-    //     printf("multiplication ok!\n");
+    if(!test_multiplication()){
+        printf("multiplication was't finished!\n");
+        return 1;
+    }
+    else
+        printf("multiplication ok!\n");
 
 
 

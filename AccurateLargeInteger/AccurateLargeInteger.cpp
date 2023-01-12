@@ -616,25 +616,38 @@ void ALi::readFileBinary(const char* path){
  * @param path source where an readable binary file is stored
  */
 void ALi::readFileReadable(const char* path){
-    // not need to be idiot proof
+    // File
     FILE* file = fopen(path,"r");
     if(file == NULL){
         printf("File \"%s\" not found!\n",path);
         return;
     }
-    std::string fileContent;
+    
+    char type = '\0';
+    fread(&type, 1, 1, file); // don't matter if fill type or not cause important is just what sign it is
+    std::string strfdata;
     char buffer;
-
-    while(fread(&buffer, 1, 1, file) != 0){
+    while(fread(&buffer, 1, 1, file) != 0)
         if(buffer == '0' || buffer == '1')
-            fileContent += buffer;
-    }
-    const char* fdata = fileContent.c_str();
-    this->clear();
-    this->globalHandle->var = (*fdata=='0' ? mask000 : mask111);
+            strfdata += buffer;
 
-    while(*fdata != '\0')
-        this->PLSB((*(fdata++)=='0' ? 0 : 1)); // x++ increment after returning value
+
+    switch (type){
+    case 'b':{
+        const char* fdata = strfdata.c_str();
+        this->globalHandle->var = (*fdata=='0' ? mask000 : mask111);
+        while(*fdata != '\0')
+            this->PLSB((*(fdata++)=='0' ? 0 : 1)); // x++ increment after returning value
+        break;
+    }
+    case 'd':{
+
+        break;
+    }
+    // in future can be extended by octal and hex 
+    default: printf("unknown number fromat type!\nnot attempted to overwrite number\n"); return;
+    }
+
     this->optymize();
     return;
 }

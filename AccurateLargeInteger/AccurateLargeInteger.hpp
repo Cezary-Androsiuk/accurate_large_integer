@@ -53,12 +53,16 @@ protected: public:
     void invert();//
 
 protected: public:
+    // might be a good idea to split class to ALi and ALi_stdio (standard input output)
     void printBinary() const;//
     void printDecimal() const;//
 
     void printBinaryApproximation(unsigned long long appPrec) const;//!
     void printDecimalApproximation(unsigned long long appPrec) const;//!
 
+    //! change xFileBinary to something other cause this exist only to store data better and to can continue work after software reopen
+    //! just to comunicate with himself name should be as "dataStore" or "saveTo"
+    //! this method save to file actual containing information currently stored in ram
     void writeFileBinary(const char* path) const;//
     void writeFileReadable(const char* path) const;//
     void writeFile(const char* path, const char& type) const;//
