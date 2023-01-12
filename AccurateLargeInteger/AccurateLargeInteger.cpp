@@ -617,7 +617,6 @@ void ALi::readFileBinary(const char* path){
  */
 void ALi::readFileReadable(const char* path){
     // not need to be idiot proof
-
     FILE* file = fopen(path,"r");
     if(file == NULL){
         printf("File \"%s\" not found!\n",path);
@@ -625,38 +624,17 @@ void ALi::readFileReadable(const char* path){
     }
     std::string fileContent;
     char buffer;
-    char sign;
 
-    // read rest of file
     while(fread(&buffer, 1, 1, file) != 0){
         if(buffer == '0' || buffer == '1')
             fileContent += buffer;
     }
-    sign = fileContent[0];
-    
+    const char* fdata = fileContent.c_str();
     this->clear();
-    // if number is negative then execute few operations
-    if(sign == '1'){
-        if(fileContent.length() % BITS_PER_VAR != 0){
-            unsigned long long len = (fileContent.length() / BITS_PER_VAR) + 1;
-            unsigned long long add = len * BITS_PER_VAR - fileContent.length();
-            for(int i=0; i<add; i++){
-                fileContent = '1' + fileContent;
-            }
-        }
-    }
+    this->globalHandle->var = (*fdata=='0' ? mask000 : mask111);
 
-    // move string to variable
-    for(unsigned long long i=0; i<fileContent.length(); i++){
-        const char v = fileContent[i];
-        if(v == '0')
-            this->PLSB(0);
-        else if(v == '1')
-            this->PLSB(1);
-    }
-    if(sign == '1'){
-        this->delCell();
-    }
+    while(*fdata != '\0')
+        this->PLSB((*(fdata++)=='0' ? 0 : 1)); // x++ increment after returning value
     this->optymize();
     return;
 }

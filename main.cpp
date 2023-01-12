@@ -67,11 +67,11 @@ const bool test_equal(){
 const bool test_PLSB_PMSB(){
     ALi x,y,_x;
     x.setSeparator(' ');
-    x.globalHandle->var = mask111;
-    // x << "r.dvfiles/128.bit";
+    // x.globalHandle->var = mask111;
+    x << "r.dvfiles/128.bit";
     x.print('b', "\n\n");
     // for(int i=0; i<70; i++){
-        x.PLSB(0);
+        x.PMSB(0);
         x.print('b',"\n");
     // }
     return false;
