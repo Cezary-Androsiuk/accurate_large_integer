@@ -30,7 +30,7 @@ public:
     ALi();//
     ALi(const ALi& source);//
     ALi(const signed long long& source);//
-    ALi(const char* sourcePath,const char& type);//
+    ALi(const char* type, const char* sourcePath);//
     ~ALi();//
 
 protected: public:
@@ -63,13 +63,16 @@ protected: public:
     //! change xFileBinary to something other cause this exist only to store data better and to can continue work after software reopen
     //! just to comunicate with himself name should be as "dataStore" or "saveTo"
     //! this method save to file actual containing information currently stored in ram
-    void writeFileBinary(const char* path) const;//
-    void writeFileReadable(const char* path) const;//
-    void writeFile(const char* path, const char& type) const;//
+    void import_cells(const char* path) const;//
+    void export_cells(const char* path);//
 
-    void readFileBinary(const char* path);//
-    void readFileReadable(const char* path);//! need d12031823712 and b1010010101001 and some better way to choose if binary, binaryr eadable or decimal
-    void readFile(const char* path, const char& type);//
+    void writeFile_02(const char* path) const;//
+    void writeFile_10(const char* path) const;//
+    void writeFile(const char* type, const char* path) const;//
+
+    void readFile_02(const char* file);
+    void readFile_10(const char* file);
+    void readFile(const char* type, const char* path);//
     
 protected: public:
     // Assignment
@@ -104,7 +107,7 @@ public:
     // Public
     void print(const char& type, const char* additionText = "", unsigned long long alignment = 0) const;
     void printApproximation(const char& type, const char* additionText = "", unsigned long long approximationPrecision = 2) const;
-    void file(const char* path, const char& action, const char& type);
+    void file(const char* arg, const char* path);
     // Get / Set
     void setSeparator(const char& separatorSign = '\0');
     const char getSeparator() const;

@@ -39,7 +39,6 @@ ALi GenRandomTestValue(int additionallen){
 
 
 
-
 const bool test_equal(){
     ALi x,y;
     x.setSeparator(' ');

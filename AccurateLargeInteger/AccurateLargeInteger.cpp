@@ -37,8 +37,8 @@ ALi::ALi(const signed long long& source) : ALi(){
  * @param path file where variable should be stored
  * @param type type of source file: readable('r'), binary('b')
  */
-ALi::ALi(const char* sourcePath, const char& type) : ALi(){
-    this->readFile(sourcePath,type);
+ALi::ALi(const char* type, const char* sourcePath) : ALi(){
+    this->readFile(type,sourcePath);
 }
 /**
  * @brief Destroy the ALi object
@@ -534,7 +534,7 @@ void ALi::printDecimalApproximation(unsigned long long appPrec) const{
  * @param path path to file where variable should be stored
  * @param append append or overwrite file if exist 
  */
-void ALi::writeFileBinary(const char* path) const{
+void ALi::import_cells(const char* path) const{
     FILE* file = fopen(path,"wb");
     if(file == NULL){
         printf("File \"%s\" not found!\n",path);
@@ -548,11 +548,62 @@ void ALi::writeFileBinary(const char* path) const{
     fclose(file);
 }
 /**
+ * @brief copy value from source file to variable
+ * @param path source where an readable binary file is stored
+ */
+void ALi::export_cells(const char* path){
+    this->clear();
+    FILE* file = fopen(path,"rb");
+    if(file == NULL){
+        printf("File \"%s\" not found!\n",path);
+        return;
+    }
+    fread(&this->globalHandle->var, BYTES_PER_VAR, 1, file);
+    char buffer;
+    while(fread(&buffer, BYTES_PER_VAR, 1, file) != 0){
+        this->newCell(buffer);
+    }
+    this->optymize();
+    fclose(file);
+}
+    // #
+    
+    // #
+    
+    // #
+    
+    // #
+    
+    // #
+    
+    // #
+    
+    // #
+/**
  * @brief save variable to file in readable form allowing to add separator sign every 8 bits 
  * @param path path to file where variable should be stored
  * @param append append or overwrite file if exist 
  */
-void ALi::writeFileReadable(const char* path) const{
+void ALi::writeFile_02(const char* path) const{
+    FILE* file = fopen(path,"w");
+    if(file == NULL){
+        printf("File \"%s\" not found!\n",path);
+        return;
+    }
+    Cell* handle = this->globalHandle->R;
+    do{
+        std::string binary = BPrint::binary_x64(handle->var,ULL_VAR_SEP);
+        fwrite(binary.c_str(), sizeof(char), binary.length(), file); // bufer, size of cell, cell amout, source
+        handle = handle->R;
+    }while(handle != this->globalHandle->R);
+    fclose(file);
+}
+/**
+ * @brief save variable to file in readable form allowing to add separator sign every 8 bits 
+ * @param path path to file where variable should be stored
+ * @param append append or overwrite file if exist 
+ */
+void ALi::writeFile_10(const char* path) const{
     FILE* file = fopen(path,"w");
     if(file == NULL){
         printf("File \"%s\" not found!\n",path);
@@ -572,10 +623,10 @@ void ALi::writeFileReadable(const char* path) const{
  * @param type type of file, readable('r') or binary('b')
  * @param append append or overwrite file if exist 
  */
-void ALi::writeFile(const char* path, const char& type) const{
-    switch (type){
-        case 'b': this->writeFileBinary(path); break;
-        case 'r': this->writeFileReadable(path); break;
+void ALi::writeFile(const char* type, const char* path) const{
+    switch (type[0]){
+        case 'b': this->writeFile_02(path); break;
+        case 'd': this->writeFile_10(path); break;
         default: printf("unknown type!\nnot attempted to create file\n"); return;
     }
 }
@@ -593,73 +644,44 @@ void ALi::writeFile(const char* path, const char& type) const{
     
     // #
 /**
- * @brief copy value from source file to variable
+ * @brief copy value from readable source file to variable and ignore others than '1' and '0' signs
  * @param path source where an readable binary file is stored
  */
-void ALi::readFileBinary(const char* path){
-    this->clear();
-    FILE* file = fopen(path,"rb");
-    if(file == NULL){
-        printf("File \"%s\" not found!\n",path);
-        return;
-    }
-    fread(&this->globalHandle->var, BYTES_PER_VAR, 1, file);
-    char buffer;
-    while(fread(&buffer, BYTES_PER_VAR, 1, file) != 0){
-        this->newCell(buffer);
-    }
+void ALi::readFile_02(const char* file){
+    this->globalHandle->var = (*file=='0' ? mask000 : mask111);
+    while(*file != '\0')
+        this->PLSB((*(file++)=='0' ? 0 : 1)); // x++ increment after returning value
+
     this->optymize();
-    fclose(file);
 }
 /**
  * @brief copy value from readable source file to variable and ignore others than '1' and '0' signs
  * @param path source where an readable binary file is stored
  */
-void ALi::readFileReadable(const char* path){
-    // File
-    FILE* file = fopen(path,"r");
-    if(file == NULL){
-        printf("File \"%s\" not found!\n",path);
-        return;
-    }
-    
-    char type = '\0';
-    fread(&type, 1, 1, file); // don't matter if fill type or not cause important is just what sign it is
-    std::string strfdata;
-    char buffer;
-    while(fread(&buffer, 1, 1, file) != 0)
-        if(buffer == '0' || buffer == '1')
-            strfdata += buffer;
+void ALi::readFile_10(const char* file){
 
-
-    switch (type){
-    case 'b':{
-        const char* fdata = strfdata.c_str();
-        this->globalHandle->var = (*fdata=='0' ? mask000 : mask111);
-        while(*fdata != '\0')
-            this->PLSB((*(fdata++)=='0' ? 0 : 1)); // x++ increment after returning value
-        break;
-    }
-    case 'd':{
-
-        break;
-    }
-    // in future can be extended by octal and hex 
-    default: printf("unknown number fromat type!\nnot attempted to overwrite number\n"); return;
-    }
-
-    this->optymize();
-    return;
 }
 /**
  * @brief copy value from file to variable
  * @param path source where an readable binary file is stored
  * @param type type of file, readable('r') or binary('b')
  */
-void ALi::readFile(const char* path, const char& type){
-    switch (type){
-        case 'b': this->readFileBinary(path); break;
-        case 'r': this->readFileReadable(path); break;
+void ALi::readFile(const char* type, const char* path){
+    FILE* file = fopen(path,"r");
+    if(file == NULL){
+        printf("File \"%s\" not found!\n",path);
+        return;
+    }
+
+    std::string strfdata;
+    char buffer;
+    while(fread(&buffer, 1, 1, file) != 0)
+        if(buffer == '0' || buffer == '1')
+            strfdata += buffer;
+                
+    switch (type[0]){
+        case 'b': this->readFile_02(strfdata.c_str()); break;
+        case 'd': this->readFile_10(strfdata.c_str()); break;
         default: printf("unknown type!\nnot attempted to read file\n"); return;
     }
 }
@@ -1334,10 +1356,10 @@ void ALi::printApproximation(const char& type, const char* additionText, unsigne
  * @param action type of action write('w') or read('r')
  * @param type type of file, readable('r') or binary('b')
  */
-void ALi::file(const char* path, const char& action, const char& type){
-    switch (action){
-        case 'w': this->writeFile(path,type); break;
-        case 'r': this->readFile(path,type); break;
+void ALi::file(const char* arg, const char* path){
+    switch (arg[0]){
+        case 'w': this->writeFile(std::string(std::string("") + arg[1]).c_str(),path); break;
+        case 'r': this->readFile(std::string(std::string("") + arg[1]).c_str(),path); break;
         default: printf("unknown action!\nnot attempted to write/append/read a file\n"); return;
     }
 }
@@ -1403,14 +1425,12 @@ void ALi::operator >> (const char* right){
     }
 }
 /**
- * @brief read from file
+ * @brief read from file 
+ * @brief  "r.dvfiles/128.bit" --- readable file in .dvfiles/128.bit path
  * @param right "xpath" x-type of file (r/b), path-path to file
- * @example "r.dvfiles/128.bit" - readable file in ".dvfiles/128.bit" path
  */
 void ALi::operator << (const char* right){
-    std::string _right(right);
-    _right.erase(_right.begin());
-    this->readFile(_right.c_str(),right[0]);
+    // this->readFile(right);
 }
 /**
  * @brief 
