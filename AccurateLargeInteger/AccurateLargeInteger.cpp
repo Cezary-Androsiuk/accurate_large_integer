@@ -627,19 +627,12 @@ void ALi::readFileReadable(const char* path){
     char buffer;
     char sign;
 
-    // read sign 
-    if(fread(&buffer, 1, 1, file) != 0){
-        if(buffer == '1') sign = '1';
-        else sign = '0';
-        if(buffer == '0' || buffer == '1')
-            fileContent += buffer;
-    }
-
     // read rest of file
     while(fread(&buffer, 1, 1, file) != 0){
         if(buffer == '0' || buffer == '1')
             fileContent += buffer;
     }
+    sign = fileContent[0];
     
     this->clear();
     // if number is negative then execute few operations

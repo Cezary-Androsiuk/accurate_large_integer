@@ -63,31 +63,17 @@ const bool test_equal(){
     return true;
 }
 
+
 const bool test_PLSB_PMSB(){
     ALi x,y,_x;
     x.setSeparator(' ');
-    x << "r.dvfiles/128.bit";
-    _x = x;
-    _x.negate();
-    x.print('b', "\n ");
-    while(x < _x){
-        // y = x;
-        // y.PLSB(0);
-        x.print('b', "\n ");
-
-        // y = x;
-        // y.PLSB(1);
-        // y.print('b', "\n  ");
-        
-        // y = x;
-        // y.PMSB(0);
-        // y.print('b', "\n  ");
-        
-        // y = x;
-        // y.PMSB(1);
-        // y.print('b', "\n\n");
-        x.increment();
-    }
+    x.globalHandle->var = mask111;
+    // x << "r.dvfiles/128.bit";
+    x.print('b', "\n\n");
+    // for(int i=0; i<70; i++){
+        x.PLSB(0);
+        x.print('b',"\n");
+    // }
     return false;
 }
 
@@ -475,6 +461,7 @@ const bool test_additionAssign(){
     return true;
 }
 
+
 const bool test_multiplication(){
     ALi x(-6),y(7),z;
     x.setSeparator(' ');
@@ -502,12 +489,12 @@ int main(){
     // else
     //     printf("equal ok!\n");
 
-    // if(!test_PLSB_PMSB()){ 
-    //     printf("test_PLSB_PMSB was't finished!\n");
-    //     return 1;
-    // }
-    // else
-    //     printf("test_PLSB_PMSB ok!\n");
+    if(!test_PLSB_PMSB()){ 
+        printf("test_PLSB_PMSB was't finished!\n");
+        return 1;
+    }
+    else
+        printf("test_PLSB_PMSB ok!\n");
 
     // if(!test_greaterThan()){ // 238068ms
     //     printf("test_greaterThan was't finished!\n");
@@ -614,12 +601,12 @@ int main(){
     // else
     //     printf("additionAssign ok!\n");
 
-    if(!test_multiplication()){
-        printf("multiplication was't finished!\n");
-        return 1;
-    }
-    else
-        printf("multiplication ok!\n");
+    // if(!test_multiplication()){
+    //     printf("multiplication was't finished!\n");
+    //     return 1;
+    // }
+    // else
+    //     printf("multiplication ok!\n");
 
 
 
