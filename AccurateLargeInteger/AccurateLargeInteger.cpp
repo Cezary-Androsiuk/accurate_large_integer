@@ -1240,7 +1240,7 @@ ALi ALi::multiplication(const ALi& right) const{
     ALi _right(right);
     ALi result;
 
-    _left.PLSB(0);
+    _left.PMSB(0);
     // _left.print('b',"\n");
     for(unsigned long long i=0; i<_left.length*BITS_PER_VAR-1; i++){
         // _left.print('b',"\n");

@@ -154,7 +154,7 @@ const bool test_increment(){
 
 
 const bool test_increment2(){
-    ALi x(".dvfiles/asrc.bit",'r');
+    ALi x("r",".dvfiles/asrc.bit");
     x.setSeparator(' ');
     x.print('b',"\n");
     x.increment();
@@ -170,7 +170,7 @@ const bool test_increment2(){
 
 
 const bool test_decrement(){
-    ALi x(".dvfiles/asrc.bit",'r');
+    ALi x("r",".dvfiles/asrc.bit");
     x.setSeparator(' ');
     for(int i=0; i<400; i++){
         x.print('b',"\n");
@@ -182,7 +182,7 @@ const bool test_decrement(){
 
 
 const bool test_decrement2(){
-    ALi x(".dvfiles/asrc.bit",'r');
+    ALi x("r",".dvfiles/asrc.bit");
     x.setSeparator(' ');
     x.print('b',"\n");
     x.increment();
@@ -255,8 +255,8 @@ const bool test_print(){
 
 
 const bool test_addition(){
-    ALi x(".dvfiles/addition_input_1",'r'),
-    y(".dvfiles/addition_input_2",'r'),
+    ALi x("r",".dvfiles/asrc.bit"),
+    y("r",".dvfiles/bsrc.bit"),
     z;
     // x.setSeparator(' ');
     // y.setSeparator(' ');
@@ -337,7 +337,7 @@ const bool test_addition2(){
 
 const bool test_addition3(){
     // add only equal numbers
-    ALi x(".dvfiles/asrc.bit",'r'),y(".dvfiles/asrc.bit",'r'),z;
+    ALi x("r",".dvfiles/asrc.bit"),y("r",".dvfiles/bsrc.bit"),z;
     x.setSeparator(' ');
     y.setSeparator(' ');
     z.setSeparator(' ');
@@ -358,7 +358,7 @@ const bool test_addition3(){
 const bool test_addition4(){
 
     return true;
-    ALi x(".dvfiles/asrc.bit",'r'),y(".dvfiles/bsrc.bit",'r'),z;
+    ALi x("r",".dvfiles/asrc.bit"),y("r",".dvfiles/bsrc.bit"),z;
     x.setSeparator('\n');
     // y.invert();
     y.setSeparator('\n');
