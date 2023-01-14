@@ -88,7 +88,9 @@ protected: public:
     // Addition
     void increment();//
     ALi addition(const ALi& right) const; //
+    ALi addition2(const ALi& right) const; //
     void additionAssign(const ALi& right); //
+    void additionAssign2(const ALi& right); //
 
     // Subtraction
     void decrement();

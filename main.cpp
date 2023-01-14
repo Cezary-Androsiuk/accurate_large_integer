@@ -255,18 +255,18 @@ const bool test_print(){
 
 
 const bool test_addition(){
-    ALi x("r",".dvfiles/asrc.bit"),
-    y("r",".dvfiles/bsrc.bit"),
+    ALi x("b",".dvfiles/128.bit"),
+    y("b",".dvfiles/128.bit"),
     z;
-    // x.setSeparator(' ');
-    // y.setSeparator(' ');
-    // z.setSeparator(' ');
+    x.setSeparator(' ');
+    y.setSeparator(' ');
+    z.setSeparator(' ');
 
-    // z = x + y;
+    z = x.addition2(y);
 
-    // x.print('d'," + ");
-    // y.print('d'," = ");
-    // z.print('d',"\n");
+    x.print('d'," + ");
+    y.print('d'," = ");
+    z.print('d',"\n");
 
     // x.print('b',"\n");
     // y.print('b',"\n");
@@ -562,12 +562,12 @@ int main(){
     // else
     //     printf("assignment ok!\n");
 
-    // if(!test_addition()){
-    //     printf("addition was't finished!\n");
-    //     return 1;
-    // }
-    // else
-    //     printf("addition ok!\n");
+    if(!test_addition()){
+        printf("addition was't finished!\n");
+        return 1;
+    }
+    else
+        printf("addition ok!\n");
 
     // if(!test_addition2()){
     //     printf("addition2 was't finished!\n");
@@ -604,12 +604,12 @@ int main(){
     // else
     //     printf("additionAssign ok!\n");
 
-    if(!test_multiplication()){
-        printf("multiplication was't finished!\n");
-        return 1;
-    }
-    else
-        printf("multiplication ok!\n");
+    // if(!test_multiplication()){
+    //     printf("multiplication was't finished!\n");
+    //     return 1;
+    // }
+    // else
+    //     printf("multiplication ok!\n");
 
 
 

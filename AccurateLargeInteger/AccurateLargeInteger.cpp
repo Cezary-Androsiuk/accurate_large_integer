@@ -1058,8 +1058,138 @@ ALi ALi::addition(const ALi& right) const{
 /**
  * @brief 
  * @param right 
+ * @return ALi 
+ */
+ALi ALi::addition2(const ALi& right) const{
+    if(right.is0()){ // L + 0 = L
+        return *this;
+    }
+    else if (this->is0()){ // 0 + R = R
+        return right;
+    } 
+    else if (right.is1()){ // L + 1 = L++
+        ALi out(*this);
+        out.increment();
+        return out;
+    }
+    else if (this->is1()){ // 1 + R = R++
+        ALi out(right);
+        out.increment();
+        return out;
+    }
+
+    ALi out;
+
+    const Cell* const lgh = this->globalHandle;
+    const Cell* lh = lgh->L;
+    const bool lsign = this->sgn();
+    Cell lmask{
+        lmask.var = (lsign ? mask111 : mask000),
+        lmask.L = &lmask,
+        lmask.R = &lmask
+    };
+    // Cell lmask;
+    // lmask.var = (lsign ? mask111 : mask000);
+    // lmask.L = &lmask;
+    // lmask.R = &lmask;
+
+    const Cell* const rgh = right.globalHandle;
+    const Cell* rh = rgh->L;
+    const bool rsign = right.sgn();
+    Cell rmask{
+        rmask.var = (rsign ? mask111 : mask000),
+        rmask.L = &rmask,
+        rmask.R = &rmask
+    };
+
+    // Cell rmask;
+    // rmask.var = (rsign ? mask111 : mask000);
+    // rmask.L = &rmask;
+    // rmask.R = &rmask;
+    
+    unsigned char carry = __builtin_add_overflow(lgh->var, rgh->var, &out.globalHandle->var);
+    if(lh == lgh) lh = &lmask;
+    if(rh == rgh) rh = &rmask;
+
+    CELL_TYPE sum;
+    while(lh != &lmask || rh != &rmask){
+        carry = __builtin_add_overflow(lh->var,carry,&sum);
+        carry += __builtin_add_overflow(rh->var,sum,&sum);
+        out.newCell(sum);
+
+        lh = lh->L;
+        rh = rh->L;
+        if(lh == lgh) lh = &lmask;
+        if(rh == rgh) rh = &rmask;
+    }
+    // overflow can only appear when both operation argument sign values are equal
+    if(lsign == rsign && lsign != out.sgn())
+        out.newCell(lmask.var);
+    out.optymize();
+    return out;
+}
+/**
+ * @brief 
+ * @param right 
  */
 void ALi::additionAssign(const ALi& right){
+    if(right.is0()){ // L += 0 == L
+        return;
+    }
+    else if (this->is0()){ // 0 += R == R
+        this->assignment(right);
+        return;
+    }
+    else if (right.is1()){ // L += 1 == L++
+        this->increment();
+        return;
+    }
+    else if (this->is1()){ // 1 += R == R++
+        this->assignment(right);
+        this->increment();
+        return;
+    }
+    
+    // this->assignment(this->addition(right));
+
+    ALi* const lobj = this; 
+    Cell* const lgh = lobj->globalHandle;
+    Cell* lh = lgh->L;
+    const bool lsign = lobj->sgn();
+    const CELL_TYPE lmask = (lsign ? mask111 : mask000);
+
+    const ALi* const robj = &right;
+    const Cell* const rgh = robj->globalHandle;
+    const Cell* rh = rgh->L;
+    const bool rsign = robj->sgn();
+    const CELL_TYPE rmask = (rsign ? mask111 : mask000);
+    
+    CELL_TYPE carry = 0;
+
+    lgh->var += rgh->var;
+    if(lgh->var < rgh->var)
+        carry = 0;
+        
+    while(lh != lgh || rh != rgh){ // continue if both are not their global handles !(lh == lgh && rh == rgh)
+        if(lh == lgh) this->newCell(lmask + (rh == rgh ? rmask : rh->var) + carry);
+        else lh->var += (rh == rgh ? rmask : rh->var) + carry;
+
+        if(lh->var < rh->var || (lh->var <= rh->var && carry)) carry = 1;
+        else carry = 0;
+
+        if(lh != lgh) lh = lh->L;
+        if(rh != rgh) rh = rh->L;
+    }
+    // overflow can only appear when both operation argument sign values are equal
+    if(lsign == rsign && lsign != this->sgn())
+        this->newCell(lmask);
+    this->optymize();
+}
+/**
+ * @brief 
+ * @param right 
+ */
+void ALi::additionAssign2(const ALi& right){
     if(right.is0()){ // L += 0 == L
         return;
     }
@@ -1256,7 +1386,7 @@ ALi ALi::multiplication(const ALi& right) const{
         // 00 & 11
         }
         // store lsb and shr result or shl _right
-        _right.SHL();3
+        _right.SHL();
         _left.SHR();
         _left.globalHandle->R->var = _left.globalHandle->R->var & mask011; // treat whole number as a unsigned shr
     }
