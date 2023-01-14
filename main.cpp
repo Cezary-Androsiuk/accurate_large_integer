@@ -462,14 +462,18 @@ const bool test_additionAssign(){
 
 
 const bool test_multiplication(){
-    ALi x(-6),y(7),z;
+    ALi x(6),y(7),z;
     x.setSeparator(' ');
     y.setSeparator(' ');
     z.setSeparator(' ');
     // x << "r.dvfiles/128.bit";
-    x.print('b',"\n");
-    y.print('b',"\n\n");
+    x.print('b'," ");
+    x.print('d',"\n");
+    y.print('b'," ");
+    y.print('d',"\n\n");
     z = x.multiplication(y);
+    z.delCell();
+    z.print('b'," ");
     z.print('d',"\n");
 
     return false;
