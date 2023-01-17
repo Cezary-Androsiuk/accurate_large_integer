@@ -534,7 +534,7 @@ void ALi::printDecimalApproximation(unsigned long long appPrec) const{
  * @param path path to file where variable should be stored
  * @param append append or overwrite file if exist 
  */
-void ALi::import_cells(const char* path) const{
+void ALi::export_cells(const char* path) const{
     FILE* file = fopen(path,"wb");
     if(file == NULL){
         printf("File \"%s\" not found!\n",path);
@@ -551,7 +551,7 @@ void ALi::import_cells(const char* path) const{
  * @brief copy value from source file to variable
  * @param path source where an readable binary file is stored
  */
-void ALi::export_cells(const char* path){
+void ALi::import_cells(const char* path){
     this->clear();
     FILE* file = fopen(path,"rb");
     if(file == NULL){
@@ -584,38 +584,21 @@ void ALi::export_cells(const char* path){
  * @param path path to file where variable should be stored
  * @param append append or overwrite file if exist 
  */
-void ALi::writeFile_02(const char* path) const{
-    FILE* file = fopen(path,"w");
-    if(file == NULL){
-        printf("File \"%s\" not found!\n",path);
-        return;
-    }
+void ALi::writeFile_02(FILE* const file) const{
     Cell* handle = this->globalHandle->R;
     do{
         std::string binary = BPrint::binary_x64(handle->var,ULL_VAR_SEP);
         fwrite(binary.c_str(), sizeof(char), binary.length(), file); // bufer, size of cell, cell amout, source
         handle = handle->R;
     }while(handle != this->globalHandle->R);
-    fclose(file);
 }
 /**
  * @brief save variable to file in readable form allowing to add separator sign every 8 bits 
  * @param path path to file where variable should be stored
  * @param append append or overwrite file if exist 
  */
-void ALi::writeFile_10(const char* path) const{
-    FILE* file = fopen(path,"w");
-    if(file == NULL){
-        printf("File \"%s\" not found!\n",path);
-        return;
-    }
-    Cell* handle = this->globalHandle->R;
-    do{
-        std::string binary = BPrint::binary_x64(handle->var,ULL_VAR_SEP);
-        fwrite(binary.c_str(), sizeof(char), binary.length(), file); // bufer, size of cell, cell amout, source
-        handle = handle->R;
-    }while(handle != this->globalHandle->R);
-    fclose(file);
+void ALi::writeFile_10(FILE* const file) const{
+
 }
 /**
  * @brief save variable to file 
@@ -624,11 +607,17 @@ void ALi::writeFile_10(const char* path) const{
  * @param append append or overwrite file if exist 
  */
 void ALi::writeFile(const char* type, const char* path) const{
-    switch (type[0]){
-        case 'b': this->writeFile_02(path); break;
-        case 'd': this->writeFile_10(path); break;
-        default: printf("unknown type!\nnot attempted to create file\n"); return;
+    FILE* file = fopen(path,"w");
+    if(file == NULL){
+        printf("File \"%s\" not found!\n",path);
+        return;
     }
+    switch (type[0]){
+        case 'b': this->writeFile_02(file); break;
+        case 'd': this->writeFile_10(file); break;
+        default: printf("writeFile: unknown type: '%c'\nbinary: 'b'\n decimal: 'd'\n"); return;
+    }
+    fclose(file);
 }
     // #
     
@@ -647,18 +636,23 @@ void ALi::writeFile(const char* type, const char* path) const{
  * @brief copy value from readable source file to variable and ignore others than '1' and '0' signs
  * @param path source where an readable binary file is stored
  */
-void ALi::readFile_02(const char* file){
-    this->globalHandle->var = (*file=='0' ? mask000 : mask111);
-    while(*file != '\0')
-        this->PLSB((*(file++)=='0' ? 0 : 1)); // x++ increment after returning value
-
+void ALi::readFile_02(FILE* const file){
+    std::string fdata;
+    char buffer;
+    while(fread(&buffer, 1, 1, file) != 0)
+        if(buffer == '0' || buffer == '1')
+            fdata += buffer;
+    const char* cstrdata = fdata.c_str();
+    this->globalHandle->var = (*cstrdata=='0' ? mask000 : mask111);
+    while(*cstrdata != '\0')
+        this->PLSB((*(cstrdata++)=='0' ? 0 : 1)); // x++ increment after returning value
     this->optymize();
 }
 /**
  * @brief copy value from readable source file to variable and ignore others than '1' and '0' signs
  * @param path source where an readable binary file is stored
  */
-void ALi::readFile_10(const char* file){
+void ALi::readFile_10(FILE* const file){
 
 }
 /**
@@ -672,18 +666,12 @@ void ALi::readFile(const char* type, const char* path){
         printf("File \"%s\" not found!\n",path);
         return;
     }
-
-    std::string strfdata;
-    char buffer;
-    while(fread(&buffer, 1, 1, file) != 0)
-        if(buffer == '0' || buffer == '1')
-            strfdata += buffer;
-                
     switch (type[0]){
-        case 'b': this->readFile_02(strfdata.c_str()); break;
-        case 'd': this->readFile_10(strfdata.c_str()); break;
-        default: printf("unknown type!\nnot attempted to read file\n"); return;
+        case 'b': this->readFile_02(file); break;
+        case 'd': this->readFile_10(file); break;
+        default: printf("readFile: unknown type: '%c'\nbinary: 'b'\n decimal: 'd'\n"); return;
     }
+    fclose(file);
 }
     // #
     
@@ -723,7 +711,9 @@ void ALi::assignment(const ALi& source){
  */
 void ALi::assignment(const signed long long& source){
     this->clear();
-    #ifdef UC_CELL
+    #ifdef UNSIGNED_LONG_LONG_CELL
+        this->globalHandle->var = source;
+    #else
         unsigned long long sample = source;
         this->globalHandle->var = sample % 256;
         sample /= 256;
@@ -736,9 +726,6 @@ void ALi::assignment(const signed long long& source){
         //     sample /= 256;
         // }
         this->optymize();
-    #endif
-    #ifdef ULL_CELL
-        this->globalHandle->var = source;
     #endif
 }
 /**
@@ -1088,10 +1075,6 @@ ALi ALi::addition2(const ALi& right) const{
         lmask.L = &lmask,
         lmask.R = &lmask
     };
-    // Cell lmask;
-    // lmask.var = (lsign ? mask111 : mask000);
-    // lmask.L = &lmask;
-    // lmask.R = &lmask;
 
     const Cell* const rgh = right.globalHandle;
     const Cell* rh = rgh->L;
@@ -1101,11 +1084,6 @@ ALi ALi::addition2(const ALi& right) const{
         rmask.L = &rmask,
         rmask.R = &rmask
     };
-
-    // Cell rmask;
-    // rmask.var = (rsign ? mask111 : mask000);
-    // rmask.L = &rmask;
-    // rmask.R = &rmask;
     
     unsigned char carry = __builtin_add_overflow(lgh->var, rgh->var, &out.globalHandle->var);
     if(lh == lgh) lh = &lmask;
@@ -1213,33 +1191,41 @@ void ALi::additionAssign2(const ALi& right){
     Cell* const lgh = lobj->globalHandle;
     Cell* lh = lgh->L;
     const bool lsign = lobj->sgn();
-    const CELL_TYPE lmask = (lsign ? mask111 : mask000);
+    Cell lmask{
+        lmask.var = (lsign ? mask111 : mask000),
+        lmask.L = &lmask,
+        lmask.R = &lmask
+    };
 
     const ALi* const robj = &right;
     const Cell* const rgh = robj->globalHandle;
     const Cell* rh = rgh->L;
     const bool rsign = robj->sgn();
-    const CELL_TYPE rmask = (rsign ? mask111 : mask000);
+    Cell rmask{
+        rmask.var = (rsign ? mask111 : mask000),
+        rmask.L = &rmask,
+        rmask.R = &rmask
+    };
     
-    CELL_TYPE carry = 0;
-
-    lgh->var += rgh->var;
-    if(lgh->var < rgh->var)
-        carry = 0;
+    unsigned char carry = 0;
+    carry = __builtin_add_overflow(lgh->var,rgh->var,&lgh->var);
         
     while(lh != lgh || rh != rgh){ // continue if both are not their global handles !(lh == lgh && rh == rgh)
-        if(lh == lgh) this->newCell(lmask + (rh == rgh ? rmask : rh->var) + carry);
-        else lh->var += (rh == rgh ? rmask : rh->var) + carry;
+
+        if(lh == lgh) this->newCell(lmask.var + rh->var + carry);
+        else lh->var += rh->var + carry;
 
         if(lh->var < rh->var || (lh->var <= rh->var && carry)) carry = 1;
         else carry = 0;
 
-        if(lh != lgh) lh = lh->L;
-        if(rh != rgh) rh = rh->L;
+        lh = lh->L;
+        rh = rh->L;
+        if(lh == lgh) lh = &lmask;
+        if(rh == rgh) rh = &rmask;
     }
     // overflow can only appear when both operation argument sign values are equal
     if(lsign == rsign && lsign != this->sgn())
-        this->newCell(lmask);
+        this->newCell(lmask.var);
     this->optymize();
 }
     // #
@@ -1486,11 +1472,15 @@ void ALi::printApproximation(const char& type, const char* additionText, unsigne
  * @param action type of action write('w') or read('r')
  * @param type type of file, readable('r') or binary('b')
  */
-void ALi::file(const char* arg, const char* path){
-    switch (arg[0]){
-        case 'w': this->writeFile(std::string(std::string("") + arg[1]).c_str(),path); break;
-        case 'r': this->readFile(std::string(std::string("") + arg[1]).c_str(),path); break;
-        default: printf("unknown action!\nnot attempted to write/append/read a file\n"); return;
+void ALi::file(const char* argpath){
+    std::string str(argpath);
+    const char action = str[0];
+    const char type[] = {str[1],'\0'};
+    str.erase(0,2);
+    switch (action){
+        case 'w': this->writeFile(type,str.c_str()); break;
+        case 'r': this->readFile(type,str.c_str()); break;
+        default: printf("file: unknown action: '%c'\nread: 'r'\n write: 'w'\n"); return;
     }
 }
     // #
@@ -1500,6 +1490,8 @@ void ALi::file(const char* arg, const char* path){
     // #
     
     // # Get / Set
+    
+    // #
     
     // #
     
@@ -1541,13 +1533,12 @@ const bool ALi::isEmpty() const{
     // #
     
     // #
-
 /**
  * @brief 
  * @param right "xtext" x-type of print (b/d), text-additional text
  * @example "d\n" - decimal print with new line 
  */
-void ALi::operator >> (const char* right){
+void ALi::operator >> (const char* right) const{
     this->print(right[0]);
     while(*right != '\0'){
         ++right;
@@ -1560,7 +1551,7 @@ void ALi::operator >> (const char* right){
  * @param right "xpath" x-type of file (r/b), path-path to file
  */
 void ALi::operator << (const char* right){
-    // this->readFile(right);
+    this->file(right);
 }
 /**
  * @brief 

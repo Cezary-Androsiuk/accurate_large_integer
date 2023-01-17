@@ -40,8 +40,8 @@ protected: public:
 protected: public:
     void SHR();//
     void SHL();//
-    void PMSB(const bool& bit);//! 11111011
-    void PLSB(const bool& bit);//!
+    void PMSB(const bool& bit);//
+    void PLSB(const bool& bit);//
 
     const bool sgn() const;//
     const bool is0() const;//
@@ -53,32 +53,29 @@ protected: public:
     void invert();//
 
 protected: public:
-    // might be a good idea to split class to ALi and ALi_stdio (standard input output)
+    // might be a good idea to split the class to ALi and ALi_stdio (standard input output)
     void printBinary() const;//
     void printDecimal() const;//
 
     void printBinaryApproximation(unsigned long long appPrec) const;//!
     void printDecimalApproximation(unsigned long long appPrec) const;//!
 
-    //! change xFileBinary to something other cause this exist only to store data better and to can continue work after software reopen
-    //! just to comunicate with himself name should be as "dataStore" or "saveTo"
-    //! this method save to file actual containing information currently stored in ram
-    void import_cells(const char* path) const;//
-    void export_cells(const char* path);//
+    void export_cells(const char* path) const;//
+    void import_cells(const char* path);//
 
-    void writeFile_02(const char* path) const;//
-    void writeFile_10(const char* path) const;//
+    void writeFile_02(FILE* const file) const;//
+    void writeFile_10(FILE* const file) const;//
     void writeFile(const char* type, const char* path) const;//
 
-    void readFile_02(const char* file);
-    void readFile_10(const char* file);
+    void readFile_02(FILE* const file);
+    void readFile_10(FILE* const file);
     void readFile(const char* type, const char* path);//
     
 protected: public:
     // Assignment
     void assignment(const ALi& source);//
     void assignment(const signed long long& source);//
-    void assignment(const std::string& source); //! 
+    void assignment(const std::string& source); //!
 
     // Bolean
     const bool equal(const ALi& right) const;//
@@ -86,11 +83,11 @@ protected: public:
     const bool smallerThan(const ALi& right) const;//
 
     // Addition
-    void increment();//
-    ALi addition(const ALi& right) const; //
-    ALi addition2(const ALi& right) const; //
-    void additionAssign(const ALi& right); //
-    void additionAssign2(const ALi& right); //
+    void increment();
+    ALi addition(const ALi& right) const;
+    ALi addition2(const ALi& right) const;
+    void additionAssign(const ALi& right);
+    void additionAssign2(const ALi& right);
 
     // Subtraction
     void decrement();
@@ -109,14 +106,15 @@ public:
     // Public
     void print(const char& type, const char* additionText = "", unsigned long long alignment = 0) const;
     void printApproximation(const char& type, const char* additionText = "", unsigned long long approximationPrecision = 2) const;
-    void file(const char* arg, const char* path);
+    void file(const char* argpath);
+    
     // Get / Set
     void setSeparator(const char& separatorSign = '\0');
     const char getSeparator() const;
     const bool isEmpty() const;
 
     // Operators
-    void operator >> (const char* right);
+    void operator >> (const char* right) const;
     void operator << (const char* right);
 
     void operator =  (const ALi& right);
