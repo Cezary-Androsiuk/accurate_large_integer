@@ -37,9 +37,9 @@ ALi::ALi(const signed long long& source) : ALi(){
  * @param path file where variable should be stored
  * @param type type of source file: readable('r'), binary('b')
  */
-ALi::ALi(const char* type, const char* sourcePath) : ALi(){
-    this->readFile(type,sourcePath);
-}
+// ALi::ALi(const char* type, const char* sourcePath) : ALi(){
+//     this->readFile(type,sourcePath);
+// }
 /**
  * @brief Destroy the ALi object
  * deletes all dynamically allocated cells
@@ -48,14 +48,6 @@ ALi::~ALi(){
     this->clear();
     delete this->globalHandle;
 }
-    // #
-    
-    // #
-    
-    // #
-    
-    // #
-    
     // #
     
     // #
@@ -95,14 +87,6 @@ const bool ALi::delCell(){
     delete handle;
     return true;
 }
-    // #
-    
-    // #
-    
-    // #
-    
-    // #
-    
     // #
     
     // #
@@ -224,14 +208,6 @@ void ALi::PLSB(const bool& bit){
     // #
     
     // #
-    
-    // #
-    
-    // #
-    
-    // #
-    
-    // #
 /**
  * @brief return sign bit
  * @return true sign bit is 1 => number is negative
@@ -258,14 +234,6 @@ const bool ALi::is1() const{
     if(this->length == 1 && this->globalHandle->var == mask001) return true;
     else return false;
 }
-    // #
-    
-    // #
-    
-    // #
-    
-    // #
-    
     // #
     
     // #
@@ -362,6 +330,17 @@ void ALi::invert(){
     // #
     
     // #
+    
+    // #
+    
+    // #
+    
+    // #
+
+    
+    // #
+    
+    // # Print
     
     // #
 /**
@@ -483,15 +462,7 @@ void ALi::printDecimal() const{
 }
     // #
     
-    // #
-    
-    // #
-    
-    // #
-    
-    // #
-    
-    // #
+    // # Print Approximation
     
     // #
 /**
@@ -518,15 +489,7 @@ void ALi::printDecimalApproximation(unsigned long long appPrec) const{
 }
     // #
     
-    // #
-    
-    // #
-    
-    // #
-    
-    // #
-    
-    // #
+    // # Store
     
     // #
 /**
@@ -568,15 +531,7 @@ void ALi::import_cells(const char* path){
 }
     // #
     
-    // #
-    
-    // #
-    
-    // #
-    
-    // #
-    
-    // #
+    // # File Write
     
     // #
 /**
@@ -615,21 +570,13 @@ void ALi::writeFile(const char* type, const char* path) const{
     switch (type[0]){
         case 'b': this->writeFile_02(file); break;
         case 'd': this->writeFile_10(file); break;
-        default: printf("writeFile: unknown type: '%c'\nbinary: 'b'\n decimal: 'd'\n"); return;
+        default: printf("writeFile: unknown type: '%c'\nbinary: 'b'\n decimal: 'd'\n",type[0]); return;
     }
     fclose(file);
 }
     // #
     
-    // #
-    
-    // #
-    
-    // #
-    
-    // #
-    
-    // #
+    // # File Read
     
     // #
 /**
@@ -669,7 +616,7 @@ void ALi::readFile(const char* type, const char* path){
     switch (type[0]){
         case 'b': this->readFile_02(file); break;
         case 'd': this->readFile_10(file); break;
-        default: printf("readFile: unknown type: '%c'\nbinary: 'b'\n decimal: 'd'\n"); return;
+        default: printf("readFile: unknown type: '%c'\nbinary: 'b'\n decimal: 'd'\n",type[0]); return;
     }
     fclose(file);
 }
@@ -679,11 +626,22 @@ void ALi::readFile(const char* type, const char* path){
     
     // #
     
+    // #
+    
+    // #
+    
+    // #
+    
+    // #
+    
+    // #
+    
+    // #
+
+    
+    // #
+    
     // # Assignment
-    
-    // #
-    
-    // #
     
     // #
 /**
@@ -711,22 +669,36 @@ void ALi::assignment(const ALi& source){
  */
 void ALi::assignment(const signed long long& source){
     this->clear();
-    #ifdef UNSIGNED_LONG_LONG_CELL
-        this->globalHandle->var = source;
-    #else
-        unsigned long long sample = source;
-        this->globalHandle->var = sample % 256;
-        sample /= 256;
-        while(sample > 0){
-            this->newCell(sample % 256);
-            sample /= 256;
+    this->globalHandle->var = source;
+}
+    // #
+    
+    // # Assignment string
+    
+    // #
+/**
+ * @brief 
+ * @param source 
+ */
+void ALi::assignment_02(const std::string& source){
+    this->clear();
+    if(source[1] == '1')
+        this->globalHandle->var = mask111;
+
+    for(char src: source){
+        switch(src){
+            case '0': this->PLSB(0); break;
+            case '1': this->PLSB(1); break;
+            default: break;
         }
-        // for(int i=0; i<7; i++){
-        //     this->newCell(sample % 256);
-        //     sample /= 256;
-        // }
-        this->optymize();
-    #endif
+    }
+}
+/**
+ * @brief 
+ * @param source 
+ */
+void ALi::assignment_10(const std::string& source){
+
 }
 /**
  * @brief 
@@ -736,32 +708,17 @@ void ALi::assignment(const signed long long& source){
  * @example "b1110101010101"
  * @example "d-765238745629"
  */
-void ALi::assignment(const std::string& source){
-    const char type = source[0];
+void ALi::assignment_str(const std::string& source){
     std::string value(source);
-    value.erase(value.begin());
-    switch(type){
-        case 'b':
-
-        break;
-        case 'd':
-
-        break;
-        default: printf("unknown action!\nnot attempted to assign the value\n"); return;
+    switch(source[0]){
+        case 'b': this->assignment_02(value); break;
+        case 'd': this->assignment_10(value); break;
+        default: printf("print: unknown type: '%c'\nbinary: 'b'\n decimal: 'd'\n",source[0]); return;
     }
-    
 }
     // #
     
-    // #
-    
-    // #
-    
     // # Boolean
-    
-    // #
-    
-    // #
     
     // #
 /**
@@ -907,15 +864,7 @@ const bool ALi::smallerThan(const ALi& right) const{
 }
     // #
     
-    // #
-    
-    // #
-    
     // # Addition
-    
-    // #
-    
-    // #
     
     // #
 /**
@@ -1230,15 +1179,7 @@ void ALi::additionAssign2(const ALi& right){
 }
     // #
     
-    // #
-    
-    // #
-    
     // # Subtraction
-    
-    // #
-    
-    // #
     
     // #
 /**
@@ -1331,15 +1272,7 @@ void ALi::subtractionAssign(const ALi& right){
 }
     // #
     
-    // #
-    
-    // #
-    
     // # Multiplication
-    
-    // #
-    
-    // #
     
     // #
 /**
@@ -1388,15 +1321,7 @@ void ALi::multiplicationAssign(const ALi& right){
 }
     // #
     
-    // #
-    
-    // #
-    
     // # Division
-    
-    // #
-    
-    // #
 
     // #
 /**
@@ -1420,37 +1345,38 @@ void ALi::divisionAssign(const ALi& right){
     
     // #
     
+    // #
+    
+    // #
+    
+    // #
+    
+    // #
+    
+    // #
+    
+    // #
+
+    
+    // #
+    
     // # Public
-    
-    // #
-    
-    // #
     
     // #
 /**
  * @brief print variable as a binary or decimal
- * @param type type of file, decimal('d') or binary('b')
- * @param additionText default is "" text what will be printed at the end of variable
+ * @param additionText "b...","d..." type and text what will be printed at the end of variable
  */
-void ALi::print(const char& type, const char* additionText, unsigned long long alignment) const{
-    switch (type){
-        case 'b': 
-            for(unsigned long long i=0; i<alignment; i++){
-                printf("%s",(this->sgn() ? "11111111" : "00000000"));
-                if(this->separator != '\0') printf("%c",this->separator);
-            }
-            this->printBinary();
-            break;
-        case 'd': 
-            for(unsigned long long i=0; i<alignment; i++){
-                printf("%s","000");
-                if(this->separator != '\0') printf("%c",this->separator);
-            }
-            this->printDecimal(); 
-            break;
-        default: printf("unknown type!\n"); return;
+void ALi::print(const char* type_text) const{
+    switch (type_text[0]){
+        case 'b': this->printBinary(); break;
+        case 'd': this->printDecimal(); break;
+        default: printf("print: unknown type: '%c'\nbinary: 'b'\n decimal: 'd'\n",type_text[0]); return;
     }
-    printf("%s",additionText);
+    while(*type_text != '\0'){
+        ++type_text;
+        printf("%c",*type_text);
+    }
 }
 /**
  * @brief printing binary variable in scientific notation format
@@ -1458,13 +1384,13 @@ void ALi::print(const char& type, const char* additionText, unsigned long long a
  * @param additionText 
  * @param approximationPrecision simply how many digits (counting from left and without variable sign) will be printed
  */
-void ALi::printApproximation(const char& type, const char* additionText, unsigned long long approximationPrecision) const{
-    switch (type){
-    case 'b': this->printBinaryApproximation(approximationPrecision); break;
-    case 'd': this->printDecimalApproximation(approximationPrecision); break;
-    default: printf("unknown type!\n"); return;
-    }
-    printf("%s",additionText);
+void ALi::printApproximation(const char* type_text, unsigned long long approximationPrecision) const{
+    // switch (type){
+    // case 'b': this->printBinaryApproximation(approximationPrecision); break;
+    // case 'd': this->printDecimalApproximation(approximationPrecision); break;
+    // default: printf("unknown type!\n"); return;
+    // }
+    // printf("%s",additionText);
 }
 /**
  * @brief actions on files around variable
@@ -1472,30 +1398,20 @@ void ALi::printApproximation(const char& type, const char* additionText, unsigne
  * @param action type of action write('w') or read('r')
  * @param type type of file, readable('r') or binary('b')
  */
-void ALi::file(const char* argpath){
-    std::string str(argpath);
+void ALi::file(const char* type_path){
+    std::string str(type_path);
     const char action = str[0];
     const char type[] = {str[1],'\0'};
     str.erase(0,2);
     switch (action){
         case 'w': this->writeFile(type,str.c_str()); break;
         case 'r': this->readFile(type,str.c_str()); break;
-        default: printf("file: unknown action: '%c'\nread: 'r'\n write: 'w'\n"); return;
+        default: printf("file: unknown action: '%c'\nread: 'r'\n write: 'w'\n",type[0]); return;
     }
 }
     // #
     
-    // #
-    
-    // #
-    
     // # Get / Set
-    
-    // #
-    
-    // #
-    
-    // #
     
     // #
 /**
@@ -1522,36 +1438,27 @@ const bool ALi::isEmpty() const{
 }
     // #
     
-    // #
-    
-    // #
-    
     // # Operators
     
     // #
-    
-    // #
-    
-    // #
 /**
- * @brief 
+ * @brief print() shortcut 
+ * @brief "d\n" - decimal print with new line 
  * @param right "xtext" x-type of print (b/d), text-additional text
- * @example "d\n" - decimal print with new line 
  */
 void ALi::operator >> (const char* right) const{
-    this->print(right[0]);
-    while(*right != '\0'){
-        ++right;
-        printf("%c",*right);
-    }
+    this->print(right);
 }
 /**
- * @brief read from file 
- * @brief  "r.dvfiles/128.bit" --- readable file in .dvfiles/128.bit path
- * @param right "xpath" x-type of file (r/b), path-path to file
+ * @brief read from char array 
+ * @brief  "b0101010101" - positive binary value 
+ * @brief  "b1101010101" - negative binary value 
+ * @brief  "d7894535434" - positive decimal value 
+ * @brief  "d-894535434" - negative decimal value 
+ * @param right "xvalue" x-type of value (b/d), value-value
  */
 void ALi::operator << (const char* right){
-    this->file(right);
+    this->assignment_str(right);
 }
 /**
  * @brief 

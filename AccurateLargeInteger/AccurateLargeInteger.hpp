@@ -30,14 +30,14 @@ public:
     ALi();//
     ALi(const ALi& source);//
     ALi(const signed long long& source);//
-    ALi(const char* type, const char* sourcePath);//
+    // ALi(const char* type, const char* sourcePath);//
     ~ALi();//
 
-protected: public:
+protected:
     void newCell(const CELL_TYPE&);//
     const bool delCell();//
 
-protected: public:
+protected:
     void SHR();//
     void SHL();//
     void PMSB(const bool& bit);//
@@ -52,21 +52,26 @@ protected: public:
     void negate();//
     void invert();//
 
-protected: public:
+protected:
     // might be a good idea to split the class to ALi and ALi_stdio (standard input output)
+    // Print
     void printBinary() const;//
     void printDecimal() const;//
-
+    
+    // Print Approximation
     void printBinaryApproximation(unsigned long long appPrec) const;//!
     void printDecimalApproximation(unsigned long long appPrec) const;//!
 
+    // Store
     void export_cells(const char* path) const;//
     void import_cells(const char* path);//
 
+    // File Write
     void writeFile_02(FILE* const file) const;//
     void writeFile_10(FILE* const file) const;//
     void writeFile(const char* type, const char* path) const;//
 
+    // File Read
     void readFile_02(FILE* const file);
     void readFile_10(FILE* const file);
     void readFile(const char* type, const char* path);//
@@ -75,7 +80,11 @@ protected: public:
     // Assignment
     void assignment(const ALi& source);//
     void assignment(const signed long long& source);//
-    void assignment(const std::string& source); //!
+
+    // Assignment String
+    void assignment_02(const std::string& source);
+    void assignment_10(const std::string& source);
+    void assignment_str(const std::string& source);
 
     // Bolean
     const bool equal(const ALi& right) const;//
@@ -104,9 +113,9 @@ protected: public:
 
 public:
     // Public
-    void print(const char& type, const char* additionText = "", unsigned long long alignment = 0) const;
-    void printApproximation(const char& type, const char* additionText = "", unsigned long long approximationPrecision = 2) const;
-    void file(const char* argpath);
+    void print(const char* type_text) const;
+    void printApproximation(const char* type_text, unsigned long long approximationPrecision = 2) const;
+    void file(const char* type_path);
     
     // Get / Set
     void setSeparator(const char& separatorSign = '\0');
