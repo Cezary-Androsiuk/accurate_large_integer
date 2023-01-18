@@ -21,9 +21,13 @@ void percent(unsigned long long from, unsigned long long current, unsigned long 
 
 int main(){
 
-    ALi x;
-    
-    // x.print("b\n");
+    ALi x("b",".dvfiles/asrc.bit");
+    x.setSeparator(' ');
+
+    for(int i=0; i<70; i++){
+        x >> "b\n";
+        x.SHR();
+    }
     
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

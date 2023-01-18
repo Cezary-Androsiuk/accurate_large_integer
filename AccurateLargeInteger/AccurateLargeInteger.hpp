@@ -7,7 +7,7 @@
     accurate large integer
 */
 class ALi{
-protected: public:
+protected:
     /**
      * @brief single cell containing:
      * var (CELL_TYPE) store byte of information
@@ -37,7 +37,7 @@ protected:
     void newCell(const CELL_TYPE&);//
     const bool delCell();//
 
-protected:
+protected: public:
     void SHR();//
     void SHL();//
     void PMSB(const bool& bit);//

@@ -20,22 +20,22 @@ ALi::ALi(){
 }
 /**
  * @brief Construct a new ALi object by using previously existing object
- * @param source object which will be source to build identical ALi
+ * @param source ALi object which will be used to build identical ALi
  */
 ALi::ALi(const ALi& source) : ALi(){
     this->assignment(source);
 }
 /**
  * @brief Construct a new ALi object by using intiger value
- * @param source object which will be source to build identical ALi
+ * @param source value which will be the source to build ALi
  */
 ALi::ALi(const signed long long& source) : ALi(){
     this->begin_ptr->var = source;
 }
 /**
  * @brief Construct a new ALi object by using existing file with value
- * @param path file where variable should be stored
- * @param type type of source file: readable('r'), binary('b')
+ * @param type type of source file: binary: 'b', decimal: 'd'
+ * @param path path to file where variable is stored
  */
 ALi::ALi(const char* type, const char* sourcePath) : ALi(){
     this->readFile(type,sourcePath);
@@ -55,7 +55,7 @@ ALi::~ALi(){
     // #
 /**
  * @brief create new cell from the left side
- * @param standardSource: unsigned long long value that will be used to optional assigned value to new cell
+ * @param standardSource: unsigned long long value that will be used to set, new cell value
  */
 void ALi::newCell(const CELL_TYPE &standardSource){
     Cell* handle = new Cell;
@@ -68,9 +68,10 @@ void ALi::newCell(const CELL_TYPE &standardSource){
     this->length++;
 }
 /**
- * @brief remove cell from the left, not including this->begin_ptr
- * @return 1: if there are more cells that can be deleted
- * @return 0: if there are no more cells that can be deleted
+ * @brief remove cell from the left, but not including this->begin_ptr
+ * @brief if there is no cell to delete set this->begin_ptr to mask000
+ * @return 1: if there are more cells that can be deleted,
+ * @return 0: if there are no more cells that can be deleted (just last one was deleted)
  */
 const bool ALi::delCell(){
     if(this->begin_ptr->R == this->begin_ptr){
@@ -94,6 +95,10 @@ const bool ALi::delCell(){
     // #
 /**
  * @brief execute shift right operation
+ * @example 0000 1010 -> 0000 0101
+ * @example 0011 1010 -> 0001 1101
+ * @example 1000 0000 -> 1100 0000
+ * @example 1000 0111 -> 1100 0011
  */
 void ALi::SHR(){
     // works just like an >> operator for signed values
@@ -118,6 +123,11 @@ void ALi::SHR(){
 }
 /**
  * @brief execute shift left operation
+ * @example 0011 0110 -> 0110 1100
+ * @example 1101 0000 -> 1010 0000
+ * @example 1011 0110 -> 1111 0110 1100
+ * @example 1000 0000 -> 1111 0000 0000
+ * @example 0111 0010 -> 0000 1110 0100
  */
 void ALi::SHL(){
     // works just like an << operator for signed values
@@ -150,6 +160,14 @@ void ALi::SHL(){
 /**
  * @brief push the most significant bit
  * @param bit if 0, 0 will be pushed if 1, 1 will be pushed on lsb
+ * @example bit=1 0000 -> 1000
+ * @example bit=1 1000 -> 1100
+ * @example bit=1 0010 0000 -> 1001 0000
+ * @example bit=1 1110 0000 -> 1111 0000
+ * @example bit=0 1111 -> 0111
+ * @example bit=0 1000 -> 0100
+ * @example bit=0 0010 0000 -> 0001 0000
+ * @example bit=0 1110 0000 -> 0111 0000
  */
 void ALi::PMSB(const bool& bit){
     // works just like an >> operator for signed values
@@ -173,7 +191,17 @@ void ALi::PMSB(const bool& bit){
 }
 /**
  * @brief push the least significant bit
- * @param bit if 0, 0 will be pushed if 1, 1 will be pushed on lsb
+ * @param bit if 0, 0 will be pushed if 1, 1 will be pushed on 
+ * @example bit=0 0011 0110 -> 0110 1100
+ * @example bit=0 1101 0000 -> 1010 0000
+ * @example bit=0 1011 0110 -> 1111 0110 1100
+ * @example bit=0 1000 0000 -> 1111 0000 0000
+ * @example bit=0 0111 0010 -> 0000 1110 0100
+ * @example bit=1 0011 0110 -> 0110 1101
+ * @example bit=1 1101 0000 -> 1010 0001
+ * @example bit=1 1011 0110 -> 1111 0110 1101
+ * @example bit=1 1000 0000 -> 1111 0000 0001
+ * @example bit=1 0111 0010 -> 0000 1110 0101
  */
 void ALi::PLSB(const bool& bit){
     // works just like an << operator for signed values
@@ -210,25 +238,25 @@ void ALi::PLSB(const bool& bit){
     // #
 /**
  * @brief return sign bit
- * @return true sign bit is 1 => number is negative
+ * @return true sign bit is 1 => number is negative,
  * @return false sign bit is 0 => number is positive
  */
 const bool ALi::sgn() const{
     return (this->begin_ptr->R->var & mask100 ? true : false);
 }
 /**
- * @brief 
- * @return true 
- * @return false 
+ * @brief return if value is 0
+ * @return true if value is 0,
+ * @return false if value is something other than 0
  */
 const bool ALi::is0() const{
     if(this->length == 1 && this->begin_ptr->var == mask000) return true;
     else return false;
 }
 /**
- * @brief 
- * @return true 
- * @return false 
+ * @brief return if value is 0
+ * @return true if value is 1,
+ * @return false if value is something other than 1
  */
 const bool ALi::is1() const{
     if(this->length == 1 && this->begin_ptr->var == mask001) return true;
@@ -240,21 +268,19 @@ const bool ALi::is1() const{
     
     // #
 /**
- * @brief remove all dynamic allocated cells 
+ * @brief remove all dynamically allocated cells 
  */
 void ALi::clear(){
     while(this->delCell());
-    this->begin_ptr->var = mask000;
 }
 /**
  * @brief removes cells from begin which are not include any new information like 00000000 or 11111111
+ * @example 1111 1111 1100 0101 -> 1100 0101
+ * @example 0000 0000 0100 0101 -> 0100 0101
+ * @example 1111 1111 0100 0101 -> 1111 0100 0101
+ * @example 0000 0000 1100 0101 -> 0000 1100 0101
  */
 void ALi::optymize(){
-    // should remove left cells until one of these paterns exists at the beginning (IMPROVED_PRINT): 
-    // 1_1_1_1_1_1_1_1 1XXXXXXX_XXXXXXXX_XXXXXXXX_XXXXXXXX_XXXXXXXX_XXXXXXXX_XXXXXXXX_XXXXXXXX
-    // 0_0_0_0_0_0_0_0 0XXXXXXX_XXXXXXXX_XXXXXXXX_XXXXXXXX_XXXXXXXX_XXXXXXXX_XXXXXXXX_XXXXXXXX
-    // and variable has more than one cell 
-
     // -- 1 -- // 
     // const Cell* const handle = this->begin_ptr->R;
     // if(handle != this->begin_ptr){
@@ -313,7 +339,7 @@ void ALi::negate(){
     }while(handle != this->begin_ptr);
 }
 /**
- * @brief inverting value from (3) to (-3) and from (-10) to (10) ...
+ * @brief inverting value from (3) to (-3) and from (-10) to (10) etc. ...
  */
 void ALi::invert(){
     this->negate();
