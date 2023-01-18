@@ -12,10 +12,10 @@
  */
 ALi::ALi(){
     this->length = 1;
-    this->globalHandle = new Cell;
-    this->globalHandle->L = this->globalHandle;
-    this->globalHandle->R = this->globalHandle;
-    this->globalHandle->var = mask000;
+    this->begin_ptr = new Cell;
+    this->begin_ptr->L = this->begin_ptr;
+    this->begin_ptr->R = this->begin_ptr;
+    this->begin_ptr->var = mask000;
     this->separator = '\0'; // '/0' means no separator
 }
 /**
@@ -30,23 +30,23 @@ ALi::ALi(const ALi& source) : ALi(){
  * @param source object which will be source to build identical ALi
  */
 ALi::ALi(const signed long long& source) : ALi(){
-    this->globalHandle->var = source;
+    this->begin_ptr->var = source;
 }
 /**
  * @brief Construct a new ALi object by using existing file with value
  * @param path file where variable should be stored
  * @param type type of source file: readable('r'), binary('b')
  */
-// ALi::ALi(const char* type, const char* sourcePath) : ALi(){
-//     this->readFile(type,sourcePath);
-// }
+ALi::ALi(const char* type, const char* sourcePath) : ALi(){
+    this->readFile(type,sourcePath);
+}
 /**
  * @brief Destroy the ALi object
  * deletes all dynamically allocated cells
  */
 ALi::~ALi(){
     this->clear();
-    delete this->globalHandle;
+    delete this->begin_ptr;
 }
     // #
     
@@ -59,30 +59,30 @@ ALi::~ALi(){
  */
 void ALi::newCell(const CELL_TYPE &standardSource){
     Cell* handle = new Cell;
-    handle->L = this->globalHandle;
-    handle->R = this->globalHandle->R;
-    this->globalHandle->R->L = handle;
-    this->globalHandle->R = handle;
+    handle->L = this->begin_ptr;
+    handle->R = this->begin_ptr->R;
+    this->begin_ptr->R->L = handle;
+    this->begin_ptr->R = handle;
 
     handle->var = standardSource;
     this->length++;
 }
 /**
- * @brief remove cell from the left, not including this->globalHandle
+ * @brief remove cell from the left, not including this->begin_ptr
  * @return 1: if there are more cells that can be deleted
  * @return 0: if there are no more cells that can be deleted
  */
 const bool ALi::delCell(){
-    if(this->globalHandle->R == this->globalHandle){
+    if(this->begin_ptr->R == this->begin_ptr){
         // all cells that can be deleted, was already deleted
         // one cell left
-        this->globalHandle->var = mask000;
+        this->begin_ptr->var = mask000;
         return false;
     }
     // n dynamically alocated cells where n >= 1
-    Cell* handle = this->globalHandle->R;
-    handle->R->L = this->globalHandle;
-    this->globalHandle->R = handle->R;
+    Cell* handle = this->begin_ptr->R;
+    handle->R->L = this->begin_ptr;
+    this->begin_ptr->R = handle->R;
     this->length--;
     delete handle;
     return true;
@@ -97,7 +97,7 @@ const bool ALi::delCell(){
  */
 void ALi::SHR(){
     // works just like an >> operator for signed values
-    Cell* handle = this->globalHandle->R;
+    Cell* handle = this->begin_ptr->R;
     bool buffer[2] = {0,this->sgn()};
     /*[0] - cell bit out*/    /*[1] - cell bit in*/
 
@@ -113,7 +113,7 @@ void ALi::SHR(){
         // hold handle cell's LSB to next loop iteration (if is last one this just will be dropped)
         buffer[1] = buffer[0]; 
         handle = handle->R;
-    } while (handle != this->globalHandle->R);
+    } while (handle != this->begin_ptr->R);
     this->optymize();
 }
 /**
@@ -121,7 +121,7 @@ void ALi::SHR(){
  */
 void ALi::SHL(){
     // works just like an << operator for signed values
-    Cell* handle = this->globalHandle; 
+    Cell* handle = this->begin_ptr; 
     bool buffer[2] = {0,0};
     /*[0] - cell bit out*/    /*[1] - cell bit in*/
 
@@ -137,10 +137,10 @@ void ALi::SHL(){
         // hold handle cell's MSB to next loop iteration (if is last one this just will be dropped)
         buffer[1] = buffer[0];
         handle = handle->L;
-    }while(handle != this->globalHandle);
+    }while(handle != this->begin_ptr);
 
     // where most left bit after SHL changed their value, then overflow has occurred
-    if((this->globalHandle->R->var & mask100) != buffer[1]){
+    if((this->begin_ptr->R->var & mask100) != buffer[1]){
         if(buffer[1]) // check if value was positive or negative before SHL
             this->newCell(mask111); // was negative
         else 
@@ -153,7 +153,7 @@ void ALi::SHL(){
  */
 void ALi::PMSB(const bool& bit){
     // works just like an >> operator for signed values
-    Cell* handle = this->globalHandle->R;
+    Cell* handle = this->begin_ptr->R;
     bool buffer[2] = {0,bit};
     /*[0] - cell bit out*/    /*[1] - cell bit in*/
 
@@ -169,7 +169,7 @@ void ALi::PMSB(const bool& bit){
         // hold handle cell's LSB to next loop iteration (if is last one this just will be dropped)
         buffer[1] = buffer[0]; 
         handle = handle->R;
-    } while (handle != this->globalHandle->R);
+    } while (handle != this->begin_ptr->R);
 }
 /**
  * @brief push the least significant bit
@@ -177,7 +177,7 @@ void ALi::PMSB(const bool& bit){
  */
 void ALi::PLSB(const bool& bit){
     // works just like an << operator for signed values
-    Cell* handle = this->globalHandle; 
+    Cell* handle = this->begin_ptr; 
     bool buffer[2] = {0,bit};
     /*[0] - cell bit out*/    /*[1] - cell bit in*/
 
@@ -193,10 +193,10 @@ void ALi::PLSB(const bool& bit){
         // hold handle cell's MSB to next loop iteration (if is last one this just will be dropped)
         buffer[1] = buffer[0];
         handle = handle->L;
-    }while(handle != this->globalHandle);
+    }while(handle != this->begin_ptr);
 
     // where most left bit after SHL changed their value, then overflow has occurred
-    if((this->globalHandle->R->var & mask100) != buffer[1]){
+    if((this->begin_ptr->R->var & mask100) != buffer[1]){
         if(buffer[1]) // check if value was positive or negative before SHL
             this->newCell(mask111); // was negative
         else 
@@ -214,7 +214,7 @@ void ALi::PLSB(const bool& bit){
  * @return false sign bit is 0 => number is positive
  */
 const bool ALi::sgn() const{
-    return (this->globalHandle->R->var & mask100 ? true : false);
+    return (this->begin_ptr->R->var & mask100 ? true : false);
 }
 /**
  * @brief 
@@ -222,7 +222,7 @@ const bool ALi::sgn() const{
  * @return false 
  */
 const bool ALi::is0() const{
-    if(this->length == 1 && this->globalHandle->var == mask000) return true;
+    if(this->length == 1 && this->begin_ptr->var == mask000) return true;
     else return false;
 }
 /**
@@ -231,7 +231,7 @@ const bool ALi::is0() const{
  * @return false 
  */
 const bool ALi::is1() const{
-    if(this->length == 1 && this->globalHandle->var == mask001) return true;
+    if(this->length == 1 && this->begin_ptr->var == mask001) return true;
     else return false;
 }
     // #
@@ -244,7 +244,7 @@ const bool ALi::is1() const{
  */
 void ALi::clear(){
     while(this->delCell());
-    this->globalHandle->var = mask000;
+    this->begin_ptr->var = mask000;
 }
 /**
  * @brief removes cells from begin which are not include any new information like 00000000 or 11111111
@@ -256,8 +256,8 @@ void ALi::optymize(){
     // and variable has more than one cell 
 
     // -- 1 -- // 
-    // const Cell* const handle = this->globalHandle->R;
-    // if(handle != this->globalHandle){
+    // const Cell* const handle = this->begin_ptr->R;
+    // if(handle != this->begin_ptr){
     //     if((handle->var == mask111 && handle->R->var & mask100) || (handle->var == mask000 && ~handle->R->var & mask100)){
     //         this->delCell();
     //         this->optymize();
@@ -265,40 +265,40 @@ void ALi::optymize(){
     // }
 
     // -- 2 -- //
-    // const Cell* const handle = this->globalHandle->R;
-    // if((handle != this->globalHandle && handle->var == mask111 && handle->R->var & mask100) || 
-    // (handle != this->globalHandle && handle->var == mask000 && ~handle->R->var & mask100)){
+    // const Cell* const handle = this->begin_ptr->R;
+    // if((handle != this->begin_ptr && handle->var == mask111 && handle->R->var & mask100) || 
+    // (handle != this->begin_ptr && handle->var == mask000 && ~handle->R->var & mask100)){
     //         this->delCell();
     //         this->optymize();
     // }
 
     // -- 3 -- //
-    const Cell* const handle = this->globalHandle->R; //last cell
-    if(handle != this->globalHandle &&
+    const Cell* const handle = this->begin_ptr->R; //last cell
+    if(handle != this->begin_ptr &&
     ((handle->var == mask111 && handle->R->var & mask100) || (handle->var == mask000 && ~handle->R->var & mask100))){
             this->delCell();
             this->optymize();
     }
 
     // -- 4 -- //
-    // if(this->globalHandle->R != this->globalHandle && 
-    // ((this->globalHandle->R->var == mask111 && this->globalHandle->R->R->var & mask100) || 
-    // (this->globalHandle->R->var == mask000 && ~this->globalHandle->R->R->var & mask100))){
+    // if(this->begin_ptr->R != this->begin_ptr && 
+    // ((this->begin_ptr->R->var == mask111 && this->begin_ptr->R->R->var & mask100) || 
+    // (this->begin_ptr->R->var == mask000 && ~this->begin_ptr->R->R->var & mask100))){
     //         this->delCell();
     //         this->optymize();
     // }
 
     // -- 5 -- //
     // if(this->sign()){
-    //     while(this->globalHandle->R->var == mask111 && 
-    //     this->globalHandle->R->R->var & mask100 &&
-    //     this->globalHandle->R != this->globalHandle)
+    //     while(this->begin_ptr->R->var == mask111 && 
+    //     this->begin_ptr->R->R->var & mask100 &&
+    //     this->begin_ptr->R != this->begin_ptr)
     //         this->delCell();
     // }
     // else{ // is positive
-    //     while(this->globalHandle->R->var == mask000 && 
-    //     ~this->globalHandle->R->R->var & mask100 &&
-    //     this->globalHandle->R != this->globalHandle)
+    //     while(this->begin_ptr->R->var == mask000 && 
+    //     ~this->begin_ptr->R->R->var & mask100 &&
+    //     this->begin_ptr->R != this->begin_ptr)
     //         this->delCell();
     // }
 }
@@ -306,11 +306,11 @@ void ALi::optymize(){
  * @brief change every single bit to oposite value
  */
 void ALi::negate(){
-    Cell* handle = this->globalHandle;
+    Cell* handle = this->begin_ptr;
     do{
         handle->var = ~handle->var;
         handle = handle->L;
-    }while(handle != this->globalHandle);
+    }while(handle != this->begin_ptr);
 }
 /**
  * @brief inverting value from (3) to (-3) and from (-10) to (10) ...
@@ -348,11 +348,11 @@ void ALi::invert(){
  * @param additionText default is "" text what will be printed at the end of variable
  */
 void ALi::printBinary() const{
-    const Cell* handle = this->globalHandle->R;
+    const Cell* handle = this->begin_ptr->R;
     do{
         printf("%s%c", BPrint::binary_x64(handle->var, ULL_VAR_SEP).c_str(),this->separator);
         handle = handle->R;
-    }while(handle != this->globalHandle->R);
+    }while(handle != this->begin_ptr->R);
 }
 /**
  * @brief print digit of variable seperated by separator sign every 3 digits and adding after all addition text
@@ -373,7 +373,7 @@ void ALi::printDecimal() const{
     }
     
     ALi bcd; // 0
-    const Cell* handle = this->globalHandle;
+    const Cell* handle = this->begin_ptr;
     // change binary to binary-coded decimal
     do{
         handle = handle->R;
@@ -381,7 +381,7 @@ void ALi::printDecimal() const{
         while(mask != 0){
             bcd.PLSB((handle->var & mask ? 1 : 0));
             const bool old_bcdsgn = bcd.sgn();
-            Cell* bcdhandle = bcd.globalHandle;
+            Cell* bcdhandle = bcd.begin_ptr;
             do{
                 bcdhandle = bcdhandle->R;
 
@@ -400,11 +400,11 @@ void ALi::printDecimal() const{
                     i++;
                 }
                 bcdhandle->var = result;
-            }while(bcdhandle != bcd.globalHandle);
+            }while(bcdhandle != bcd.begin_ptr);
             if(old_bcdsgn != bcd.sgn()) bcd.newCell(mask000);
             mask >>= 1;
         }
-    }while(handle != this->globalHandle);
+    }while(handle != this->begin_ptr);
 
 
     // CELL_TYPE BCDincrement(CELL_TYPE cell){
@@ -428,22 +428,22 @@ void ALi::printDecimal() const{
     //     while(mask != 0){
     //         bcd.PLSB((handle->var & mask ? 1 : 0));
     //         const bool old_bcdsgn = bcd.sgn();
-    //         Cell* bcdhandle = bcd.globalHandle;
+    //         Cell* bcdhandle = bcd.begin_ptr;
     //         do{
     //             bcdhandle = bcdhandle->R;
     //             bcdhandle->var = BCDincrement(bcdhandle->var);
-    //         }while(bcdhandle != bcd.globalHandle);
+    //         }while(bcdhandle != bcd.begin_ptr);
     //         if(old_bcdsgn != bcd.sgn()) bcd.newCell(mask000);
     //         mask >>= 1;
     //     }
-    // }while(handle != this->globalHandle);
+    // }while(handle != this->begin_ptr);
 
     // print binary-coded decimal
     std::string rev;
-    while(bcd.globalHandle->R->var != 0){ 
-        const char nibble = bcd.globalHandle->R->var & 0b00001111;
+    while(bcd.begin_ptr->R->var != 0){ 
+        const char nibble = bcd.begin_ptr->R->var & 0b00001111;
         rev = std::string(1,(nibble > 4 ? nibble+45 : nibble+48)) + rev; 
-        bcd.globalHandle->R->var >>= 4;
+        bcd.begin_ptr->R->var >>= 4;
     }
     printf("%s",rev.c_str());
     bcd.delCell();
@@ -452,9 +452,9 @@ void ALi::printDecimal() const{
     do{
         std::string rev;
         for(int i=0; i<16; i++){
-            const char nibble = bcd.globalHandle->R->var & 0b00001111; 
+            const char nibble = bcd.begin_ptr->R->var & 0b00001111; 
             rev = std::string(1,(nibble > 4 ? nibble+45 : nibble+48)) + rev; 
-            bcd.globalHandle->R->var >>= 4;
+            bcd.begin_ptr->R->var >>= 4;
         }
         printf("%s",rev.c_str());
     }while(bcd.delCell());
@@ -503,11 +503,11 @@ void ALi::export_cells(const char* path) const{
         printf("File \"%s\" not found!\n",path);
         return;
     }
-    const Cell* handle = this->globalHandle;
+    const Cell* handle = this->begin_ptr;
     do{
         fwrite(&handle->var, BYTES_PER_VAR, 1, file); // bufer, size of cell, cell amout, source
         handle = handle->L;
-    }while(handle != this->globalHandle);
+    }while(handle != this->begin_ptr);
     fclose(file);
 }
 /**
@@ -521,7 +521,7 @@ void ALi::import_cells(const char* path){
         printf("File \"%s\" not found!\n",path);
         return;
     }
-    fread(&this->globalHandle->var, BYTES_PER_VAR, 1, file);
+    fread(&this->begin_ptr->var, BYTES_PER_VAR, 1, file);
     char buffer;
     while(fread(&buffer, BYTES_PER_VAR, 1, file) != 0){
         this->newCell(buffer);
@@ -540,12 +540,12 @@ void ALi::import_cells(const char* path){
  * @param append append or overwrite file if exist 
  */
 void ALi::writeFile_02(FILE* const file) const{
-    Cell* handle = this->globalHandle->R;
+    Cell* handle = this->begin_ptr->R;
     do{
         std::string binary = BPrint::binary_x64(handle->var,ULL_VAR_SEP);
         fwrite(binary.c_str(), sizeof(char), binary.length(), file); // bufer, size of cell, cell amout, source
         handle = handle->R;
-    }while(handle != this->globalHandle->R);
+    }while(handle != this->begin_ptr->R);
 }
 /**
  * @brief save variable to file in readable form allowing to add separator sign every 8 bits 
@@ -590,7 +590,7 @@ void ALi::readFile_02(FILE* const file){
         if(buffer == '0' || buffer == '1')
             fdata += buffer;
     const char* cstrdata = fdata.c_str();
-    this->globalHandle->var = (*cstrdata=='0' ? mask000 : mask111);
+    this->begin_ptr->var = (*cstrdata=='0' ? mask000 : mask111);
     while(*cstrdata != '\0')
         this->PLSB((*(cstrdata++)=='0' ? 0 : 1)); // x++ increment after returning value
     this->optymize();
@@ -649,15 +649,15 @@ void ALi::readFile(const char* type, const char* path){
  * @param source ALi what will be assigned to variable
  */
 void ALi::assignment(const ALi& source){
-    // it will be nice to just drop this variable globalhandle and focus on assigning 
+    // it will be nice to just drop this variable begin_ptr and focus on assigning 
     // clearig can be leaved for other cpu process
     // const int *  -  (pointer to const int)
     // int const *  -  (pointer to const int)
     // int * const  -  (const pointer to int)
-    const Cell* srchandle = source.globalHandle->L;
+    const Cell* srchandle = source.begin_ptr->L;
     this->clear();
-    this->globalHandle->var = source.globalHandle->var;
-    while (srchandle != source.globalHandle){
+    this->begin_ptr->var = source.begin_ptr->var;
+    while (srchandle != source.begin_ptr){
         this->newCell(srchandle->var);
         srchandle = srchandle->L;
     }
@@ -669,7 +669,7 @@ void ALi::assignment(const ALi& source){
  */
 void ALi::assignment(const signed long long& source){
     this->clear();
-    this->globalHandle->var = source;
+    this->begin_ptr->var = source;
 }
     // #
     
@@ -683,7 +683,7 @@ void ALi::assignment(const signed long long& source){
 void ALi::assignment_02(const std::string& source){
     this->clear();
     if(source[1] == '1')
-        this->globalHandle->var = mask111;
+        this->begin_ptr->var = mask111;
 
     for(char src: source){
         switch(src){
@@ -731,13 +731,13 @@ const bool ALi::equal(const ALi& right) const{
     // assume that both are optymized otherways it is harder...
     if(this->sgn() != right.sgn()) return false;
     if(this->length != right.length) return false;
-    const Cell* hL = this->globalHandle;
-    const Cell* hR = right.globalHandle;
+    const Cell* hL = this->begin_ptr;
+    const Cell* hR = right.begin_ptr;
     do{
         if(hL->var != hR->var) return false;
         hL = hL->R;
         hR = hR->R;
-    }while(hL != this->globalHandle);
+    }while(hL != this->begin_ptr);
     return true;
 }
 /**
@@ -791,14 +791,14 @@ const bool ALi::greaterThan(const ALi& right) const{
     else if(this->length > right.length) return !Lsgn;
     else if(this->length < right.length) return Lsgn;
     // lengths are equal
-    Cell* hL = this->globalHandle;
-    Cell* hR = right.globalHandle;
+    Cell* hL = this->begin_ptr;
+    Cell* hR = right.begin_ptr;
     do{
         if(hL->var > hR->var) return true; // left is greater
         if(hL->var < hR->var) return false; // left is smaller
         hL = hL->R;
         hR = hR->R;
-    }while(hL != this->globalHandle); // compare each cell, begin from the most significant
+    }while(hL != this->begin_ptr); // compare each cell, begin from the most significant
     return false; // both are equal => left is NOT greater
 }
 /**
@@ -852,14 +852,14 @@ const bool ALi::smallerThan(const ALi& right) const{
     else if(this->length > right.length) return Lsgn;
     else if(this->length < right.length) return !Lsgn;
     // lengths are equal
-    Cell* hL = this->globalHandle;
-    Cell* hR = right.globalHandle;
+    Cell* hL = this->begin_ptr;
+    Cell* hR = right.begin_ptr;
     do{
         if(hL->var > hR->var) return false; // left is greater
         if(hL->var < hR->var) return true; // left is smaller
         hL = hL->R;
         hR = hR->R;
-    }while(hL != this->globalHandle); // compare each cell, begin from the most significant
+    }while(hL != this->begin_ptr); // compare each cell, begin from the most significant
     return false; // both are equal => left is NOT smaller
 }
     // #
@@ -878,7 +878,7 @@ void ALi::increment(){
     // if is 0 then set to 1 exit
     
     this->optymize();
-    Cell *handle = this->globalHandle;
+    Cell *handle = this->begin_ptr;
     // set handle on first cell that can store additional bit
     // 10101101  11111111  11111111  11111111  11111111 -> [10101101] 00000000  00000000  00000000  00000000
     // 11111111                                         -> [11111111]
@@ -886,7 +886,7 @@ void ALi::increment(){
     // 00000010                                         -> [00000010]
     // 01111111  11111111                               -> [01111111] 00000000
     // 01111111  11110011                               ->  01111111 [11110011]
-    while(handle->var == mask111 && handle != this->globalHandle->R){
+    while(handle->var == mask111 && handle != this->begin_ptr->R){
         handle->var = mask000; // 11111111 -> (1)00000000
         handle = handle->L;
     }
@@ -897,7 +897,7 @@ void ALi::increment(){
     // 00000010                                         -> [00000010]
     // 01111111  11111111                               ->  00000000 [01111111] 00000000
     // 01111111  11110011                               ->  01111111 [11110011]
-    if(!this->sgn() && handle->var == mask011 && handle == this->globalHandle->R){
+    if(!this->sgn() && handle->var == mask011 && handle == this->begin_ptr->R){
         this->newCell(mask000);
     }
     // 10101101  11111111  11111111  11111111  11111111 -> [10101110] 00000000  00000000  00000000  00000000
@@ -934,7 +934,7 @@ ALi ALi::addition(const ALi& right) const{
 
     ALi out;
 
-    const Cell* const lgh = this->globalHandle;
+    const Cell* const lgh = this->begin_ptr;
     const Cell* lh = lgh->L;
     const bool lsign = this->sgn();
     Cell lmask{
@@ -947,7 +947,7 @@ ALi ALi::addition(const ALi& right) const{
     // lmask.L = &lmask;
     // lmask.R = &lmask;
 
-    const Cell* const rgh = right.globalHandle;
+    const Cell* const rgh = right.begin_ptr;
     const Cell* rh = rgh->L;
     const bool rsign = right.sgn();
     Cell rmask{
@@ -965,7 +965,7 @@ ALi ALi::addition(const ALi& right) const{
     CELL_TYPE ofldet; // just keep equation result, instead of computing it every time while comparing
     
     ofldet = lgh->var + rgh->var;
-    out.globalHandle->var = ofldet;
+    out.begin_ptr->var = ofldet;
     if(ofldet < rgh->var && ofldet < lgh->var)
         carry = 1;
     if(lh == lgh) lh = &lmask;
@@ -1016,7 +1016,7 @@ ALi ALi::addition2(const ALi& right) const{
 
     ALi out;
 
-    const Cell* const lgh = this->globalHandle;
+    const Cell* const lgh = this->begin_ptr;
     const Cell* lh = lgh->L;
     const bool lsign = this->sgn();
     Cell lmask{
@@ -1025,7 +1025,7 @@ ALi ALi::addition2(const ALi& right) const{
         lmask.R = &lmask
     };
 
-    const Cell* const rgh = right.globalHandle;
+    const Cell* const rgh = right.begin_ptr;
     const Cell* rh = rgh->L;
     const bool rsign = right.sgn();
     Cell rmask{
@@ -1034,7 +1034,7 @@ ALi ALi::addition2(const ALi& right) const{
         rmask.R = &rmask
     };
     
-    unsigned char carry = __builtin_add_overflow(lgh->var, rgh->var, &out.globalHandle->var);
+    unsigned char carry = __builtin_add_overflow(lgh->var, rgh->var, &out.begin_ptr->var);
     if(lh == lgh) lh = &lmask;
     if(rh == rgh) rh = &rmask;
 
@@ -1080,13 +1080,13 @@ void ALi::additionAssign(const ALi& right){
     // this->assignment(this->addition(right));
 
     ALi* const lobj = this; 
-    Cell* const lgh = lobj->globalHandle;
+    Cell* const lgh = lobj->begin_ptr;
     Cell* lh = lgh->L;
     const bool lsign = lobj->sgn();
     const CELL_TYPE lmask = (lsign ? mask111 : mask000);
 
     const ALi* const robj = &right;
-    const Cell* const rgh = robj->globalHandle;
+    const Cell* const rgh = robj->begin_ptr;
     const Cell* rh = rgh->L;
     const bool rsign = robj->sgn();
     const CELL_TYPE rmask = (rsign ? mask111 : mask000);
@@ -1137,7 +1137,7 @@ void ALi::additionAssign2(const ALi& right){
     // this->assignment(this->addition(right));
 
     ALi* const lobj = this; 
-    Cell* const lgh = lobj->globalHandle;
+    Cell* const lgh = lobj->begin_ptr;
     Cell* lh = lgh->L;
     const bool lsign = lobj->sgn();
     Cell lmask{
@@ -1147,7 +1147,7 @@ void ALi::additionAssign2(const ALi& right){
     };
 
     const ALi* const robj = &right;
-    const Cell* const rgh = robj->globalHandle;
+    const Cell* const rgh = robj->begin_ptr;
     const Cell* rh = rgh->L;
     const bool rsign = robj->sgn();
     Cell rmask{
@@ -1187,13 +1187,13 @@ void ALi::additionAssign2(const ALi& right){
  * 
  */
 void ALi::decrement(){
-    Cell *handle = this->globalHandle;
-    while(handle->var == mask000 && handle != this->globalHandle->R){
+    Cell *handle = this->begin_ptr;
+    while(handle->var == mask000 && handle != this->begin_ptr->R){
         handle->var = mask111; // (1)00000000 -> (0)11111111
         handle = handle->L;
     }
     // if number is negative, overflow can occur cause we are adding two negative numbers
-    if(this->sgn() && (handle->var == mask100 && handle == this->globalHandle->R)){
+    if(this->sgn() && (handle->var == mask100 && handle == this->begin_ptr->R)){
         this->newCell(mask111);
     }
     handle->var--;
@@ -1295,7 +1295,7 @@ ALi ALi::multiplication(const ALi& right) const{
         // _left.print('b',"\n");
         // result.print('b',"\n\n");
 
-        switch (_left.globalHandle->var & 0b11){
+        switch (_left.begin_ptr->var & 0b11){
         case 1: // 01
             result.additionAssign(_right);
             break;
@@ -1307,7 +1307,7 @@ ALi ALi::multiplication(const ALi& right) const{
         // store lsb and shr result or shl _right
         _right.SHL();
         _left.SHR();
-        _left.globalHandle->R->var = _left.globalHandle->R->var & mask011; // treat whole number as a unsigned shr
+        _left.begin_ptr->R->var = _left.begin_ptr->R->var & mask011; // treat whole number as a unsigned shr
     }
 
     return result;

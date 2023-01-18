@@ -23,14 +23,14 @@ protected: public:
         Cell* R;
     };
 
-    Cell *globalHandle; //   [...11010001] <-
+    Cell* begin_ptr;//   [...11010001] <-
     unsigned long long length;
     char separator; // '/0' means no separator others are printed in print method
 public:
     ALi();//
     ALi(const ALi& source);//
     ALi(const signed long long& source);//
-    // ALi(const char* type, const char* sourcePath);//
+    ALi(const char* type, const char* sourcePath);//
     ~ALi();//
 
 protected:
