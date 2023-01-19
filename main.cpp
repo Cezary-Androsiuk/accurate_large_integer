@@ -27,7 +27,7 @@ int main(){
     x = 9;
     y = -8;
     y >> "b\n";
-    y.SHL();
+    y.PLSB(0);
     y >> "b\n";
 
     // z = x.multiplication(y);

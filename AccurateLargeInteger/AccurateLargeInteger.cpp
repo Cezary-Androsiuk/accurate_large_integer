@@ -107,15 +107,10 @@ void ALi::SHR(){
     /*[0] - cell bit out*/    /*[1] - cell bit in*/
 
     do{
-        // hold right bit of a cell
-        buffer[0] = handle->var & mask001; 
-        // shr cell
+        buffer[0] = handle->var & mask001;
         handle->var >>= 1; 
-        // if left cell's LSB, from this cell was 1, then set handle cell MSB to 1
         if(buffer[1]) handle->var |= mask100;
-        // else to 0
         else handle->var &= mask011;
-        // hold handle cell's LSB to next loop iteration (if is last one this just will be dropped)
         buffer[1] = buffer[0]; 
         handle = handle->R;
     } while (handle != this->begin_ptr->R);
@@ -136,7 +131,6 @@ void ALi::SHL(){
     /*[0] - cell bit out*/    /*[1] - cell bit in*/
 
     do{
-        // hold left bit of a cell
         buffer[0] = handle->var & mask100;
         handle->var <<= 1;
         if(buffer[1]) handle->var |= mask001;
@@ -146,7 +140,7 @@ void ALi::SHL(){
     }while(handle != this->begin_ptr);
 
     // where most left bit after SHL changed their value, then overflow has occurred
-    if((this->begin_ptr->R->var & mask100) != (buffer[1]? mask100 : mask000)){
+    if((this->begin_ptr->R->var & mask100) != (buffer[1] ? mask100 : mask000)){
         if(buffer[1]) // check if value was positive or negative before SHL
             this->newCell(mask111); // was negative
         else 
@@ -172,15 +166,10 @@ void ALi::PMSB(const bool& bit){
     /*[0] - cell bit out*/    /*[1] - cell bit in*/
 
     do{
-        // hold right bit of a cell
         buffer[0] = handle->var & mask001; 
-        // shr cell
         handle->var >>= 1; 
-        // if left cell's LSB, from this cell was 1, then set handle cell MSB to 1
         if(buffer[1]) handle->var |= mask100;
-        // else to 0
         else handle->var &= mask011;
-        // hold handle cell's LSB to next loop iteration (if is last one this just will be dropped)
         buffer[1] = buffer[0]; 
         handle = handle->R;
     } while (handle != this->begin_ptr->R);
@@ -206,21 +195,16 @@ void ALi::PLSB(const bool& bit){
     /*[0] - cell bit out*/    /*[1] - cell bit in*/
 
     do{
-        // hold left bit of a cell
         buffer[0] = handle->var & mask100;
-        // shl cell
         handle->var <<= 1;
-        // if right cell's MSB, from this cell was 1, then set handle cell LSB to 1
         if(buffer[1]) handle->var |= mask001;
-        // else to 0
         else handle->var &= mask110;
-        // hold handle cell's MSB to next loop iteration (if is last one this just will be dropped)
         buffer[1] = buffer[0];
         handle = handle->L;
     }while(handle != this->begin_ptr);
 
     // where most left bit after SHL changed their value, then overflow has occurred
-    if((this->begin_ptr->R->var & mask100) != buffer[1]){
+    if((this->begin_ptr->R->var & mask100) != (buffer[1] ? mask100 : mask000)){
         if(buffer[1]) // check if value was positive or negative before SHL
             this->newCell(mask111); // was negative
         else 
@@ -1346,8 +1330,7 @@ ALi ALi::multiplication(const ALi& right) const{
     if(!slider.sgn()){
         for(unsigned long long i=0; i<slider_length; i++){
             multiplier >> "b\n\n";
-            // multiplier.PLSB(0);
-            multiplier.SHL();
+            multiplier.PLSB(0);
         }
     }
     else{
