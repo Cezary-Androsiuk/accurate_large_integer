@@ -24,16 +24,34 @@ int main(){
     ALi x, y, z;
     x.setSeparator(' ');
     y.setSeparator(' ');
+
+    x = 9;
+    y = 8;
+    z = x.multiplication(y);
+    x >> "d  * ";
+    y >> "d  = ";
+    z >> "d\n";
+
+    x = -9;
+    y = 8;
+    z = x.multiplication(y);
+    x >> "d * ";
+    y >> "d  = ";
+    z >> "d\n";
+
     x = 9;
     y = -8;
-    y >> "b\n";
-    y.PLSB(0);
-    y >> "b\n";
+    z = x.multiplication(y);
+    x >> "d  * ";
+    y >> "d = ";
+    z >> "d\n";
 
-    // z = x.multiplication(y);
-    // x >> "d * ";
-    // y >> "d = ";
-    // z >> "d\n";
+    x = -9;
+    y = -8;
+    z = x.multiplication(y);
+    x >> "d * ";
+    y >> "d = ";
+    z >> "d\n";
     
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

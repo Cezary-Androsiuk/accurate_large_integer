@@ -1293,97 +1293,40 @@ ALi ALi::multiplication(const ALi& right) const{
 
     
     ALi slider(*this);
-    ALi multiplier(right); // factor
+    slider.PLSB(0); // comparison bit
+    ALi factor;
+
     slider.setSeparator(' ');
-    multiplier.setSeparator(' ');
+    factor.setSeparator(' ');
 
-    slider.PLSB(0);
-    // if(slider.length < multiplier.length){
-    //     if(!slider.sgn()){ // positive
-    //         while(slider.length < multiplier.length)
-    //             slider.newCell(mask000);
-    //     }
-    //     else{ // negative
-    //         while(slider.length < multiplier.length)
-    //             slider.newCell(mask111);
-    //     }
-    // }
-    // else{
-    //     if(!multiplier.sgn()){ // positive
-    //         while(slider.length > multiplier.length)
-    //             multiplier.newCell(mask000);
-    //     }
-    //     else{ // negative
-    //         while(slider.length > multiplier.length)
-    //             multiplier.newCell(mask111);
-    //     }
-    // }
-    // // both are the same length
-    // unsigned long long expected_multiplier_length = slider.length + multiplier.length;
-    // while()
-    
-    slider >> "b\n";
-    multiplier >> "b\n\n";
+    // align (factor.length = this->length + right.length)
+    while(factor.length < slider.length)
+        factor.newCell(mask000);
+    const Cell* rhandle = right.begin_ptr;
+    do{
+        factor.newCell(rhandle->var);
+        rhandle = rhandle->L;
+    }while(rhandle != right.begin_ptr);
 
-    
+
     unsigned long long slider_length = slider.length*BITS_PER_VAR;
-    if(!slider.sgn()){
-        for(unsigned long long i=0; i<slider_length; i++){
-            multiplier >> "b\n\n";
-            multiplier.PLSB(0);
-        }
-    }
-    else{
-        // for(unsigned long long i=0; i<slider_length; i++){
-        //     multiplier >> "b\n\n";
-        //     multiplier.PLSB(1);
-        // }
-    }
-    // slider >> "b\n\n";
-    multiplier >> "b\n\n";
-    
-    for(unsigned long long i=0; i<slider_length; i++){
+    unsigned long long i=0;
+    // for(unsigned long long i=0; i<slider_length; i++){
+    while(i < slider_length){
         switch (slider.begin_ptr->var & 0b11){
         case 1: // 01
-            slider.additionAssign(multiplier);
+            slider.additionAssign(factor);
             break;
         case 2: // 10
-            slider.subtractionAssign(multiplier);
+            slider.subtractionAssign(factor);
             break;
         // 00 & 11
         }
         slider.SHR();
+        i++;
     }
 
     return slider;
-
-
-    // ALi _left(*this);
-    // ALi _right(right);
-    // ALi result;
-
-    // _left.PLSB(0);
-    // // _left.print('b',"\n");
-    // for(unsigned long long i=0; i<_left.length*BITS_PER_VAR-1; i++){
-    //     // _left.print('b',"\n");
-    //     // result.print('b',"\n\n");
-
-    //     switch (_left.begin_ptr->var & 0b11){
-    //     case 1: // 01
-    //         result.additionAssign(_right);
-    //         break;
-    //     case 2: // 10
-    //         result.subtractionAssign(_right);
-    //         break;
-    //     // 00 & 11
-    //     }
-    //     // store lsb and shr result or shl _right
-    //     _right.SHL();
-    //     _left.SHR();
-    //     _left.begin_ptr->R->var = _left.begin_ptr->R->var & mask011; // treat whole number as a unsigned shr
-    // }
-
-    // return result;
 }
 /**
  * @brief 
