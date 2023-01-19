@@ -138,19 +138,15 @@ void ALi::SHL(){
     do{
         // hold left bit of a cell
         buffer[0] = handle->var & mask100;
-        // shl cell
         handle->var <<= 1;
-        // if right cell's MSB, from this cell was 1, then set handle cell LSB to 1
         if(buffer[1]) handle->var |= mask001;
-        // else to 0
         else handle->var &= mask110;
-        // hold handle cell's MSB to next loop iteration (if is last one this just will be dropped)
         buffer[1] = buffer[0];
         handle = handle->L;
     }while(handle != this->begin_ptr);
 
     // where most left bit after SHL changed their value, then overflow has occurred
-    if((this->begin_ptr->R->var & mask100) != buffer[1]){
+    if((this->begin_ptr->R->var & mask100) != (buffer[1]? mask100 : mask000)){
         if(buffer[1]) // check if value was positive or negative before SHL
             this->newCell(mask111); // was negative
         else 
@@ -1311,32 +1307,100 @@ ALi ALi::multiplication(const ALi& right) const{
     else if(right.is1()) return *this;
     else if(this->is1()) return right;
 
-    ALi _left(*this);
-    ALi _right(right);
-    ALi result;
+    
+    ALi slider(*this);
+    ALi multiplier(right); // factor
+    slider.setSeparator(' ');
+    multiplier.setSeparator(' ');
 
-    _left.PLSB(0);
-    // _left.print('b',"\n");
-    for(unsigned long long i=0; i<_left.length*BITS_PER_VAR-1; i++){
-        // _left.print('b',"\n");
-        // result.print('b',"\n\n");
+    slider.PLSB(0);
+    // if(slider.length < multiplier.length){
+    //     if(!slider.sgn()){ // positive
+    //         while(slider.length < multiplier.length)
+    //             slider.newCell(mask000);
+    //     }
+    //     else{ // negative
+    //         while(slider.length < multiplier.length)
+    //             slider.newCell(mask111);
+    //     }
+    // }
+    // else{
+    //     if(!multiplier.sgn()){ // positive
+    //         while(slider.length > multiplier.length)
+    //             multiplier.newCell(mask000);
+    //     }
+    //     else{ // negative
+    //         while(slider.length > multiplier.length)
+    //             multiplier.newCell(mask111);
+    //     }
+    // }
+    // // both are the same length
+    // unsigned long long expected_multiplier_length = slider.length + multiplier.length;
+    // while()
+    
+    slider >> "b\n";
+    multiplier >> "b\n\n";
 
-        switch (_left.begin_ptr->var & 0b11){
+    
+    unsigned long long slider_length = slider.length*BITS_PER_VAR;
+    if(!slider.sgn()){
+        for(unsigned long long i=0; i<slider_length; i++){
+            multiplier >> "b\n\n";
+            // multiplier.PLSB(0);
+            multiplier.SHL();
+        }
+    }
+    else{
+        // for(unsigned long long i=0; i<slider_length; i++){
+        //     multiplier >> "b\n\n";
+        //     multiplier.PLSB(1);
+        // }
+    }
+    // slider >> "b\n\n";
+    multiplier >> "b\n\n";
+    
+    for(unsigned long long i=0; i<slider_length; i++){
+        switch (slider.begin_ptr->var & 0b11){
         case 1: // 01
-            result.additionAssign(_right);
+            slider.additionAssign(multiplier);
             break;
         case 2: // 10
-            result.subtractionAssign(_right);
+            slider.subtractionAssign(multiplier);
             break;
         // 00 & 11
         }
-        // store lsb and shr result or shl _right
-        _right.SHL();
-        _left.SHR();
-        _left.begin_ptr->R->var = _left.begin_ptr->R->var & mask011; // treat whole number as a unsigned shr
+        slider.SHR();
     }
 
-    return result;
+    return slider;
+
+
+    // ALi _left(*this);
+    // ALi _right(right);
+    // ALi result;
+
+    // _left.PLSB(0);
+    // // _left.print('b',"\n");
+    // for(unsigned long long i=0; i<_left.length*BITS_PER_VAR-1; i++){
+    //     // _left.print('b',"\n");
+    //     // result.print('b',"\n\n");
+
+    //     switch (_left.begin_ptr->var & 0b11){
+    //     case 1: // 01
+    //         result.additionAssign(_right);
+    //         break;
+    //     case 2: // 10
+    //         result.subtractionAssign(_right);
+    //         break;
+    //     // 00 & 11
+    //     }
+    //     // store lsb and shr result or shl _right
+    //     _right.SHL();
+    //     _left.SHR();
+    //     _left.begin_ptr->R->var = _left.begin_ptr->R->var & mask011; // treat whole number as a unsigned shr
+    // }
+
+    // return result;
 }
 /**
  * @brief 
