@@ -43,11 +43,11 @@ protected: public:
     void PMSB(const bool& bit);//
     void PLSB(const bool& bit);//
 
-    const bool vsign() const;//
-    const bool is_p0() const;//
-    const bool is_p1() const;//
+    const bool sign() const;//
+    const bool is_0() const;
+
+    const bool is_p1() const;
     const bool is_p2() const;
-    const bool is_n0() const;
     const bool is_n1() const;
     const bool is_n2() const;
 
