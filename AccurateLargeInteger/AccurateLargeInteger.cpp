@@ -1043,17 +1043,27 @@ ALi ALi::addition(const ALi& right) const{
     if(right.is_0()){ // L + 0 = L
         return *this;
     }
-    else if (this->is_0()){ // 0 + R = R
-        return right;
-    } 
-    else if (right.is_p1()){ // L + 1 = L++
+    else if (right.is_p1()){ // L + 1 = ++L
         ALi out(*this);
         out.increment();
         return out;
     }
-    else if (this->is_p1()){ // 1 + R = R++
+    else if (right.is_n1()){ // L + -1 = --L
+        ALi out(*this);
+        out.decrement();
+        return out;
+    }
+    else if (this->is_0()){ // 0 + R = R
+        return right;
+    }
+    else if (this->is_p1()){ // 1 + R = ++R
         ALi out(right);
         out.increment();
+        return out;
+    }
+    else if (this->is_n1()){ // -1 + R = --R
+        ALi out(right);
+        out.decrement();
         return out;
     }
 
@@ -1125,17 +1135,27 @@ ALi ALi::addition2(const ALi& right) const{
     if(right.is_0()){ // L + 0 = L
         return *this;
     }
-    else if (this->is_0()){ // 0 + R = R
-        return right;
-    } 
-    else if (right.is_p1()){ // L + 1 = L++
+    else if (right.is_p1()){ // L + 1 = ++L
         ALi out(*this);
         out.increment();
         return out;
     }
-    else if (this->is_p1()){ // 1 + R = R++
+    else if (right.is_n1()){ // L + -1 = --L
+        ALi out(*this);
+        out.decrement();
+        return out;
+    }
+    else if (this->is_0()){ // 0 + R = R
+        return right;
+    }
+    else if (this->is_p1()){ // 1 + R = ++R
         ALi out(right);
         out.increment();
+        return out;
+    }
+    else if (this->is_n1()){ // -1 + R = --R
+        ALi out(right);
+        out.decrement();
         return out;
     }
 
@@ -1188,17 +1208,26 @@ void ALi::additionAssign(const ALi& right){
     if(right.is_0()){ // L += 0 == L
         return;
     }
+    else if (right.is_p1()){ // L += 1 == ++L
+        this->increment();
+        return;
+    }
+    else if (right.is_n1()){ // L += -1 == --L
+        this->decrement();
+        return;
+    }
     else if (this->is_0()){ // 0 += R == R
         this->assignment(right);
         return;
     }
-    else if (right.is_p1()){ // L += 1 == L++
+    else if (this->is_p1()){ // 1 += R == ++R
+        this->assignment(right);
         this->increment();
         return;
     }
-    else if (this->is_p1()){ // 1 += R == R++
+    else if (this->is_n1()){ // -1 += R == --R
         this->assignment(right);
-        this->increment();
+        this->decrement();
         return;
     }
     
@@ -1245,17 +1274,26 @@ void ALi::additionAssign2(const ALi& right){
     if(right.is_0()){ // L += 0 == L
         return;
     }
+    else if (right.is_p1()){ // L += 1 == ++L
+        this->increment();
+        return;
+    }
+    else if (right.is_n1()){ // L += -1 == --L
+        this->decrement();
+        return;
+    }
     else if (this->is_0()){ // 0 += R == R
         this->assignment(right);
         return;
     }
-    else if (right.is_p1()){ // L += 1 == L++
+    else if (this->is_p1()){ // 1 += R == ++R
+        this->assignment(right);
         this->increment();
         return;
     }
-    else if (this->is_p1()){ // 1 += R == R++
+    else if (this->is_n1()){ // -1 += R == --R
         this->assignment(right);
-        this->increment();
+        this->decrement();
         return;
     }
     
@@ -1333,20 +1371,31 @@ ALi ALi::subtraction(const ALi& right) const{
     if(right.is_0()){ // L - 0 = L
         return *this;
     }
+    else if(right.is_p1()){ // L - 1 = --L
+        ALi out(*this);
+        out.decrement();
+        return out;
+    }
+    else if(right.is_n1()){ // L - -1 = ++L
+        ALi out(*this);
+        out.increment();
+        return out;
+    }
     else if(this->is_0()){ // 0 - R = -R
         ALi out(right);
         out.invert();
         return out;
     }
-    else if(right.is_p1()){ // L - 1 = L--
-        ALi out(*this);
+    else if(this->is_p1()){ // 1 - R = -(--R)
+        ALi out(right);
         out.decrement();
+        out.invert();
         return out;
     }
-    else if(this->is_p1()){ // 1 - R = (-R)++
+    else if(this->is_n1()){ // -1 - R = -(++R)
         ALi out(right);
-        out.invert();
         out.increment();
+        out.invert();
         return out;
     }
     else if(this->equal(right)){ // L - R = 0    L==R
@@ -1368,19 +1417,29 @@ void ALi::subtractionAssign(const ALi& right){
     if(right.is_0()){ // L -= 0 == L
         return;
     }
+    else if(right.is_p1()){ // L -= 1 == --L
+        this->decrement();
+        return;
+    }
+    else if(right.is_n1()){ // L -= -1 == ++L
+        this->increment();
+        return;
+    }
     else if(this->is_0()){ // 0 -= R == -R
         this->assignment(right);
         this->invert();
         return;
     }
-    else if(right.is_p1()){ // L -= 1 == L--
+    else if(this->is_p1()){ // 1 -= R == -(--R)
+        this->assignment(right);
         this->decrement();
+        this->invert();
         return;
     }
-    else if(this->is_p1()){ // 1 -= R == (-R)++
+    else if(this->is_n1()){ // -1 -= R == -(++R)
         this->assignment(right);
-        this->invert();
         this->increment();
+        this->invert();
         return;
     }
     else if(this->equal(right)){ // L -= R == 0    L==R
@@ -1406,9 +1465,50 @@ void ALi::subtractionAssign(const ALi& right){
  * @return ALi 
  */
 ALi ALi::multiplication(const ALi& right) const{
-    if(this->is_0() || right.is_0()) return 0;
-    else if(right.is_p1()) return *this;
-    else if(this->is_p1()) return right;
+    if(right.is_0()){
+        return 0;
+    }
+    else if(right.is_p1()){
+        return *this;
+    }
+    else if(right.is_p2()){
+        ALi out(*this);
+        out.SHL();
+        return out;
+    }
+    else if(right.is_n1()){
+        ALi out(*this);
+        out.invert();
+        return out;
+    }
+    else if(right.is_n2()){
+        ALi out(*this);
+        out.SHL();
+        out.invert();
+        return out;
+    }
+    else if(this->is_0()){
+        return 0;
+    }
+    else if(this->is_p1()){
+        return right;
+    }
+    else if(this->is_p2()){
+        ALi out(right);
+        out.SHL();
+        return out;
+    }
+    else if(this->is_n1()){
+        ALi out(right);
+        out.invert();
+        return out;
+    }
+    else if(this->is_n2()){
+        ALi out(right);
+        out.SHL();
+        out.invert();
+        return out;
+    }
 
     ALi slider(*this);
     ALi factor;
@@ -1451,7 +1551,49 @@ ALi ALi::multiplication(const ALi& right) const{
  * @param right 
  */
 void ALi::multiplicationAssign(const ALi& right){
-
+    if(right.is_0()){
+        this->clear();
+        return;
+    }
+    else if(right.is_p1()){
+        return;
+    }
+    else if(right.is_p2()){
+        this->SHL();
+        return;
+    }
+    else if(right.is_n1()){
+        this->invert();
+        return;
+    }
+    else if(right.is_n2()){
+        this->SHL();
+        this->invert();
+        return;
+    }
+    else if(this->is_0()){
+        return;
+    }
+    else if(this->is_p1()){
+        this->assignment(right);
+        return;
+    }
+    else if(this->is_p2()){
+        this->assignment(right);
+        this->SHL();
+        return;
+    }
+    else if(this->is_n1()){
+        this->assignment(right);
+        this->invert();
+        return;
+    }
+    else if(this->is_n2()){
+        this->assignment(right);
+        this->SHL();
+        this->invert();
+        return;
+    }
 }
     // #
     
