@@ -44,12 +44,12 @@ protected: public:
     void PLSB(const bool& bit);//
 
     const bool sign() const;//
-    const bool is_0() const;
+    const bool is_0(const Cell* const handle = nullptr) const;
 
-    const bool is_p1() const;
-    const bool is_p2() const;
-    const bool is_n1() const;
-    const bool is_n2() const;
+    const bool is_p1(const Cell* const handle = nullptr) const;
+    const bool is_p2(const Cell* const handle = nullptr) const;
+    const bool is_n1(const Cell* const handle = nullptr) const;
+    const bool is_n2(const Cell* const handle = nullptr) const;
 
     void clear();//
     void optymize();//
