@@ -96,14 +96,14 @@ protected: public:
     const bool smallerThan(const ALi& right) const;//
 
     // Addition
-    void increment();
+    void increment(const bool &handle_overflow = true);
     ALi addition(const ALi& right, const bool &handle_overflow = true) const;
     ALi addition2(const ALi& right, const bool &handle_overflow = true) const;
     void additionAssign(const ALi& right, const bool &handle_overflow = true);
     void additionAssign2(const ALi& right, const bool &handle_overflow = true);
 
     // Subtraction
-    void decrement();// handle_overfow - hdl_ofl
+    void decrement(const bool &handle_overflow = true);
     ALi subtraction(const ALi& right, const bool &handle_overflow = true) const;
     void subtractionAssign(const ALi& right, const bool &handle_overflow = true);
 

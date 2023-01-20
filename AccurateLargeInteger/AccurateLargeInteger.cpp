@@ -996,7 +996,7 @@ const bool ALi::smallerThan(const ALi& right) const{
  * @brief increment ALi by one
  * 
  */
-void ALi::increment(){
+void ALi::increment(const bool &handle_overflow){
     // incrementing binary is acctually easy:
     // going through each bit from right
     // if is 1 then set to 0
@@ -1349,7 +1349,7 @@ void ALi::additionAssign2(const ALi& right, const bool &handle_overflow){
  * @brief increment ALi by one
  * 
  */
-void ALi::decrement(){
+void ALi::decrement(const bool &handle_overflow){
     Cell *handle = this->begin_ptr;
     while(handle->var == mask000 && handle != this->begin_ptr->R){
         handle->var = mask111; // (1)00000000 -> (0)11111111
