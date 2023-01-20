@@ -1039,7 +1039,7 @@ void ALi::increment(){
  * @param right 
  * @return ALi 
  */
-ALi ALi::addition(const ALi& right) const{
+ALi ALi::addition(const ALi& right, const bool &handle_overflow) const{
     if(right.is_0()){ // L + 0 = L
         return *this;
     }
@@ -1131,7 +1131,7 @@ ALi ALi::addition(const ALi& right) const{
  * @param right 
  * @return ALi 
  */
-ALi ALi::addition2(const ALi& right) const{
+ALi ALi::addition2(const ALi& right, const bool &handle_overflow) const{
     if(right.is_0()){ // L + 0 = L
         return *this;
     }
@@ -1204,7 +1204,7 @@ ALi ALi::addition2(const ALi& right) const{
  * @brief 
  * @param right 
  */
-void ALi::additionAssign(const ALi& right){
+void ALi::additionAssign(const ALi& right, const bool &handle_overflow){
     if(right.is_0()){ // L += 0 == L
         return;
     }
@@ -1270,7 +1270,7 @@ void ALi::additionAssign(const ALi& right){
  * @brief 
  * @param right 
  */
-void ALi::additionAssign2(const ALi& right){
+void ALi::additionAssign2(const ALi& right, const bool &handle_overflow){
     if(right.is_0()){ // L += 0 == L
         return;
     }
@@ -1367,7 +1367,7 @@ void ALi::decrement(){
  * @param right 
  * @return ALi 
  */
-ALi ALi::subtraction(const ALi& right) const{
+ALi ALi::subtraction(const ALi& right, const bool &handle_overflow) const{
     if(right.is_0()){ // L - 0 = L
         return *this;
     }
@@ -1413,7 +1413,7 @@ ALi ALi::subtraction(const ALi& right) const{
  * @brief 
  * @param right 
  */
-void ALi::subtractionAssign(const ALi& right){
+void ALi::subtractionAssign(const ALi& right, const bool &handle_overflow){
     if(right.is_0()){ // L -= 0 == L
         return;
     }

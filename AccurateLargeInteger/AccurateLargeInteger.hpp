@@ -97,15 +97,15 @@ protected: public:
 
     // Addition
     void increment();
-    ALi addition(const ALi& right) const;
-    ALi addition2(const ALi& right) const;
-    void additionAssign(const ALi& right);
-    void additionAssign2(const ALi& right);
+    ALi addition(const ALi& right, const bool &handle_overflow = true) const;
+    ALi addition2(const ALi& right, const bool &handle_overflow = true) const;
+    void additionAssign(const ALi& right, const bool &handle_overflow = true);
+    void additionAssign2(const ALi& right, const bool &handle_overflow = true);
 
     // Subtraction
-    void decrement();
-    ALi subtraction(const ALi& right) const;
-    void subtractionAssign(const ALi& right);
+    void decrement();// handle_overfow - hdl_ofl
+    ALi subtraction(const ALi& right, const bool &handle_overflow = true) const;
+    void subtractionAssign(const ALi& right, const bool &handle_overflow = true);
 
     // Multiplication
     ALi multiplication(const ALi& right) const;
