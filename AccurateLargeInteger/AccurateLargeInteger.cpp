@@ -103,7 +103,7 @@ const bool ALi::delCell(){
 void ALi::SHR(){
     // works just like an >> operator for signed values
     Cell* handle = this->begin_ptr->R;
-    bool buffer[2] = {0,this->sgn()};
+    bool buffer[2] = {0,this->vsign()};
     /*[0] - cell bit out*/    /*[1] - cell bit in*/
 
     do{
@@ -221,7 +221,7 @@ void ALi::PLSB(const bool& bit){
  * @return true sign bit is 1 => number is negative,
  * @return false sign bit is 0 => number is positive
  */
-const bool ALi::sgn() const{
+const bool ALi::vsign() const{
     return (this->begin_ptr->R->var & mask100 ? true : false);
 }
 /**
@@ -229,19 +229,28 @@ const bool ALi::sgn() const{
  * @return true if value is 0,
  * @return false if value is something other than 0
  */
-const bool ALi::is0() const{
+const bool ALi::is_p0() const{
     if(this->length == 1 && this->begin_ptr->var == mask000) return true;
     else return false;
 }
 /**
- * @brief return if value is 0
+ * @brief return if value is 1
  * @return true if value is 1,
  * @return false if value is something other than 1
  */
-const bool ALi::is1() const{
+const bool ALi::is_p1() const{
     if(this->length == 1 && this->begin_ptr->var == mask001) return true;
     else return false;
 }
+// /**
+//  * @brief return if value is 2
+//  * @return true if value is 2,
+//  * @return false if value is something other than 2
+//  */
+// const bool ALi::is_p2() const{
+//     if(this->length == 2 && this->begin_ptr->var == mask001) return true;
+//     else return false;
+// }
     // #
     
     // #
@@ -366,14 +375,14 @@ void ALi::printBinary() const{
  */
 void ALi::printDecimal() const{
     // if it is negative invert and print '-' sign
-    if(this->sgn()){
+    if(this->vsign()){
         printf("-");
         ALi tmp(*this);
         tmp.invert();
         tmp.printDecimal();
         return;
     }
-    else if(this->is0()){
+    else if(this->is_p0()){
         printf("0");
         return;
     }
@@ -386,7 +395,7 @@ void ALi::printDecimal() const{
         CELL_TYPE mask = mask100;
         while(mask != 0){
             bcd.PLSB((handle->var & mask ? 1 : 0));
-            const bool old_bcdsgn = bcd.sgn();
+            const bool old_bcdvsign = bcd.vsign();
             Cell* bcdhandle = bcd.begin_ptr;
             do{
                 bcdhandle = bcdhandle->R;
@@ -407,7 +416,7 @@ void ALi::printDecimal() const{
                 }
                 bcdhandle->var = result;
             }while(bcdhandle != bcd.begin_ptr);
-            if(old_bcdsgn != bcd.sgn()) bcd.newCell(mask000);
+            if(old_bcdvsign != bcd.vsign()) bcd.newCell(mask000);
             mask >>= 1;
         }
     }while(handle != this->begin_ptr);
@@ -433,13 +442,13 @@ void ALi::printDecimal() const{
     //     CELL_TYPE mask = mask100;
     //     while(mask != 0){
     //         bcd.PLSB((handle->var & mask ? 1 : 0));
-    //         const bool old_bcdsgn = bcd.sgn();
+    //         const bool old_bcdvsign = bcd.vsign();
     //         Cell* bcdhandle = bcd.begin_ptr;
     //         do{
     //             bcdhandle = bcdhandle->R;
     //             bcdhandle->var = BCDincrement(bcdhandle->var);
     //         }while(bcdhandle != bcd.begin_ptr);
-    //         if(old_bcdsgn != bcd.sgn()) bcd.newCell(mask000);
+    //         if(old_bcdvsign != bcd.vsign()) bcd.newCell(mask000);
     //         mask >>= 1;
     //     }
     // }while(handle != this->begin_ptr);
@@ -453,7 +462,7 @@ void ALi::printDecimal() const{
     }
     printf("%s",rev.c_str());
     bcd.delCell();
-    if(bcd.is0()) return;
+    if(bcd.is_p0()) return;
 
     do{
         std::string rev;
@@ -735,7 +744,7 @@ void ALi::assignment_str(const std::string& source){
  */
 const bool ALi::equal(const ALi& right) const{
     // assume that both are optymized otherways it is harder...
-    if(this->sgn() != right.sgn()) return false;
+    if(this->vsign() != right.vsign()) return false;
     if(this->length != right.length) return false;
     const Cell* hL = this->begin_ptr;
     const Cell* hR = right.begin_ptr;
@@ -760,14 +769,14 @@ const bool ALi::greaterThan(const ALi& right) const{
     return + == return 0
     return - == return 1
 
-    if(Lsgn != Rsgn){
+    if(Lvsign != Rvsign){
         L+ > R- return true
         L- > R+ return false
         return true if L is positive, false if is not
 
         L+ > R- return -
         L- > R+ return +
-        return Rsgn
+        return Rvsign
     }
     else if(Llen > Rlen){
         left is greater if left is longer?
@@ -777,7 +786,7 @@ const bool ALi::greaterThan(const ALi& right) const{
             answer is false
 
         return true if L is positive, false if is not
-        return !Lsgn
+        return !Lvsign
     }
     else if(Llen < Rlen){
         left is greater if left is shorter?
@@ -787,15 +796,15 @@ const bool ALi::greaterThan(const ALi& right) const{
             answer is true
 
         return false if L is positive, true if is not
-        return Lsgn
+        return Lvsign
     }
     */
-    const bool Lsgn = this->sgn();
-    const bool Rsgn = right.sgn();
-    if(Lsgn != Rsgn) return Rsgn; 
+    const bool Lvsign = this->vsign();
+    const bool Rvsign = right.vsign();
+    if(Lvsign != Rvsign) return Rvsign; 
     // signs are equal
-    else if(this->length > right.length) return !Lsgn;
-    else if(this->length < right.length) return Lsgn;
+    else if(this->length > right.length) return !Lvsign;
+    else if(this->length < right.length) return Lvsign;
     // lengths are equal
     Cell* hL = this->begin_ptr;
     Cell* hR = right.begin_ptr;
@@ -821,14 +830,14 @@ const bool ALi::smallerThan(const ALi& right) const{
     return + == return 0
     return - == return 1
 
-    if(Lsgn != Rsgn){
+    if(Lvsign != Rvsign){
         L+ < R- return false
         L- < R+ return true
         return false if L is positive, true if is not
 
         L+ < R- return +
         L- < R+ return -
-        return Lsgn
+        return Lvsign
     }
     else if(Llen > Rlen){
         left is smaller if left is longer?
@@ -838,7 +847,7 @@ const bool ALi::smallerThan(const ALi& right) const{
             answer is true
 
         return false if L is positive, true if is not
-        return Lsgn
+        return Lvsign
     }
     else if(Llen < Rlen){
         left is smaller if left is shorter?
@@ -848,15 +857,15 @@ const bool ALi::smallerThan(const ALi& right) const{
             answer is false
 
         return true if L is positive, false if is not
-        return !Lsgn
+        return !Lvsign
     }
     */
-    const bool Lsgn = this->sgn();
-    const bool Rsgn = right.sgn();
-    if(Lsgn != Rsgn) return Lsgn;
+    const bool Lvsign = this->vsign();
+    const bool Rvsign = right.vsign();
+    if(Lvsign != Rvsign) return Lvsign;
     // signs are equal
-    else if(this->length > right.length) return Lsgn;
-    else if(this->length < right.length) return !Lsgn;
+    else if(this->length > right.length) return Lvsign;
+    else if(this->length < right.length) return !Lvsign;
     // lengths are equal
     Cell* hL = this->begin_ptr;
     Cell* hR = right.begin_ptr;
@@ -903,7 +912,7 @@ void ALi::increment(){
     // 00000010                                         -> [00000010]
     // 01111111  11111111                               ->  00000000 [01111111] 00000000
     // 01111111  11110011                               ->  01111111 [11110011]
-    if(!this->sgn() && handle->var == mask011 && handle == this->begin_ptr->R){
+    if(!this->vsign() && handle->var == mask011 && handle == this->begin_ptr->R){
         this->newCell(mask000);
     }
     // 10101101  11111111  11111111  11111111  11111111 -> [10101110] 00000000  00000000  00000000  00000000
@@ -921,18 +930,18 @@ void ALi::increment(){
  * @return ALi 
  */
 ALi ALi::addition(const ALi& right) const{
-    if(right.is0()){ // L + 0 = L
+    if(right.is_p0()){ // L + 0 = L
         return *this;
     }
-    else if (this->is0()){ // 0 + R = R
+    else if (this->is_p0()){ // 0 + R = R
         return right;
     } 
-    else if (right.is1()){ // L + 1 = L++
+    else if (right.is_p1()){ // L + 1 = L++
         ALi out(*this);
         out.increment();
         return out;
     }
-    else if (this->is1()){ // 1 + R = R++
+    else if (this->is_p1()){ // 1 + R = R++
         ALi out(right);
         out.increment();
         return out;
@@ -942,7 +951,7 @@ ALi ALi::addition(const ALi& right) const{
 
     const Cell* const lgh = this->begin_ptr;
     const Cell* lh = lgh->L;
-    const bool lsign = this->sgn();
+    const bool lsign = this->vsign();
     Cell lmask{
         lmask.var = (lsign ? mask111 : mask000),
         lmask.L = &lmask,
@@ -955,7 +964,7 @@ ALi ALi::addition(const ALi& right) const{
 
     const Cell* const rgh = right.begin_ptr;
     const Cell* rh = rgh->L;
-    const bool rsign = right.sgn();
+    const bool rsign = right.vsign();
     Cell rmask{
         rmask.var = (rsign ? mask111 : mask000),
         rmask.L = &rmask,
@@ -992,7 +1001,7 @@ ALi ALi::addition(const ALi& right) const{
         if(rh == rgh) rh = &rmask;
     }
     // overflow can only appear when both operation argument sign values are equal
-    if(lsign == rsign && lsign != out.sgn())
+    if(lsign == rsign && lsign != out.vsign())
         out.newCell(lmask.var);
     out.optymize();
     return out;
@@ -1003,18 +1012,18 @@ ALi ALi::addition(const ALi& right) const{
  * @return ALi 
  */
 ALi ALi::addition2(const ALi& right) const{
-    if(right.is0()){ // L + 0 = L
+    if(right.is_p0()){ // L + 0 = L
         return *this;
     }
-    else if (this->is0()){ // 0 + R = R
+    else if (this->is_p0()){ // 0 + R = R
         return right;
     } 
-    else if (right.is1()){ // L + 1 = L++
+    else if (right.is_p1()){ // L + 1 = L++
         ALi out(*this);
         out.increment();
         return out;
     }
-    else if (this->is1()){ // 1 + R = R++
+    else if (this->is_p1()){ // 1 + R = R++
         ALi out(right);
         out.increment();
         return out;
@@ -1024,7 +1033,7 @@ ALi ALi::addition2(const ALi& right) const{
 
     const Cell* const lgh = this->begin_ptr;
     const Cell* lh = lgh->L;
-    const bool lsign = this->sgn();
+    const bool lsign = this->vsign();
     Cell lmask{
         lmask.var = (lsign ? mask111 : mask000),
         lmask.L = &lmask,
@@ -1033,7 +1042,7 @@ ALi ALi::addition2(const ALi& right) const{
 
     const Cell* const rgh = right.begin_ptr;
     const Cell* rh = rgh->L;
-    const bool rsign = right.sgn();
+    const bool rsign = right.vsign();
     Cell rmask{
         rmask.var = (rsign ? mask111 : mask000),
         rmask.L = &rmask,
@@ -1056,7 +1065,7 @@ ALi ALi::addition2(const ALi& right) const{
         if(rh == rgh) rh = &rmask;
     }
     // overflow can only appear when both operation argument sign values are equal
-    if(lsign == rsign && lsign != out.sgn())
+    if(lsign == rsign && lsign != out.vsign())
         out.newCell(lmask.var);
     out.optymize();
     return out;
@@ -1066,18 +1075,18 @@ ALi ALi::addition2(const ALi& right) const{
  * @param right 
  */
 void ALi::additionAssign(const ALi& right){
-    if(right.is0()){ // L += 0 == L
+    if(right.is_p0()){ // L += 0 == L
         return;
     }
-    else if (this->is0()){ // 0 += R == R
+    else if (this->is_p0()){ // 0 += R == R
         this->assignment(right);
         return;
     }
-    else if (right.is1()){ // L += 1 == L++
+    else if (right.is_p1()){ // L += 1 == L++
         this->increment();
         return;
     }
-    else if (this->is1()){ // 1 += R == R++
+    else if (this->is_p1()){ // 1 += R == R++
         this->assignment(right);
         this->increment();
         return;
@@ -1088,13 +1097,13 @@ void ALi::additionAssign(const ALi& right){
     ALi* const lobj = this; 
     Cell* const lgh = lobj->begin_ptr;
     Cell* lh = lgh->L;
-    const bool lsign = lobj->sgn();
+    const bool lsign = lobj->vsign();
     const CELL_TYPE lmask = (lsign ? mask111 : mask000);
 
     const ALi* const robj = &right;
     const Cell* const rgh = robj->begin_ptr;
     const Cell* rh = rgh->L;
-    const bool rsign = robj->sgn();
+    const bool rsign = robj->vsign();
     const CELL_TYPE rmask = (rsign ? mask111 : mask000);
     
     CELL_TYPE carry = 0;
@@ -1114,7 +1123,7 @@ void ALi::additionAssign(const ALi& right){
         if(rh != rgh) rh = rh->L;
     }
     // overflow can only appear when both operation argument sign values are equal
-    if(lsign == rsign && lsign != this->sgn())
+    if(lsign == rsign && lsign != this->vsign())
         this->newCell(lmask);
     this->optymize();
 }
@@ -1123,18 +1132,18 @@ void ALi::additionAssign(const ALi& right){
  * @param right 
  */
 void ALi::additionAssign2(const ALi& right){
-    if(right.is0()){ // L += 0 == L
+    if(right.is_p0()){ // L += 0 == L
         return;
     }
-    else if (this->is0()){ // 0 += R == R
+    else if (this->is_p0()){ // 0 += R == R
         this->assignment(right);
         return;
     }
-    else if (right.is1()){ // L += 1 == L++
+    else if (right.is_p1()){ // L += 1 == L++
         this->increment();
         return;
     }
-    else if (this->is1()){ // 1 += R == R++
+    else if (this->is_p1()){ // 1 += R == R++
         this->assignment(right);
         this->increment();
         return;
@@ -1145,7 +1154,7 @@ void ALi::additionAssign2(const ALi& right){
     ALi* const lobj = this; 
     Cell* const lgh = lobj->begin_ptr;
     Cell* lh = lgh->L;
-    const bool lsign = lobj->sgn();
+    const bool lsign = lobj->vsign();
     Cell lmask{
         lmask.var = (lsign ? mask111 : mask000),
         lmask.L = &lmask,
@@ -1155,7 +1164,7 @@ void ALi::additionAssign2(const ALi& right){
     const ALi* const robj = &right;
     const Cell* const rgh = robj->begin_ptr;
     const Cell* rh = rgh->L;
-    const bool rsign = robj->sgn();
+    const bool rsign = robj->vsign();
     Cell rmask{
         rmask.var = (rsign ? mask111 : mask000),
         rmask.L = &rmask,
@@ -1179,7 +1188,7 @@ void ALi::additionAssign2(const ALi& right){
         if(rh == rgh) rh = &rmask;
     }
     // overflow can only appear when both operation argument sign values are equal
-    if(lsign == rsign && lsign != this->sgn())
+    if(lsign == rsign && lsign != this->vsign())
         this->newCell(lmask.var);
     this->optymize();
 }
@@ -1199,7 +1208,7 @@ void ALi::decrement(){
         handle = handle->L;
     }
     // if number is negative, overflow can occur cause we are adding two negative numbers
-    if(this->sgn() && (handle->var == mask100 && handle == this->begin_ptr->R)){
+    if(this->vsign() && (handle->var == mask100 && handle == this->begin_ptr->R)){
         this->newCell(mask111);
     }
     handle->var--;
@@ -1211,20 +1220,20 @@ void ALi::decrement(){
  * @return ALi 
  */
 ALi ALi::subtraction(const ALi& right) const{
-    if(right.is0()){ // L - 0 = L
+    if(right.is_p0()){ // L - 0 = L
         return *this;
     }
-    else if(this->is0()){ // 0 - R = -R
+    else if(this->is_p0()){ // 0 - R = -R
         ALi out(right);
         out.invert();
         return out;
     }
-    else if(right.is1()){ // L - 1 = L--
+    else if(right.is_p1()){ // L - 1 = L--
         ALi out(*this);
         out.decrement();
         return out;
     }
-    else if(this->is1()){ // 1 - R = (-R)++
+    else if(this->is_p1()){ // 1 - R = (-R)++
         ALi out(right);
         out.invert();
         out.increment();
@@ -1246,19 +1255,19 @@ ALi ALi::subtraction(const ALi& right) const{
  * @param right 
  */
 void ALi::subtractionAssign(const ALi& right){
-    if(right.is0()){ // L -= 0 == L
+    if(right.is_p0()){ // L -= 0 == L
         return;
     }
-    else if(this->is0()){ // 0 -= R == -R
+    else if(this->is_p0()){ // 0 -= R == -R
         this->assignment(right);
         this->invert();
         return;
     }
-    else if(right.is1()){ // L -= 1 == L--
+    else if(right.is_p1()){ // L -= 1 == L--
         this->decrement();
         return;
     }
-    else if(this->is1()){ // 1 -= R == (-R)++
+    else if(this->is_p1()){ // 1 -= R == (-R)++
         this->assignment(right);
         this->invert();
         this->increment();
@@ -1287,31 +1296,27 @@ void ALi::subtractionAssign(const ALi& right){
  * @return ALi 
  */
 ALi ALi::multiplication(const ALi& right) const{
-    if(this->is0() || right.is0()) return 0;
-    else if(right.is1()) return *this;
-    else if(this->is1()) return right;
+    if(this->is_p0() || right.is_p0()) return 0;
+    else if(right.is_p1()) return *this;
+    else if(this->is_p1()) return right;
 
-    
     ALi slider(*this);
-    slider.PLSB(0); // comparison bit
     ALi factor;
 
-    slider.setSeparator(' ');
-    factor.setSeparator(' ');
+    slider.PLSB(0); // comparison bit
 
-    // align (factor.length = this->length + right.length)
+    // align
     while(factor.length < slider.length)
         factor.newCell(mask000);
+    
     const Cell* rhandle = right.begin_ptr;
     do{
         factor.newCell(rhandle->var);
         rhandle = rhandle->L;
     }while(rhandle != right.begin_ptr);
 
-
     unsigned long long slider_length = slider.length*BITS_PER_VAR;
     unsigned long long i=0;
-    // for(unsigned long long i=0; i<slider_length; i++){
     while(i < slider_length){
         switch (slider.begin_ptr->var & 0b11){
         case 1: // 01
@@ -1325,6 +1330,9 @@ ALi ALi::multiplication(const ALi& right) const{
         slider.SHR();
         i++;
     }
+
+    // idk why for negative left, do not work and needs +1
+    if(this->vsign()) slider.increment();
 
     return slider;
 }
@@ -1450,7 +1458,7 @@ const char ALi::getSeparator() const{
  * @return false ALi containing something
  */
 const bool ALi::isEmpty() const{
-    return this->is0();
+    return this->is_p0();
 }
     // #
     
