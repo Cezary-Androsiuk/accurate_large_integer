@@ -1022,7 +1022,7 @@ void ALi::increment(const bool &handle_overflow){
     // 00000010                                         -> [00000010]
     // 01111111  11111111                               ->  00000000 [01111111] 00000000
     // 01111111  11110011                               ->  01111111 [11110011]
-    if(!this->sign() && handle->var == mask011 && handle == this->begin_ptr->R){
+    if(handle_overflow && !this->sign() && handle->var == mask011 && handle == this->begin_ptr->R){
         this->newCell(mask000);
     }
     // 10101101  11111111  11111111  11111111  11111111 -> [10101110] 00000000  00000000  00000000  00000000
@@ -1077,10 +1077,6 @@ ALi ALi::addition(const ALi& right, const bool &handle_overflow) const{
         lmask.L = &lmask,
         lmask.R = &lmask
     };
-    // Cell lmask;
-    // lmask.var = (lsign ? mask111 : mask000);
-    // lmask.L = &lmask;
-    // lmask.R = &lmask;
 
     const Cell* const rgh = right.begin_ptr;
     const Cell* rh = rgh->L;
@@ -1090,11 +1086,6 @@ ALi ALi::addition(const ALi& right, const bool &handle_overflow) const{
         rmask.L = &rmask,
         rmask.R = &rmask
     };
-
-    // Cell rmask;
-    // rmask.var = (rsign ? mask111 : mask000);
-    // rmask.L = &rmask;
-    // rmask.R = &rmask;
     
     CELL_TYPE carry = 0;
     CELL_TYPE ofldet; // just keep equation result, instead of computing it every time while comparing
@@ -1121,7 +1112,7 @@ ALi ALi::addition(const ALi& right, const bool &handle_overflow) const{
         if(rh == rgh) rh = &rmask;
     }
     // overflow can only appear when both operation argument sign values are equal
-    if(lsign == rsign && lsign != out.sign())
+    if(handle_overflow && lsign == rsign && lsign != out.sign())
         out.newCell(lmask.var);
     out.optymize();
     return out;
@@ -1195,7 +1186,7 @@ ALi ALi::addition2(const ALi& right, const bool &handle_overflow) const{
         if(rh == rgh) rh = &rmask;
     }
     // overflow can only appear when both operation argument sign values are equal
-    if(lsign == rsign && lsign != out.sign())
+    if(handle_overflow && lsign == rsign && lsign != out.sign())
         out.newCell(lmask.var);
     out.optymize();
     return out;
@@ -1262,7 +1253,7 @@ void ALi::additionAssign(const ALi& right, const bool &handle_overflow){
         if(rh != rgh) rh = rh->L;
     }
     // overflow can only appear when both operation argument sign values are equal
-    if(lsign == rsign && lsign != this->sign())
+    if(handle_overflow && lsign == rsign && lsign != this->sign())
         this->newCell(lmask);
     this->optymize();
 }
@@ -1336,7 +1327,7 @@ void ALi::additionAssign2(const ALi& right, const bool &handle_overflow){
         if(rh == rgh) rh = &rmask;
     }
     // overflow can only appear when both operation argument sign values are equal
-    if(lsign == rsign && lsign != this->sign())
+    if(handle_overflow && lsign == rsign && lsign != this->sign())
         this->newCell(lmask.var);
     this->optymize();
 }
@@ -1356,7 +1347,7 @@ void ALi::decrement(const bool &handle_overflow){
         handle = handle->L;
     }
     // if number is negative, overflow can occur cause we are adding two negative numbers
-    if(this->sign() && (handle->var == mask100 && handle == this->begin_ptr->R)){
+    if(handle_overflow && this->sign() && (handle->var == mask100 && handle == this->begin_ptr->R)){
         this->newCell(mask111);
     }
     handle->var--;
@@ -1406,7 +1397,7 @@ ALi ALi::subtraction(const ALi& right, const bool &handle_overflow) const{
     ALi right_(right);
     right_.invert();
 
-    return this->addition(right_);
+    return this->addition(right_,handle_overflow);
     //#############################
 }
 /**
@@ -1451,7 +1442,7 @@ void ALi::subtractionAssign(const ALi& right, const bool &handle_overflow){
     ALi right_(right);
     right_.invert();
 
-    this->additionAssign(right_);
+    this->additionAssign(right_,handle_overflow);
     //#############################
 }
     // #
@@ -1465,45 +1456,45 @@ void ALi::subtractionAssign(const ALi& right, const bool &handle_overflow){
  * @return ALi 
  */
 ALi ALi::multiplication(const ALi& right) const{
-    if(right.is_0()){
+    if(right.is_0()){ // L * 0 = 0
         return 0;
     }
-    else if(right.is_p1()){
+    else if(right.is_p1()){ // L * 1 = L
         return *this;
     }
-    else if(right.is_p2()){
+    else if(right.is_p2()){ // L * 2 = L.SHL()
         ALi out(*this);
         out.SHL();
         return out;
     }
-    else if(right.is_n1()){
+    else if(right.is_n1()){ // L * -1 = -L
         ALi out(*this);
         out.invert();
         return out;
     }
-    else if(right.is_n2()){
+    else if(right.is_n2()){ // L * -2 = -L.SHL()
         ALi out(*this);
         out.SHL();
         out.invert();
         return out;
     }
-    else if(this->is_0()){
+    else if(this->is_0()){ // 0 * R = 0
         return 0;
     }
-    else if(this->is_p1()){
+    else if(this->is_p1()){ // 1 * R = R
         return right;
     }
-    else if(this->is_p2()){
+    else if(this->is_p2()){ // 2 * R = R.SHL()
         ALi out(right);
         out.SHL();
         return out;
     }
-    else if(this->is_n1()){
+    else if(this->is_n1()){ // -1 * R = -R
         ALi out(right);
         out.invert();
         return out;
     }
-    else if(this->is_n2()){
+    else if(this->is_n2()){ // -2 * R = -R.SHL()
         ALi out(right);
         out.SHL();
         out.invert();
@@ -1525,21 +1516,27 @@ ALi ALi::multiplication(const ALi& right) const{
         rhandle = rhandle->L;
     }while(rhandle != right.begin_ptr);
 
-    unsigned long long slider_length = slider.length*BITS_PER_VAR;
+    unsigned long long slider_length = slider.length * BITS_PER_VAR - 1;
     unsigned long long i=0;
     while(i < slider_length){
+        slider.setSeparator(' ');
+        printf("%d\n->",i);
+        slider >> "b\n->";
         switch (slider.begin_ptr->var & 0b11){
         case 1: // 01
-            slider.additionAssign(factor);
+            slider.additionAssign(factor,false);
             break;
         case 2: // 10
-            slider.subtractionAssign(factor);
+            slider.subtractionAssign(factor,false);
             break;
         // 00 & 11
         }
+        slider >> "b\n->";
         slider.SHR();
+        slider >> "b\n\n";
         i++;
     }
+    slider.SHR();
 
     // idk why for negative left, do not work and needs +1
     if(this->sign()) slider.increment();
@@ -1551,44 +1548,44 @@ ALi ALi::multiplication(const ALi& right) const{
  * @param right 
  */
 void ALi::multiplicationAssign(const ALi& right){
-    if(right.is_0()){
+    if(right.is_0()){ // L *= 0 == 0
         this->clear();
         return;
     }
-    else if(right.is_p1()){
+    else if(right.is_p1()){ // L *= 1 == L
         return;
     }
-    else if(right.is_p2()){
+    else if(right.is_p2()){ // L *= 2 == L.SHL()
         this->SHL();
         return;
     }
-    else if(right.is_n1()){
+    else if(right.is_n1()){ // L *= -1 == -L
         this->invert();
         return;
     }
-    else if(right.is_n2()){
+    else if(right.is_n2()){ // L *= -2 == -L.SHL()
         this->SHL();
         this->invert();
         return;
     }
-    else if(this->is_0()){
+    else if(this->is_0()){ // 0 *= R == 0
         return;
     }
-    else if(this->is_p1()){
+    else if(this->is_p1()){ // 1 *= R == R
         this->assignment(right);
         return;
     }
-    else if(this->is_p2()){
+    else if(this->is_p2()){ // 2 *= R == R.SHL()
         this->assignment(right);
         this->SHL();
         return;
     }
-    else if(this->is_n1()){
+    else if(this->is_n1()){ // -1 *= R == -R
         this->assignment(right);
         this->invert();
         return;
     }
-    else if(this->is_n2()){
+    else if(this->is_n2()){ // -2 *= R == -R.SHL()
         this->assignment(right);
         this->SHL();
         this->invert();
