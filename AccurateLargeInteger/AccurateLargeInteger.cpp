@@ -284,7 +284,7 @@ const bool ALi::is_p1(const Cell* const handle) const{
         else return false;
     }
     else{
-        if(handle->var != mask000){
+        if(handle->var == mask000){
             if(handle->L != this->begin_ptr)
                 return this->is_p1(handle->L);
             else return true;
@@ -307,7 +307,7 @@ const bool ALi::is_p2(const Cell* const handle) const{
         else return false;
     }
     else{
-        if(handle->var != mask000){
+        if(handle->var == mask000){
             if(handle->L != this->begin_ptr)
                 return this->is_p2(handle->L);
             else return true;
@@ -330,7 +330,7 @@ const bool ALi::is_n1(const Cell* const handle) const{
         else return false;
     }
     else{
-        if(handle->var != mask111){
+        if(handle->var == mask111){
             if(handle->L != this->begin_ptr)
                 return this->is_n1(handle->L);
             else return true;
@@ -353,7 +353,7 @@ const bool ALi::is_n2(const Cell* const handle) const{
         else return false;
     }
     else{
-        if(handle->var != mask111){
+        if(handle->var == mask111){
             if(handle->L != this->begin_ptr)
                 return this->is_n2(handle->L);
             else return true;
@@ -1040,7 +1040,10 @@ void ALi::increment(const bool &handle_overflow){
  * @return ALi 
  */
 ALi ALi::addition(const ALi& right, const bool &handle_overflow) const{
-    if(right.is_0()){ // L + 0 = L
+    if(this->length < right.length){
+        return right.addition(*this);
+    }
+    else if(right.is_0()){ // L + 0 = L
         return *this;
     }
     else if (right.is_p1()){ // L + 1 = ++L
@@ -1067,6 +1070,37 @@ ALi ALi::addition(const ALi& right, const bool &handle_overflow) const{
         return out;
     }
 
+    ALi out;
+    Cell* ohandle = out.begin_ptr;
+    const Cell* lhandle = this->begin_ptr;
+    const Cell* rhandle = right.begin_ptr;
+    Cell rmask{
+        rmask.var = (right.sign() ? mask111 : mask000),
+        rmask.L = &rmask,
+        rmask.R = &rmask
+    };
+
+    CELL_TYPE carry = 0;
+    do{
+        carry  = __builtin_add_overflow(carry       , lhandle->var, &ohandle->var);
+        carry += __builtin_add_overflow(ohandle->var, rhandle->var, &ohandle->var);
+        
+        out.newCell(mask000);
+        ohandle = ohandle->L;
+
+        lhandle = lhandle->L;
+        rhandle = rhandle->L;
+        if(rhandle == right.begin_ptr) rhandle = &rmask;
+    }while(lhandle != this->begin_ptr);
+    out.delCell();
+
+    if(handle_overflow && carry && this->sign() == right.sign())
+        out.newCell(mask001);
+
+    out.optymize();
+    return out;
+
+    /*
     ALi out;
 
     const Cell* const lgh = this->begin_ptr;
@@ -1115,7 +1149,7 @@ ALi ALi::addition(const ALi& right, const bool &handle_overflow) const{
     if(handle_overflow && lsign == rsign && lsign != out.sign())
         out.newCell(lmask.var);
     out.optymize();
-    return out;
+    return out;*/
 }
 /**
  * @brief 
@@ -1520,7 +1554,7 @@ ALi ALi::multiplication(const ALi& right) const{
     unsigned long long i=0;
     while(i < slider_length){
         slider.setSeparator(' ');
-        printf("%d\n->",i);
+        printf("%lld\n->",i);
         slider >> "b\n->";
         switch (slider.begin_ptr->var & 0b11){
         case 1: // 01
