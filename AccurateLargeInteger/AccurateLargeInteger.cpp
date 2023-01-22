@@ -1040,123 +1040,10 @@ void ALi::increment(const bool &handle_overflow){
  * @return ALi 
  */
 ALi ALi::addition(const ALi& right, const bool &handle_overflow) const{
-    if(this->length < right.length){
-        return right.addition(*this);
-    }
-    else if(right.is_0()){ // L + 0 = L
-        return *this;
-    }
-    else if (right.is_p1()){ // L + 1 = ++L
-        ALi out(*this);
-        out.increment();
-        return out;
-    }
-    else if (right.is_n1()){ // L + -1 = --L
-        ALi out(*this);
-        out.decrement();
-        return out;
-    }
-    else if (this->is_0()){ // 0 + R = R
-        return right;
-    }
-    else if (this->is_p1()){ // 1 + R = ++R
-        ALi out(right);
-        out.increment();
-        return out;
-    }
-    else if (this->is_n1()){ // -1 + R = --R
-        ALi out(right);
-        out.decrement();
-        return out;
-    }
-
-    ALi out;
-    Cell* ohandle = out.begin_ptr;
-    const Cell* lhandle = this->begin_ptr;
-    const Cell* rhandle = right.begin_ptr;
-    Cell rmask{
-        rmask.var = (right.sign() ? mask111 : mask000),
-        rmask.L = &rmask,
-        rmask.R = &rmask
-    };
-
-    CELL_TYPE carry = 0;
-    do{
-        carry  = __builtin_add_overflow(carry       , lhandle->var, &ohandle->var);
-        carry += __builtin_add_overflow(ohandle->var, rhandle->var, &ohandle->var);
-        
-        out.newCell(mask000);
-        ohandle = ohandle->L;
-
-        lhandle = lhandle->L;
-        rhandle = rhandle->L;
-        if(rhandle == right.begin_ptr) rhandle = &rmask;
-    }while(lhandle != this->begin_ptr);
-    out.delCell();
-
-    if(handle_overflow && carry && this->sign() == right.sign())
-        out.newCell(mask001);
-
-    out.optymize();
-    return out;
-
-    /*
-    ALi out;
-
-    const Cell* const lgh = this->begin_ptr;
-    const Cell* lh = lgh->L;
-    const bool lsign = this->sign();
-    Cell lmask{
-        lmask.var = (lsign ? mask111 : mask000),
-        lmask.L = &lmask,
-        lmask.R = &lmask
-    };
-
-    const Cell* const rgh = right.begin_ptr;
-    const Cell* rh = rgh->L;
-    const bool rsign = right.sign();
-    Cell rmask{
-        rmask.var = (rsign ? mask111 : mask000),
-        rmask.L = &rmask,
-        rmask.R = &rmask
-    };
-    
-    CELL_TYPE carry = 0;
-    CELL_TYPE ofldet; // just keep equation result, instead of computing it every time while comparing
-    
-    ofldet = lgh->var + rgh->var;
-    out.begin_ptr->var = ofldet;
-    if(ofldet < rgh->var && ofldet < lgh->var)
-        carry = 1;
-    if(lh == lgh) lh = &lmask;
-    if(rh == rgh) rh = &rmask;
-
-    while(lh != &lmask || rh != &rmask){
-        ofldet = lh->var + rh->var + carry;
-        out.newCell(ofldet);
-        // vvvv           carry is 0              ||               carry is 1                     vvvv
-        if((ofldet < lh->var && ofldet < rh->var) || (ofldet <= lh->var && ofldet <= rh->var && carry))
-            carry = 1;
-        else
-            carry = 0;
-
-        lh = lh->L;
-        rh = rh->L;
-        if(lh == lgh) lh = &lmask;
-        if(rh == rgh) rh = &rmask;
-    }
-    // overflow can only appear when both operation argument sign values are equal
-    if(handle_overflow && lsign == rsign && lsign != out.sign())
-        out.newCell(lmask.var);
-    out.optymize();
-    return out;*/
-}
-/**
- * @brief 
- * @param right 
- * @return ALi 
- */
-ALi ALi::addition2(const ALi& right, const bool &handle_overflow) const{
+    // if(this->length < right.length){
+    //     return right.addition(*this);
+    // }
+    // else
     if(right.is_0()){ // L + 0 = L
         return *this;
     }
@@ -1184,35 +1071,56 @@ ALi ALi::addition2(const ALi& right, const bool &handle_overflow) const{
         return out;
     }
 
+    
     ALi out;
 
     const Cell* const lgh = this->begin_ptr;
     const Cell* lh = lgh->L;
-    const bool lsign = this->sign();
     Cell lmask{
-        lmask.var = (lsign ? mask111 : mask000),
+        lmask.var = (this->sign() ? mask111 : mask000),
         lmask.L = &lmask,
         lmask.R = &lmask
     };
 
     const Cell* const rgh = right.begin_ptr;
     const Cell* rh = rgh->L;
-    const bool rsign = right.sign();
     Cell rmask{
-        rmask.var = (rsign ? mask111 : mask000),
+        rmask.var = (right.sign() ? mask111 : mask000),
         rmask.L = &rmask,
         rmask.R = &rmask
     };
-    
+
+    //*
     unsigned char carry = __builtin_add_overflow(lgh->var, rgh->var, &out.begin_ptr->var);
     if(lh == lgh) lh = &lmask;
     if(rh == rgh) rh = &rmask;
 
     CELL_TYPE sum;
     while(lh != &lmask || rh != &rmask){
-        carry = __builtin_add_overflow(lh->var,carry,&sum);
-        carry += __builtin_add_overflow(rh->var,sum,&sum);
+        carry  = __builtin_add_overflow(lh->var,carry,&sum);
+        carry += __builtin_add_overflow(rh->var,sum  ,&sum);
         out.newCell(sum);
+    //*/
+    /*
+    CELL_TYPE carry = 0;
+    CELL_TYPE ofldet; // just keep equation result, instead of computing it every time while comparing
+    
+    ofldet = lgh->var + rgh->var;
+    out.begin_ptr->var = ofldet;
+    if(ofldet < rgh->var && ofldet < lgh->var)
+        carry = 1;
+    if(lh == lgh) lh = &lmask;
+    if(rh == rgh) rh = &rmask;
+
+    while(lh != &lmask || rh != &rmask){
+        ofldet = lh->var + rh->var + carry;
+        out.newCell(ofldet);
+        // vvvv           carry is 0              ||               carry is 1                     vvvv
+        if((ofldet < lh->var && ofldet < rh->var) || (ofldet <= lh->var && ofldet <= rh->var && carry))
+            carry = 1;
+        else
+            carry = 0;
+    //*/
 
         lh = lh->L;
         rh = rh->L;
@@ -1220,7 +1128,7 @@ ALi ALi::addition2(const ALi& right, const bool &handle_overflow) const{
         if(rh == rgh) rh = &rmask;
     }
     // overflow can only appear when both operation argument sign values are equal
-    if(handle_overflow && lsign == rsign && lsign != out.sign())
+    if(handle_overflow && this->sign() == right.sign() && this->sign() != out.sign())
         out.newCell(lmask.var);
     out.optymize();
     return out;
@@ -1261,15 +1169,17 @@ void ALi::additionAssign(const ALi& right, const bool &handle_overflow){
     ALi* const lobj = this; 
     Cell* const lgh = lobj->begin_ptr;
     Cell* lh = lgh->L;
-    const bool lsign = lobj->sign();
-    const CELL_TYPE lmask = (lsign ? mask111 : mask000);
+    const CELL_TYPE lmask = (lobj->sign() ? mask111 : mask000);
 
     const ALi* const robj = &right;
     const Cell* const rgh = robj->begin_ptr;
     const Cell* rh = rgh->L;
-    const bool rsign = robj->sign();
-    const CELL_TYPE rmask = (rsign ? mask111 : mask000);
+    const CELL_TYPE rmask = (robj->sign() ? mask111 : mask000);
+
+    //*
     
+    //*/
+    //*
     CELL_TYPE carry = 0;
 
     lgh->var += rgh->var;
@@ -1282,12 +1192,13 @@ void ALi::additionAssign(const ALi& right, const bool &handle_overflow){
 
         if(lh->var < rh->var || (lh->var <= rh->var && carry)) carry = 1;
         else carry = 0;
+    //*/
 
         if(lh != lgh) lh = lh->L;
         if(rh != rgh) rh = rh->L;
     }
     // overflow can only appear when both operation argument sign values are equal
-    if(handle_overflow && lsign == rsign && lsign != this->sign())
+    if(handle_overflow && lobj->sign() == robj->sign() && lobj->sign() != this->sign())
         this->newCell(lmask);
     this->optymize();
 }
@@ -1553,9 +1464,9 @@ ALi ALi::multiplication(const ALi& right) const{
     unsigned long long slider_length = slider.length * BITS_PER_VAR - 1;
     unsigned long long i=0;
     while(i < slider_length){
-        slider.setSeparator(' ');
-        printf("%lld\n->",i);
-        slider >> "b\n->";
+        // slider.setSeparator(' ');
+        // printf("%lld\n->",i);
+        // slider >> "b\n->";
         switch (slider.begin_ptr->var & 0b11){
         case 1: // 01
             slider.additionAssign(factor,false);
@@ -1565,9 +1476,9 @@ ALi ALi::multiplication(const ALi& right) const{
             break;
         // 00 & 11
         }
-        slider >> "b\n->";
+        // slider >> "b\n->";
         slider.SHR();
-        slider >> "b\n\n";
+        // slider >> "b\n\n";
         i++;
     }
     slider.SHR();

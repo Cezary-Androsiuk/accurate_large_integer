@@ -98,7 +98,6 @@ protected: public:
     // Addition
     void increment(const bool &handle_overflow = true);
     ALi addition(const ALi& right, const bool &handle_overflow = true) const;
-    ALi addition2(const ALi& right, const bool &handle_overflow = true) const;
     void additionAssign(const ALi& right, const bool &handle_overflow = true);
     void additionAssign2(const ALi& right, const bool &handle_overflow = true);
 
