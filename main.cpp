@@ -87,21 +87,21 @@ int main(){
     // z >> "d\n";
 
 
-    for(int i=-1000; i<1001; i++){
-        for(int j=-1000; j<1001; j++){
-            x = i;
-            y = j;
+    // for(int i=-1000; i<1001; i++){
+    //     for(int j=-1000; j<1001; j++){
+    //         x = i;
+    //         y = j;
 
-            // z = x.multiplication(y);
-            x.multiplicationAssign(y);
-            if(!x.equal(i*j)){
-                x >> "d \n";
-                y >> "d ";
-                // z >> "d\n";
-            }
-        }
-        // printf("\n");
-    }
+    //         // z = x.multiplication(y);
+    //         x.multiplicationAssign(y);
+    //         if(!x.equal(i*j)){
+    //             x >> "d \n";
+    //             y >> "d ";
+    //             // z >> "d\n";
+    //         }
+    //     }
+    //     // printf("\n");
+    // }
 
     // x.file("rb.dvfiles/addition_input_1");
     // y.file("rb.dvfiles/addition_input_2");
@@ -113,27 +113,27 @@ int main(){
     // x = -10;
     // y = -12;
 
-    // for(int i=0; i<100'000; i++){
-    //     x << generate_random_value(rand()).c_str();
-    //     y << generate_random_value(rand()).c_str();
+    for(int i=0; i<100'000; i++){
+        x << generate_random_value(rand()).c_str();
+        y << generate_random_value(rand()).c_str();
 
-    //     z1 = x + y;
+        z1 = x * y;
 
-    //     z2 = x;
-    //     z2 += y;
+        z2 = x;
+        z2 *= y;
 
-    //     if(z1 != z2){
-    //         x >> "d+ ";
-    //         y >> "d\n";
-    //         z1 >> "d\n";
-    //         z2 >> "d\n";
+        if(z1 != z2){
+            x >> "d\n";
+            y >> "d\n";
+            z1 >> "d\n";
+            z2 >> "d\n";
 
-    //         x >> "b\n";
-    //         y >> "b\n";
-    //         z1 >> "b\n";
-    //         z2 >> "b\n";
-    //     }
-    // }
+            x >> "b\n";
+            y >> "b\n";
+            z1 >> "b\n";
+            z2 >> "b\n";
+        }
+    }
 
     // x = 9;
     // y = 8;
