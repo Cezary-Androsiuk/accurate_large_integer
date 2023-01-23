@@ -1090,7 +1090,7 @@ ALi ALi::addition(const ALi& right, const bool &handle_overflow) const{
         rmask.R = &rmask
     };
 
-    //*
+    /*
     unsigned char carry = __builtin_add_overflow(lgh->var, rgh->var, &out.begin_ptr->var);
     if(lh == lgh) lh = &lmask;
     if(rh == rgh) rh = &rmask;
@@ -1101,7 +1101,7 @@ ALi ALi::addition(const ALi& right, const bool &handle_overflow) const{
         carry += __builtin_add_overflow(rh->var,sum  ,&sum);
         out.newCell(sum);
     //*/
-    /*
+    //*
     CELL_TYPE carry = 0;
     CELL_TYPE ofldet; // just keep equation result, instead of computing it every time while comparing
     

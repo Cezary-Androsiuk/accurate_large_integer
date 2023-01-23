@@ -151,7 +151,8 @@ public:
     ALi  operator *  (const ALi& right) const;
     void operator *= (const ALi& right);
     // vvvv need to return accurate large rational number
-    // ALi  operator /  (const ALi& right) const;
-    // void operator /= (const ALi& right);
+    // in this class division will be integer type, to get rational number result before division object need to be casted to rational class object
+    ALi  operator /  (const ALi& right) const;
+    void operator /= (const ALi& right);
 };
 

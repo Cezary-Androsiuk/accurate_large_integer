@@ -63,11 +63,20 @@ std::string generate_random_value(int len_seed){
     return value;
 }
 
+void additionSpeedTest(){
+    ALi x("b",".dvfiles/addition_input_2"),y("b",".dvfiles/addition_input_2"),z;
 
+    Timer t;
+    for(int i=0; i<100'000; i++){
+        x + y;
+    }
+}
 
 
 
 int main(){
+    additionSpeedTest();
+    return 0;
     srand(time(nullptr));
 
     // std::cout << generate_random_value(rand()) << std::endl;
@@ -114,27 +123,27 @@ int main(){
     // x = -10;
     // y = -12;
 
-    for(int i=0; i<100'000; i++){
-        x << generate_random_value(rand()).c_str();
-        y << generate_random_value(rand()).c_str();
+    // for(int i=0; i<100'000; i++){
+    //     x << generate_random_value(rand()).c_str();
+    //     y << generate_random_value(rand()).c_str();
 
-        z1 = x + y;
+    //     z1 = x + y;
 
-        z2 = x;
-        z2 += y;
+    //     z2 = x;
+    //     z2 += y;
 
-        if(z1 != z2){
-            x >> "d+ ";
-            y >> "d\n";
-            z1 >> "d\n";
-            z2 >> "d\n";
+    //     if(z1 != z2){
+    //         x >> "d+ ";
+    //         y >> "d\n";
+    //         z1 >> "d\n";
+    //         z2 >> "d\n";
 
-            x >> "b\n";
-            y >> "b\n";
-            z1 >> "b\n";
-            z2 >> "b\n";
-        }
-    }
+    //         x >> "b\n";
+    //         y >> "b\n";
+    //         z1 >> "b\n";
+    //         z2 >> "b\n";
+    //     }
+    // }
 
     // x = 9;
     // y = 8;
