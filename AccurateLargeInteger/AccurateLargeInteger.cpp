@@ -1445,9 +1445,6 @@ ALi ALi::multiplication(const ALi& right) const{
     unsigned long long slider_length = slider.length * BITS_PER_VAR - 1;
     unsigned long long i=0;
     while(i < slider_length){
-        // slider.setSeparator(' ');
-        // printf("%lld\n->",i);
-        // slider >> "b\n->";
         switch (slider.begin_ptr->var & 0b11){
         case 1: // 01
             slider.additionAssign(factor,false);
@@ -1457,9 +1454,7 @@ ALi ALi::multiplication(const ALi& right) const{
             break;
         // 00 & 11
         }
-        // slider >> "b\n->";
         slider.SHR();
-        // slider >> "b\n\n";
         i++;
     }
     slider.SHR();
@@ -1536,9 +1531,6 @@ void ALi::multiplicationAssign(const ALi& right){
     unsigned long long slider_length = this->length * BITS_PER_VAR - 1;
     unsigned long long i=0;
     while(i < slider_length){
-        // slider.setSeparator(' ');
-        // printf("%lld\n->",i);
-        // slider >> "b\n->";
         switch (this->begin_ptr->var & 0b11){
         case 1: // 01
             this->additionAssign(factor,false);
@@ -1548,9 +1540,7 @@ void ALi::multiplicationAssign(const ALi& right){
             break;
         // 00 & 11
         }
-        // slider >> "b\n->";
         this->SHR();
-        // slider >> "b\n\n";
         i++;
     }
     this->SHR();
