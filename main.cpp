@@ -15,16 +15,71 @@ void percent(unsigned long long from, unsigned long long current, unsigned long 
 }
 
 
+std::string generate_random_8bit(int seed){
+    int mod_seed = seed%10;
+    switch (mod_seed){
+    case 0:
+        return "00000000";
+        break;
+    case 1:
+        return "11111111";
+        break;
+    case 2:
+        return "11110000";
+        break;
+    case 3:
+        return "00001111";
+        break;
+    case 4:
+        return "11001100";
+        break;
+    case 5:
+        return "00110011";
+        break;
+    case 6:
+        return "01111111";
+        break;
+    case 7:
+        return "10000000";
+        break;
+    case 8:
+        return "01111110";
+        break;
+    case 9:
+        return "10000001";
+        break;
+    
+    default:
+        return "00000000";
+        break;
+    }
+}
+std::string generate_random_value(int len_seed){
+    std::string value = "b";
+    int len = len_seed % 32;
+    for(int i=0; i<len; i++){
+        value += generate_random_8bit(rand());
+    }
+    return value;
+}
+
 
 
 
 
 int main(){
+    srand(time(nullptr));
 
-    ALi x, y, z;
+    // std::cout << generate_random_value(rand()) << std::endl;
+
+    // return 0;
+
+    ALi x, y, z, z1, z2;
     x.setSeparator(' ');
     y.setSeparator(' ');
     z.setSeparator(' ');
+    z1.setSeparator(' ');
+    z2.setSeparator(' ');
 
     // x = 4;
     // y = 6;
@@ -56,7 +111,30 @@ int main(){
     // y >> "d\n\n";
     // z >> "d\n";
     
+    // x = -10;
+    // y = -12;
 
+    for(int i=0; i<100'000; i++){
+        x << generate_random_value(rand()).c_str();
+        y << generate_random_value(rand()).c_str();
+
+        z1 = x + y;
+
+        z2 = x;
+        z2 += y;
+
+        if(z1 != z2){
+            x >> "d+ ";
+            y >> "d\n";
+            z1 >> "d\n";
+            z2 >> "d\n";
+
+            x >> "b\n";
+            y >> "b\n";
+            z1 >> "b\n";
+            z2 >> "b\n";
+        }
+    }
 
     // x = 9;
     // y = 8;

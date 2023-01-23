@@ -5,6 +5,7 @@
 #include <string>
 #include "BPrint/BPrint.hpp"
 #include "time/time.hpp"
+#include <ctime>
 
 
 #include <iostream> // unit tests
