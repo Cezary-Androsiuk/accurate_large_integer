@@ -1,5 +1,5 @@
-#ifndef TIME_HPP
-#define TIME_HPP
+#ifndef TIMER_HPP
+#define TIMER_HPP
 #include <iostream>
 #include <string>
 #include <chrono>
@@ -25,4 +25,4 @@ public:
     }
 };
 
-#endif
+#endif // TIMER_HPP

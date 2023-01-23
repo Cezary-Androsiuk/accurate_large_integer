@@ -63,15 +63,6 @@ std::string generate_random_value(int len_seed){
     return value;
 }
 
-void additionSpeedTest(){
-    ALi x("b",".dvfiles/addition_input_2"),y("b",".dvfiles/addition_input_2"),z;
-
-    Timer t;
-    for(int i=0; i<100'000; i++){
-        x + y;
-    }
-}
-
 
 
 int main(){

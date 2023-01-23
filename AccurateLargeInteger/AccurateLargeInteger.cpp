@@ -1040,10 +1040,6 @@ void ALi::increment(const bool &handle_overflow){
  * @return ALi 
  */
 ALi ALi::addition(const ALi& right, const bool &handle_overflow) const{
-    // if(this->length < right.length){
-    //     return right.addition(*this);
-    // }
-    // else
     if(right.is_0()){ // L + 0 = L
         return *this;
     }
@@ -1090,7 +1086,6 @@ ALi ALi::addition(const ALi& right, const bool &handle_overflow) const{
         rmask.R = &rmask
     };
 
-    /*
     unsigned char carry = __builtin_add_overflow(lgh->var, rgh->var, &out.begin_ptr->var);
     if(lh == lgh) lh = &lmask;
     if(rh == rgh) rh = &rmask;
@@ -1100,27 +1095,6 @@ ALi ALi::addition(const ALi& right, const bool &handle_overflow) const{
         carry  = __builtin_add_overflow(lh->var,carry,&sum);
         carry += __builtin_add_overflow(rh->var,sum  ,&sum);
         out.newCell(sum);
-    //*/
-    //*
-    CELL_TYPE carry = 0;
-    CELL_TYPE ofldet; // just keep equation result, instead of computing it every time while comparing
-    
-    ofldet = lgh->var + rgh->var;
-    out.begin_ptr->var = ofldet;
-    if(ofldet < rgh->var && ofldet < lgh->var)
-        carry = 1;
-    if(lh == lgh) lh = &lmask;
-    if(rh == rgh) rh = &rmask;
-
-    while(lh != &lmask || rh != &rmask){
-        ofldet = lh->var + rh->var + carry;
-        out.newCell(ofldet);
-        // vvvv           carry is 0              ||               carry is 1                     vvvv
-        if((ofldet < lh->var && ofldet < rh->var) || (ofldet <= lh->var && ofldet <= rh->var && carry))
-            carry = 1;
-        else
-            carry = 0;
-    //*/
 
         lh = lh->L;
         rh = rh->L;
@@ -1185,7 +1159,6 @@ void ALi::additionAssign(const ALi& right, const bool &handle_overflow){
         rmask.R = &rmask
     };
 
-    //*
     unsigned char carry = __builtin_add_overflow(lgh->var, rgh->var, &lgh->var);
     if(lh == lgh) lh = &lmask;
     if(rh == rgh) rh = &rmask;
@@ -1198,25 +1171,6 @@ void ALi::additionAssign(const ALi& right, const bool &handle_overflow){
             lobj->newCell(sum);
         else
             lh->var = sum;
-    //*/
-    /*
-    const CELL_TYPE lmask = (lobj->sign() ? mask111 : mask000);
-    const CELL_TYPE rmask = (robj->sign() ? mask111 : mask000);
-    CELL_TYPE carry = 0;
-
-    lgh->var += rgh->var;
-    if(lgh->var < rgh->var)
-        carry = 0;
-        
-    while(lh != lgh || rh != rgh){ // continue if both are not their global handles !(lh == lgh && rh == rgh)
-        if(lh == lgh) this->newCell(lmask + (rh == rgh ? rmask : rh->var) + carry);
-        else lh->var += (rh == rgh ? rmask : rh->var) + carry;
-
-        if(lh->var < rh->var || (lh->var <= rh->var && carry)) carry = 1;
-        else carry = 0;
-        if(lh != lgh) lh = lh->L;
-        if(rh != rgh) rh = rh->L;
-    //*/
 
         lh = lh->L;
         rh = rh->L;
@@ -1770,9 +1724,9 @@ void ALi::operator *= (const ALi& right){
     this->multiplicationAssign(right);
 }
 
-// ALi  ALi::operator /  (const ALi& right){
-//     return this->division(right);
-// }
-// void ALi::operator /= (const ALi& right){
-//     this->divisionAssign(right);
-// }
+ALi  ALi::operator /  (const ALi& right) const{
+    return this->division(right);
+}
+void ALi::operator /= (const ALi& right){
+    this->divisionAssign(right);
+}
