@@ -1168,18 +1168,40 @@ void ALi::additionAssign(const ALi& right, const bool &handle_overflow){
 
     ALi* const lobj = this; 
     Cell* const lgh = lobj->begin_ptr;
+    const bool lsign = lobj->sign(); // cause it could be changed
     Cell* lh = lgh->L;
-    const CELL_TYPE lmask = (lobj->sign() ? mask111 : mask000);
+    Cell lmask{
+        lmask.var = (lsign ? mask111 : mask000),
+        lmask.L = &lmask,
+        lmask.R = &lmask
+    };
 
     const ALi* const robj = &right;
     const Cell* const rgh = robj->begin_ptr;
     const Cell* rh = rgh->L;
-    const CELL_TYPE rmask = (robj->sign() ? mask111 : mask000);
+    Cell rmask{
+        rmask.var = (robj->sign() ? mask111 : mask000),
+        rmask.L = &rmask,
+        rmask.R = &rmask
+    };
 
     //*
-    
+    unsigned char carry = __builtin_add_overflow(lgh->var, rgh->var, &lgh->var);
+    if(lh == lgh) lh = &lmask;
+    if(rh == rgh) rh = &rmask;
+
+    CELL_TYPE sum;
+    while(lh != &lmask || rh != &rmask){
+        carry  = __builtin_add_overflow(lh->var,carry,&sum);
+        carry += __builtin_add_overflow(rh->var,sum  ,&sum);
+        if(lh == &lmask)
+            lobj->newCell(sum);
+        else
+            lh->var = sum;
     //*/
-    //*
+    /*
+    const CELL_TYPE lmask = (lobj->sign() ? mask111 : mask000);
+    const CELL_TYPE rmask = (robj->sign() ? mask111 : mask000);
     CELL_TYPE carry = 0;
 
     lgh->var += rgh->var;
@@ -1192,14 +1214,19 @@ void ALi::additionAssign(const ALi& right, const bool &handle_overflow){
 
         if(lh->var < rh->var || (lh->var <= rh->var && carry)) carry = 1;
         else carry = 0;
-    //*/
-
         if(lh != lgh) lh = lh->L;
         if(rh != rgh) rh = rh->L;
+    //*/
+
+        lh = lh->L;
+        rh = rh->L;
+        if(lh == lgh) lh = &lmask;
+        if(rh == rgh) rh = &rmask;
+
     }
     // overflow can only appear when both operation argument sign values are equal
-    if(handle_overflow && lobj->sign() == robj->sign() && lobj->sign() != this->sign())
-        this->newCell(lmask);
+    if(handle_overflow && lsign == robj->sign() && lsign != this->sign())
+        this->newCell(lmask.var);
     this->optymize();
 }
 /**
