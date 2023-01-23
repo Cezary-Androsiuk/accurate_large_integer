@@ -87,20 +87,21 @@ int main(){
     // z >> "d\n";
 
 
-    // for(int i=-1000; i<1001; i++){
-    //     for(int j=-1000; j<1001; j++){
-    //         x = i;
-    //         y = j;
+    for(int i=-1000; i<1001; i++){
+        for(int j=-1000; j<1001; j++){
+            x = i;
+            y = j;
 
-    //         z = x.multiplication(y);
-    //         if(!z.equal(i*j)){
-    //             x >> "d * ";
-    //             y >> "d = ";
-    //             z >> "d\n";
-    //         }
-    //     }
-    //     // printf("\n");
-    // }
+            // z = x.multiplication(y);
+            x.multiplicationAssign(y);
+            if(!x.equal(i*j)){
+                x >> "d \n";
+                y >> "d ";
+                // z >> "d\n";
+            }
+        }
+        // printf("\n");
+    }
 
     // x.file("rb.dvfiles/addition_input_1");
     // y.file("rb.dvfiles/addition_input_2");

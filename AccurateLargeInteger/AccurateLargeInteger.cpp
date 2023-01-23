@@ -1517,6 +1517,56 @@ void ALi::multiplicationAssign(const ALi& right){
         this->invert();
         return;
     }
+
+    // ALi slider(*this);
+    ALi factor;
+    const bool lsign = this->sign();
+
+    // slider.PLSB(0); // comparison bit
+    this->PLSB(0); // comparison bit
+
+    // align
+    // while(factor.length < slider.length)
+    while(factor.length < this->length)
+        factor.newCell(mask000);
+    
+    const Cell* rhandle = right.begin_ptr;
+    do{
+        factor.newCell(rhandle->var);
+        rhandle = rhandle->L;
+    }while(rhandle != right.begin_ptr);
+
+    // unsigned long long slider_length = slider.length * BITS_PER_VAR - 1;
+    unsigned long long slider_length = this->length * BITS_PER_VAR - 1;
+    unsigned long long i=0;
+    while(i < slider_length){
+        // slider.setSeparator(' ');
+        // printf("%lld\n->",i);
+        // slider >> "b\n->";
+        // switch (slider.begin_ptr->var & 0b11){
+        switch (this->begin_ptr->var & 0b11){
+        case 1: // 01
+            // slider.additionAssign(factor,false);
+            this->additionAssign(factor,false);
+            break;
+        case 2: // 10
+            // slider.subtractionAssign(factor,false);
+            this->subtractionAssign(factor,false);
+            break;
+        // 00 & 11
+        }
+        // slider >> "b\n->";
+        // slider.SHR();
+        this->SHR();
+        // slider >> "b\n\n";
+        i++;
+    }
+    // slider.SHR();
+    this->SHR();
+
+    // idk why for negative left, do not work and needs +1
+    // if(this->sign()) slider.increment();
+    if(lsign) this->increment();
 }
     // #
     
