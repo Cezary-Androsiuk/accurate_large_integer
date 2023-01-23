@@ -66,8 +66,6 @@ std::string generate_random_value(int len_seed){
 
 
 int main(){
-    additionSpeedTest();
-    return 0;
     srand(time(nullptr));
 
     // std::cout << generate_random_value(rand()) << std::endl;

@@ -28,22 +28,22 @@ protected:
     char separator; // '/0' means no separator others are printed in print method
 public:
     ALi();//
-    ALi(const ALi& source);//
-    ALi(const signed long long& source);//
-    ALi(const char* type, const char* sourcePath);//
-    ~ALi();//
+    ALi(const ALi& source);
+    ALi(const signed long long& source);
+    ALi(const char* type, const char* sourcePath);
+    ~ALi();
 
 protected:
-    void newCell(const CELL_TYPE&);//
-    const bool delCell();//
+    void newCell(const CELL_TYPE&);
+    const bool delCell();
 
 protected: public:
-    void SHR();//
-    void SHL();//
-    void PMSB(const bool& bit);//
-    void PLSB(const bool& bit);//
+    void SHR();
+    void SHL();
+    void PMSB(const bool& bit);
+    void PLSB(const bool& bit);
 
-    const bool sign() const;//
+    const bool sign() const;
     const bool is_0(const Cell* const handle = nullptr) const;
 
     const bool is_p1(const Cell* const handle = nullptr) const;
@@ -51,39 +51,39 @@ protected: public:
     const bool is_n1(const Cell* const handle = nullptr) const;
     const bool is_n2(const Cell* const handle = nullptr) const;
 
-    void clear();//
-    void optymize();//
-    void negate();//
-    void invert();//
+    void clear();
+    void optymize();
+    void negate();
+    void invert();
 
 protected:
     // might be a good idea to split the class to ALi and ALi_stdio (standard input output)
     // Print
-    void printBinary() const;//
-    void printDecimal() const;//
+    void printBinary() const;
+    void printDecimal() const;
     
     // Print Approximation
-    void printBinaryApproximation(unsigned long long appPrec) const;//!
-    void printDecimalApproximation(unsigned long long appPrec) const;//!
+    void printBinaryApproximation(unsigned long long appPrec) const;
+    void printDecimalApproximation(unsigned long long appPrec) const;
 
     // Store
-    void export_cells(const char* path) const;//
-    void import_cells(const char* path);//
+    void export_cells(const char* path) const;
+    void import_cells(const char* path);
 
     // File Write
-    void writeFile_02(FILE* const file) const;//
-    void writeFile_10(FILE* const file) const;//
-    void writeFile(const char* type, const char* path) const;//
+    void writeFile_02(FILE* const file) const;
+    void writeFile_10(FILE* const file) const;
+    void writeFile(const char* type, const char* path) const;
 
     // File Read
     void readFile_02(FILE* const file);
     void readFile_10(FILE* const file);
-    void readFile(const char* type, const char* path);//
+    void readFile(const char* type, const char* path);
     
 protected: public:
     // Assignment
-    void assignment(const ALi& source);//
-    void assignment(const signed long long& source);//
+    void assignment(const ALi& source);
+    void assignment(const signed long long& source);
 
     // Assignment String
     void assignment_02(const std::string& source);
@@ -91,9 +91,9 @@ protected: public:
     void assignment_str(const std::string& source);
 
     // Bolean
-    const bool equal(const ALi& right) const;//
-    const bool greaterThan(const ALi& right) const;//
-    const bool smallerThan(const ALi& right) const;//
+    const bool equal(const ALi& right) const;
+    const bool greaterThan(const ALi& right) const;
+    const bool smallerThan(const ALi& right) const;
 
     // Addition
     void increment(const bool &handle_overflow = true);
@@ -156,3 +156,16 @@ public:
     void operator /= (const ALi& right);
 };
 
+/*
+
+TODO    printBinaryApproximation
+TODO    printDecimalApproximation
+
+TODO    writeFile_10
+TODO    readFile_10
+
+TODO    printApproximation
+TODO    static separator
+TODO    
+
+*/
