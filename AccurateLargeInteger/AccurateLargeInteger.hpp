@@ -54,8 +54,7 @@ protected: public:
     void clear();
     void optymize();
     void negate();
-    void invertAssign();
-    ALi invert() const;
+    void invert();
 
 protected:
     // might be a good idea to split the class to ALi and ALi_stdio (standard input output)
