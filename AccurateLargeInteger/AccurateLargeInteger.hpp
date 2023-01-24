@@ -54,7 +54,8 @@ protected: public:
     void clear();
     void optymize();
     void negate();
-    void invert();
+    void invertAssign();
+    ALi invert() const;
 
 protected:
     // might be a good idea to split the class to ALi and ALi_stdio (standard input output)
@@ -89,6 +90,10 @@ protected: public:
     void assignment_02(const std::string& source);
     void assignment_10(const std::string& source);
     void assignment_str(const std::string& source);
+
+    // Special
+    ALi modulo() const;
+    void moduloAssign();
 
     // Bolean
     const bool equal(const ALi& right) const;

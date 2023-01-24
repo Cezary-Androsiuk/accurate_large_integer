@@ -440,9 +440,18 @@ void ALi::negate(){
 /**
  * @brief inverting value from (3) to (-3) and from (-10) to (10) etc. ...
  */
-void ALi::invert(){
+void ALi::invertAssign(){
     this->negate();
     this->increment();
+}
+/**
+ * @brief return inverted value from (3) to (-3) and from (-10) to (10) etc. ...
+ */
+ALi ALi::invert() const{
+    ALi out(*this);
+    out.negate();
+    out.increment();
+    return out;
 }
     // #
     
@@ -484,11 +493,11 @@ void ALi::printBinary() const{
  * @param additionText default is "" text what will be printed at the end of variable
  */
 void ALi::printDecimal() const{
-    // if it is negative invert and print '-' sign
+    // if it is negative invertAssign and print '-' sign
     if(this->sign()){
         printf("-");
         ALi tmp(*this);
-        tmp.invert();
+        tmp.invertAssign();
         tmp.printDecimal();
         return;
     }
@@ -840,6 +849,32 @@ void ALi::assignment_str(const std::string& source){
         case 'd': this->assignment_10(value); break;
         default: printf("print: unknown type: '%c'\nbinary: 'b'\n decimal: 'd'\n",source[0]); return;
     }
+}
+    // #
+    
+    // # Special
+    
+    // #    
+/**
+ * @brief 
+ * @return ALi 
+ */
+ALi ALi::modulo() const{
+    if(this->sign()){
+        ALi out(*this);
+        out.invertAssign();
+        return out;
+    }
+    else return *this;
+}
+/**
+ * @brief 
+ * 
+ */
+void ALi::moduloAssign(){
+    if(this->sign())
+        this->invertAssign();
+
 }
     // #
     
@@ -1300,19 +1335,19 @@ ALi ALi::subtraction(const ALi& right, const bool &handle_overflow) const{
     }
     else if(this->is_0()){ // 0 - R = -R
         ALi out(right);
-        out.invert();
+        out.invertAssign();
         return out;
     }
     else if(this->is_p1()){ // 1 - R = -(--R)
         ALi out(right);
         out.decrement();
-        out.invert();
+        out.invertAssign();
         return out;
     }
     else if(this->is_n1()){ // -1 - R = -(++R)
         ALi out(right);
         out.increment();
-        out.invert();
+        out.invertAssign();
         return out;
     }
     else if(this->equal(right)){ // L - R = 0    L==R
@@ -1321,7 +1356,7 @@ ALi ALi::subtraction(const ALi& right, const bool &handle_overflow) const{
 
     //############################# not large impact to efficiency (+x)-(+y) == (+x)+(-y)
     ALi right_(right);
-    right_.invert();
+    right_.invertAssign();
 
     return this->addition(right_,handle_overflow);
     //#############################
@@ -1344,19 +1379,19 @@ void ALi::subtractionAssign(const ALi& right, const bool &handle_overflow){
     }
     else if(this->is_0()){ // 0 -= R == -R
         this->assignment(right);
-        this->invert();
+        this->invertAssign();
         return;
     }
     else if(this->is_p1()){ // 1 -= R == -(--R)
         this->assignment(right);
         this->decrement();
-        this->invert();
+        this->invertAssign();
         return;
     }
     else if(this->is_n1()){ // -1 -= R == -(++R)
         this->assignment(right);
         this->increment();
-        this->invert();
+        this->invertAssign();
         return;
     }
     else if(this->equal(right)){ // L -= R == 0    L==R
@@ -1366,7 +1401,7 @@ void ALi::subtractionAssign(const ALi& right, const bool &handle_overflow){
     
     //############################# not large impact to efficiency (+x)-=(+y) == (+x)+=(-y)
     ALi right_(right);
-    right_.invert();
+    right_.invertAssign();
 
     this->additionAssign(right_,handle_overflow);
     //#############################
@@ -1395,13 +1430,13 @@ ALi ALi::multiplication(const ALi& right) const{
     }
     else if(right.is_n1()){ // L * -1 = -L
         ALi out(*this);
-        out.invert();
+        out.invertAssign();
         return out;
     }
     else if(right.is_n2()){ // L * -2 = -L.SHL()
         ALi out(*this);
         out.SHL();
-        out.invert();
+        out.invertAssign();
         return out;
     }
     else if(this->is_0()){ // 0 * R = 0
@@ -1417,13 +1452,13 @@ ALi ALi::multiplication(const ALi& right) const{
     }
     else if(this->is_n1()){ // -1 * R = -R
         ALi out(right);
-        out.invert();
+        out.invertAssign();
         return out;
     }
     else if(this->is_n2()){ // -2 * R = -R.SHL()
         ALi out(right);
         out.SHL();
-        out.invert();
+        out.invertAssign();
         return out;
     }
 
@@ -1481,12 +1516,12 @@ void ALi::multiplicationAssign(const ALi& right){
         return;
     }
     else if(right.is_n1()){ // L *= -1 == -L
-        this->invert();
+        this->invertAssign();
         return;
     }
     else if(right.is_n2()){ // L *= -2 == -L.SHL()
         this->SHL();
-        this->invert();
+        this->invertAssign();
         return;
     }
     else if(this->is_0()){ // 0 *= R == 0
@@ -1503,13 +1538,13 @@ void ALi::multiplicationAssign(const ALi& right){
     }
     else if(this->is_n1()){ // -1 *= R == -R
         this->assignment(right);
-        this->invert();
+        this->invertAssign();
         return;
     }
     else if(this->is_n2()){ // -2 *= R == -R.SHL()
         this->assignment(right);
         this->SHL();
-        this->invert();
+        this->invertAssign();
         return;
     }
 
@@ -1559,6 +1594,48 @@ void ALi::multiplicationAssign(const ALi& right){
  * @return ALi 
  */
 ALi ALi::division(const ALi& right) const{
+    if(right.is_0()){ // L / 0 = !
+        printf("Zero division!\nreturned: 0\n");
+        return 0;
+    }
+    else if(right.is_p1()){ // L / 1 = L
+        return *this;
+    }
+    else if(right.is_p2()){ // L / 2 = L.SHR()
+        ALi out(*this);
+        out.SHR();
+        return out;
+    }
+    else if(right.is_n1()){ // L / -1 = -L
+        ALi out(*this);
+        out.invertAssign();
+        return out;
+    }
+    else if(right.is_n2()){ // L / -2 = -L.SHR()
+        ALi out(*this);
+        out.SHR();
+        out.invertAssign();
+        return out;
+    }
+    // if left value has smaller difference between his value and 0 than right has, then result will be allways 0
+    // if left and right values have equal difference between they and 0 then result will be 1 or -1 (depends from their signs)
+    else if(this->is_0()){ // 0 / R = 0
+        return 0;
+    }
+
+    // else if(this->is_p1()){ // 1 / R = 0 ( 1/0, 1/1, was already handled => 1/2, 1/3, ... will be 0)
+    //     return 0;
+    // }
+    // else if(this->is_p2()){ // 2 / R = 0 ( 2/0, 2/1, 2/2 was already handled => 2/3, 2/4, ... will be 0)
+    //     return 0;
+    // }
+    // else if(this->is_n1()){ // -1 / R = 0 
+    //     return 0;
+    // }
+    // else if(this->is_n2()){ // -2 / R = 0
+    //     return 0;
+    // }
+
     return 0;
 }
 /**
