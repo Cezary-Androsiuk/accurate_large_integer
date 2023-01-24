@@ -1608,26 +1608,71 @@ ALi ALi::division(const ALi& right) const{
         out.invert();
         return out;
     }
-    // if left value has smaller difference between his value and 0 than right has, then result will be allways 0
-    // if left and right values have equal difference between they and 0 then result will be 1 or -1 (depends from their signs)
     else if(this->is_0()){ // 0 / R = 0
         return 0;
     }
+    // if left value has smaller difference between his value and 0 than right has, then result will be allways 0
+    else if(this->modulo().smallerThan(right.modulo())){
+        return 0;
+    }
+    // if left and right values have equal difference between they and 0 then result will be 1 or -1 (depends from their signs)
+    // i will not check this
 
-    // else if(this->is_p1()){ // 1 / R = 0 ( 1/0, 1/1, was already handled => 1/2, 1/3, ... will be 0)
-    //     return 0;
-    // }
-    // else if(this->is_p2()){ // 2 / R = 0 ( 2/0, 2/1, 2/2 was already handled => 2/3, 2/4, ... will be 0)
-    //     return 0;
-    // }
-    // else if(this->is_n1()){ // -1 / R = 0 
-    //     return 0;
-    // }
-    // else if(this->is_n2()){ // -2 / R = 0
-    //     return 0;
-    // }
+    ALi slider(*this);
+    ALi out;
+    
+    while(!slider.is_0()){
+        slider.optymize();
+        slider.newCell(mask000);
+        unsigned long long len = (slider.length-1) * 8;
+        for(int i=0; i<len; i++){
+            if(slider.begin_ptr->R->var >= 10){
+                slider.begin_ptr->R->var -= 10;
+                slider.PLSB(mask001);
+            }
+            else slider.PLSB(mask000);
+        }
+        if(slider.begin_ptr->R->var >= 10){
+            out.additionAssign(slider.begin_ptr->R->var - 10);
+            slider.PLSB(mask001);
+        } 
+        else{
+            out.additionAssign(slider.begin_ptr->R->var);
+            slider.PLSB(mask000);
+        }
+        slider.delCell();
+    }
 
-    return 0;
+//*    PART FROM OLD PRINT DECIMAL METHOD
+//*    I CAN REUSE DIVISION ALGORITHM
+//
+//     ALi slider(*this);
+//     slider.setSeparator(' ');
+//     std::string decimal = "";
+//     unsigned long long bitlength = 8;
+//     while(slider.begin_ptr.var != 0 || slider.length != 1){
+//         slider.optymize();
+//         slider.newCell(0);
+//         bitlength = (slider.length-1) * 8;
+//         for(int i=0; i<bitlength; i++){
+//             if(slider.begin_ptr.R->var >= 10){
+//                 slider.begin_ptr.R->var -= 10;
+//                 slider.PLSB(1);
+//             }
+//             else slider.PLSB(0);
+//         }
+//         if(slider.begin_ptr.R->var >= 10){
+//             decimal += (char)(slider.begin_ptr.R->var - 10);
+//             slider.PLSB(1);
+//         } 
+//         else{
+//             decimal += (char)(slider.begin_ptr.R->var);
+//             slider.PLSB(0);
+//         }
+//         slider.delCell();
+//     }
+
+    return out;
 }
 /**
  * @brief 
