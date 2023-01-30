@@ -65,7 +65,7 @@ void ALi::newCell(const CELL_TYPE &standardSource){
     this->begin_ptr->R = handle;
 
     handle->var = standardSource;
-    this->length++;
+    ++this->length;
 }
 /**
  * @brief remove cell from the left, but not including this->begin_ptr
@@ -519,10 +519,10 @@ void ALi::printDecimal() const{
                     CELL_TYPE nibble = bcdhandle->var & 0b00001111;
                     bcdhandle->var >>= 4;
                     if(nibble > 4) nibble += 3;
-                    for(int j=0; j<i; j++) nibble <<= 4;
+                    for(int j=0; j<i; ++j) nibble <<= 4;
                     
                     result |= nibble;
-                    i++;
+                    ++i;
                 }
                 bcdhandle->var = result;
             }while(bcdhandle != bcd.begin_ptr);
@@ -541,9 +541,9 @@ void ALi::printDecimal() const{
     //         CELL_TYPE nibble = cell & 0b00001111;
     //         cell >>= 4;
     //         if(nibble > 4) nibble += 3;
-    //         for(int j=0; j<i; j++) nibble <<= 4;
+    //         for(int j=0; j<i; ++j) nibble <<= 4;
     //         result |= nibble;
-    //         i++;
+    //         ++i;
     //     }
     //     return result;
     // }
@@ -576,7 +576,7 @@ void ALi::printDecimal() const{
 
     do{
         std::string rev;
-        for(int i=0; i<16; i++){
+        for(int i=0; i<16; ++i){
             const char nibble = bcd.begin_ptr->R->var & 0b00001111; 
             rev = std::string(1,(nibble > 4 ? nibble+45 : nibble+48)) + rev; 
             bcd.begin_ptr->R->var >>= 4;
@@ -1057,7 +1057,7 @@ void ALi::increment(const bool &handle_overflow){
     // 00000010                                         -> [00000011]
     // 01111111  11111111                               ->  00000000 [10000000] 00000000
     // 01111111  11110011                               ->  01111111 [11110100]
-    handle->var++;
+    ++handle->var;
     // this->optymize();
 }
 /**
@@ -1481,7 +1481,7 @@ ALi ALi::multiplication(const ALi& right) const{
         // 00 & 11
         }
         slider.SHR();
-        i++;
+        ++i;
     }
     slider.SHR();
 
@@ -1567,7 +1567,7 @@ void ALi::multiplicationAssign(const ALi& right){
         // 00 & 11
         }
         this->SHR();
-        i++;
+        ++i;
     }
     this->SHR();
 
@@ -1618,30 +1618,79 @@ ALi ALi::division(const ALi& right) const{
     // if left and right values have equal difference between they and 0 then result will be 1 or -1 (depends from their signs)
     // i will not check this
 
-    ALi slider(*this);
+
+
+
+    ALi slider;
+    ALi factor(right);
+    factor.invert();
     ALi out;
+
+    // align
+    // while(factor.length < slider.length)
+    //     factor.newCell(mask000);
     
-    while(!slider.is_0()){
-        slider.optymize();
-        slider.newCell(mask000);
-        unsigned long long len = (slider.length-1) * 8;
-        for(int i=0; i<len; i++){
-            if(slider.begin_ptr->R->var >= 10){
-                slider.begin_ptr->R->var -= 10;
-                slider.PLSB(mask001);
+    // const Cell* rhandle = right.begin_ptr;
+    // do{
+    //     factor.newCell(rhandle->var);
+    //     rhandle = rhandle->L;
+    // }while(rhandle != right.begin_ptr);
+    const Cell* hdl = this->begin_ptr->R;
+    do{
+        unsigned long long mask = mask100;
+        do{
+            // printf("  ");
+            // slider >> "b\n";
+            // system("sleep 1");
+            if(hdl->var & mask) slider.PLSB(1);
+            else                slider.PLSB(0);
+
+            // printf("  ");
+            // slider >> "b\n";
+            if(!slider.smallerThan(right)){
+                // printf("- ");
+                // right >> "b\n";
+                // printf("+ ");
+                // factor >> "b\n";
+                slider.additionAssign(factor,false);
+                out.PLSB(1);
             }
-            else slider.PLSB(mask000);
-        }
-        if(slider.begin_ptr->R->var >= 10){
-            out.additionAssign(slider.begin_ptr->R->var - 10);
-            slider.PLSB(mask001);
-        } 
-        else{
-            out.additionAssign(slider.begin_ptr->R->var);
-            slider.PLSB(mask000);
-        }
-        slider.delCell();
-    }
+            else 
+                out.PLSB(0);
+
+            // printf("  ");
+            // slider >> "b\n\n";
+            mask >>= 1;
+        }while(mask > 0);
+        hdl = hdl->R;
+    }while(hdl != this->begin_ptr);
+
+
+
+    // ALi slider(*this);
+    // ALi out;
+    
+    // while(!slider.is_0()){
+    //     slider.optymize();
+    //     slider.newCell(mask000);
+    //     unsigned long long len = (slider.length-1) * 8;
+    //     for(int i=0; i<len; ++i){
+    //         if(slider.begin_ptr->R->var >= 10){
+    //             slider.begin_ptr->R->var -= 10;
+    //             slider.PLSB(mask001);
+    //         }
+    //         else slider.PLSB(mask000);
+    //     }
+    //     if(slider.begin_ptr->R->var >= 10){
+    //         out.additionAssign(slider.begin_ptr->R->var - 10);
+    //         slider.PLSB(mask001);
+    //     } 
+    //     else{
+    //         out.additionAssign(slider.begin_ptr->R->var);
+    //         slider.PLSB(mask000);
+    //     }
+    //     slider.delCell();
+    // }
 
 //*    PART FROM OLD PRINT DECIMAL METHOD
 //*    I CAN REUSE DIVISION ALGORITHM
@@ -1654,7 +1703,7 @@ ALi ALi::division(const ALi& right) const{
 //         slider.optymize();
 //         slider.newCell(0);
 //         bitlength = (slider.length-1) * 8;
-//         for(int i=0; i<bitlength; i++){
+//         for(int i=0; i<bitlength; ++i){
 //             if(slider.begin_ptr.R->var >= 10){
 //                 slider.begin_ptr.R->var -= 10;
 //                 slider.PLSB(1);
