@@ -91,8 +91,8 @@ protected: public:
     void assignment_str(const std::string& source);
 
     // Special
-    ALi modulo() const;
-    void moduloAssign();
+    ALi absoluteValue() const;
+    void absoluteValueAssign();
 
     // Bolean
     const bool equal(const ALi& right) const;

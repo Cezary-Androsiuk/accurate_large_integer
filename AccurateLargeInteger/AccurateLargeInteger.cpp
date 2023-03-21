@@ -20,7 +20,7 @@ ALi::ALi(){
 }
 /**
  * @brief Construct a new ALi object by using previously existing object
- * @param source ALi object which will be used to build identical ALi
+ * @param source ALi object which will be used as a source
  */
 ALi::ALi(const ALi& source) : ALi(){
     this->assignment(source);
@@ -34,8 +34,8 @@ ALi::ALi(const signed long long& source) : ALi(){
 }
 /**
  * @brief Construct a new ALi object by using existing file with value
- * @param type type of source file: binary: 'b', decimal: 'd'
- * @param path path to file where variable is stored
+ * @param type what value of the variable format will be expected [binary/decimal]
+ * @param path path to file where value is stored in readable type
  */
 ALi::ALi(const char* type, const char* sourcePath) : ALi(){
     this->readFile(type,sourcePath);
@@ -149,7 +149,7 @@ void ALi::SHL(){
 }
 /**
  * @brief push the most significant bit
- * @param bit if 0, 0 will be pushed if 1, 1 will be pushed on lsb
+ * @param bit bit you want to add at the beginning
  * @example bit=1 0000 -> 1000
  * @example bit=1 1000 -> 1100
  * @example bit=1 0010 0000 -> 1001 0000
@@ -176,7 +176,7 @@ void ALi::PMSB(const bool& bit){
 }
 /**
  * @brief push the least significant bit
- * @param bit if 0, 0 will be pushed if 1, 1 will be pushed on 
+ * @param bit bit you want to add at the end
  * @example bit=0 0011 0110 -> 0110 1100
  * @example bit=0 1101 0000 -> 1010 0000
  * @example bit=0 1011 0110 -> 1111 0110 1100
@@ -218,15 +218,15 @@ void ALi::PLSB(const bool& bit){
     // #
 /**
  * @brief return sign bit
- * @return true sign bit is 1 => number is negative,
- * @return false sign bit is 0 => number is positive
+ * @return true  sign bit is 1  =>  number is negative\
+ * @return false sign bit is 0  =>  number is positive
  */
 const bool ALi::sign() const{
     return (this->begin_ptr->R->var & mask100 ? true : false);
 }
 /**
- * @brief return if value is 0
- * @return true if value is 0,
+ * @brief checks if value is 0
+ * @return true if value is 0\
  * @return false if value is something other than 0
  */
 const bool ALi::is_0(const Cell* const handle) const{
@@ -267,8 +267,8 @@ const bool ALi::is_0(const Cell* const handle) const{
     
     // #
 /**
- * @brief return if value is 1
- * @return true if value is 1,
+ * @brief checks if value is 1
+ * @return true if value is 1\
  * @return false if value is something other than 1
  */
 const bool ALi::is_p1(const Cell* const handle) const{
@@ -293,8 +293,8 @@ const bool ALi::is_p1(const Cell* const handle) const{
     }
 }
 /**
- * @brief return if value is 2
- * @return true if value is 2,
+ * @brief checks if value is 2
+ * @return true if value is 2\
  * @return false if value is something other than 2
  */
 const bool ALi::is_p2(const Cell* const handle) const{
@@ -316,9 +316,9 @@ const bool ALi::is_p2(const Cell* const handle) const{
     }
 }
 /**
- * @brief return if value is 2
- * @return true if value is 2,
- * @return false if value is something other than 2
+ * @brief checks if value is -1
+ * @return true if value is -1\
+ * @return false if value is something other than -1
  */
 const bool ALi::is_n1(const Cell* const handle) const{
     if(handle == nullptr){
@@ -339,9 +339,9 @@ const bool ALi::is_n1(const Cell* const handle) const{
     }
 }
 /**
- * @brief return if value is 2
- * @return true if value is 2,
- * @return false if value is something other than 2
+ * @brief checks if value is -2
+ * @return true if value is -2,
+ * @return false if value is something other than -2
  */
 const bool ALi::is_n2(const Cell* const handle) const{
     if(handle == nullptr){
@@ -469,8 +469,7 @@ void ALi::invert(){
     
     // #
 /**
- * @brief print each byte of variable seperated by separator sign and adding after all addition text
- * @param additionText default is "" text what will be printed at the end of variable
+ * @brief prints value of the variable in binary format
  */
 void ALi::printBinary() const{
     const Cell* handle = this->begin_ptr->R;
@@ -480,8 +479,7 @@ void ALi::printBinary() const{
     }while(handle != this->begin_ptr->R);
 }
 /**
- * @brief print digit of variable seperated by separator sign every 3 digits and adding after all addition text
- * @param additionText default is "" text what will be printed at the end of variable
+ * @brief prints value of the variable in decimal format
  */
 void ALi::printDecimal() const{
     // if it is negative invert and print '-' sign
@@ -591,25 +589,23 @@ void ALi::printDecimal() const{
     
     // #
 /**
- * @brief printing binary variable in scientific notation format
- * @param appPrec simply how many digits (counting from left and without variable sign) will be printed
+ * @brief prints value of the variable in binary format, using scientific notation
+ * @param appPrec precision (how many bytes should be printed after a dot)
  */
 void ALi::printBinaryApproximation(unsigned long long appPrec) const{
-    // appPrec is not 0
-    // print variable in scientific notation format
-    // precision is in default 2 result will be xx * 
-    // 
+    // precision is in default 0 result will be X * 2^n 
+    // for 3 result will be X.XXX * 2^n 
+
     printf("printBinaryApproximation is not finished yet\n");
 }
 /**
- * @brief printing decimal variable in scientific notation format
- * @param appPrec simply how many digits (counting from left and without variable sign) will be printed
+ * @brief prints value of the variable in decimal format, using scientific notation
+ * @param appPrec precision (how many bytes should be printed after a dot)
  */
 void ALi::printDecimalApproximation(unsigned long long appPrec) const{
-    // appPrec is not 0
-    // print variable in scientific notation format
-    // precision is in default 2 result will be xx * 
-    // 
+    // precision is in default 0 result will be X * 10^n 
+    // for 3 result will be X.XXX * 10^n  
+
     printf("printDecimalApproximation is not finished yet\n");
 }
     // #
@@ -618,9 +614,8 @@ void ALi::printDecimalApproximation(unsigned long long appPrec) const{
     
     // #
 /**
- * @brief save variable to file in binary form
- * @param path path to file where variable should be stored
- * @param append append or overwrite file if exist 
+ * @brief save value of the variable to file in machine code
+ * @param path path to file where value of the variable should be saved
  */
 void ALi::export_cells(const char* path) const{
     FILE* file = fopen(path,"wb");
@@ -636,8 +631,8 @@ void ALi::export_cells(const char* path) const{
     fclose(file);
 }
 /**
- * @brief copy value from source file to variable
- * @param path source where an readable binary file is stored
+ * @brief copy value from source (machine code) file to the variable
+ * @param path path to file from where value of the variable should be read
  */
 void ALi::import_cells(const char* path){
     this->clear();
@@ -660,9 +655,8 @@ void ALi::import_cells(const char* path){
     
     // #
 /**
- * @brief save variable to file in readable form allowing to add separator sign every 8 bits 
- * @param path path to file where variable should be stored
- * @param append append or overwrite file if exist 
+ * @brief save value of the variable to file in readable binary form with separator sign every 8 bits (using BPrint)
+ * @param file already opened file to operate on
  */
 void ALi::writeFile_02(FILE* const file) const{
     Cell* handle = this->begin_ptr->R;
@@ -673,18 +667,16 @@ void ALi::writeFile_02(FILE* const file) const{
     }while(handle != this->begin_ptr->R);
 }
 /**
- * @brief save variable to file in readable form allowing to add separator sign every 8 bits 
- * @param path path to file where variable should be stored
- * @param append append or overwrite file if exist 
+ * @brief save value of the variable to file in readable decimal form with separator sign every 8 bits (using BPrint)
+ * @param file already opened file to operate on
  */
 void ALi::writeFile_10(FILE* const file) const{
-
+    printf("writeFile_10 is not finished yet\n");
 }
 /**
- * @brief save variable to file 
- * @param path path to file where variable should be stored
- * @param type type of file, readable('r') or binary('b')
- * @param append append or overwrite file if exist 
+ * @brief save value of the variable to file in readable form with separator sign every 8 bits (using BPrint)
+ * @param type in what format value of the variable should be saved [binary/decimal]
+ * @param path path to file where value of the variable should be saved
  */
 void ALi::writeFile(const char* type, const char* path) const{
     FILE* file = fopen(path,"w");
@@ -705,8 +697,8 @@ void ALi::writeFile(const char* type, const char* path) const{
     
     // #
 /**
- * @brief copy value from readable source file to variable and ignore others than '1' and '0' signs
- * @param path source where an readable binary file is stored
+ * @brief read value of the variable from file with readable binary form, only '0' and '1' will be read
+ * @param file already opened file to operate on
  */
 void ALi::readFile_02(FILE* const file){
     std::string fdata;
@@ -721,16 +713,16 @@ void ALi::readFile_02(FILE* const file){
     this->optymize();
 }
 /**
- * @brief copy value from readable source file to variable and ignore others than '1' and '0' signs
- * @param path source where an readable binary file is stored
+ * @brief read value of the variable from file with readable decimal form, only ['0',...,'9'] will be read
+ * @param file already opened file to operate on
  */
 void ALi::readFile_10(FILE* const file){
 
 }
 /**
- * @brief copy value from file to variable
- * @param path source where an readable binary file is stored
- * @param type type of file, readable('r') or binary('b')
+ * @brief read value of the variable from file with readable form, only significant characters will be interpreted
+ * @param type what value of the variable format will be expected [binary/decimal]
+ * @param path path to file from where value of the variable should be read
  */
 void ALi::readFile(const char* type, const char* path){
     FILE* file = fopen(path,"r");
@@ -770,8 +762,8 @@ void ALi::readFile(const char* type, const char* path){
     
     // #
 /**
- * @brief assigns existed ALi to variable
- * @param source ALi what will be assigned to variable
+ * @brief build current variable using other ALi value
+ * @param source ALi variable used as a source
  */
 void ALi::assignment(const ALi& source){
     // it will be nice to just drop this variable begin_ptr and focus on assigning 
@@ -789,8 +781,8 @@ void ALi::assignment(const ALi& source){
     this->optymize();
 }
 /**
- * @brief assigns source int to variable
- * @param source int what will be assigned to variable
+ * @brief build current variable using integer value
+ * @param source int variable used as a source
  */
 void ALi::assignment(const signed long long& source){
     this->clear();
@@ -802,8 +794,8 @@ void ALi::assignment(const signed long long& source){
     
     // #
 /**
- * @brief 
- * @param source 
+ * @brief build current variable using std::strng with binary type value
+ * @param source std::string with binary type value used as a source
  */
 void ALi::assignment_02(const std::string& source){
     this->clear();
@@ -819,26 +811,26 @@ void ALi::assignment_02(const std::string& source){
     }
 }
 /**
- * @brief 
- * @param source 
+ * @brief build current variable using std::strng with decimal type value
+ * @param source std::string with decimal type value used as a source
  */
 void ALi::assignment_10(const std::string& source){
-
+    printf("assignment_10 is not finished yet\n");
 }
 /**
- * @brief 
- * @param source 
+ * @brief build current variable using std::string his with type and value
+ * @param type_source std::string containing type (b/d) and value used as a source
  * @example "b010101010101"
  * @example "d765238745629"
  * @example "b1110101010101"
  * @example "d-765238745629"
  */
-void ALi::assignment_str(const std::string& source){
-    std::string value(source);
-    switch(source[0]){
+void ALi::assignment_str(const std::string& type_source){
+    std::string value(type_source);
+    switch(type_source[0]){
         case 'b': this->assignment_02(value); break;
         case 'd': this->assignment_10(value); break;
-        default: printf("print: unknown type: '%c'\nbinary: 'b'\n decimal: 'd'\n",source[0]); return;
+        default: printf("print: unknown type: '%c'\nbinary: 'b'\n decimal: 'd'\n",type_source[0]); return;
     }
 }
     // #
@@ -847,10 +839,10 @@ void ALi::assignment_str(const std::string& source){
     
     // #    
 /**
- * @brief 
- * @return ALi 
+ * @brief change value to non-negative
+ * @return ALi non-negative value of the variable
  */
-ALi ALi::modulo() const{
+ALi ALi::absoluteValue() const{
     if(this->sign()){
         ALi out(*this);
         out.invert();
@@ -859,10 +851,9 @@ ALi ALi::modulo() const{
     else return *this;
 }
 /**
- * @brief 
- * 
+ * @brief change value of the variable to non-negative
  */
-void ALi::moduloAssign(){
+void ALi::absoluteValueAssign(){
     if(this->sign())
         this->invert();
 
@@ -1612,11 +1603,12 @@ ALi ALi::division(const ALi& right) const{
         return 0;
     }
     // if left value has smaller difference between his value and 0 than right has, then result will be allways 0
-    else if(this->modulo().smallerThan(right.modulo())){
-        return 0;
-    }
+    // else if(this->modulo().smallerThan(right.modulo())){
+    //     return 0;
+    // }
     // if left and right values have equal difference between they and 0 then result will be 1 or -1 (depends from their signs)
-    // i will not check this
+    // i will not check this cause [checking / changing value / saving] given to function data could be slower than just comuting it 
+    // but from other side working on realy large numbers just checking could save us a lot of time
 
 
 

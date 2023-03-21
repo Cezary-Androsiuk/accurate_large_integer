@@ -81,12 +81,28 @@ int main(){
 
 
     x = 1317;
-    y = 10;
+    y = 1317;
 
     x >> "d\n";
+    return 1;
     y >> "d\n";
     z = x.division(y);
     z >> "d\n";
+    
+    for(int i=0; i<10'000; i++){
+        x = i;
+        printf("%d\n",i);
+        for(int j=1; j<10'000; j++){
+            y = j;
+            if(x / y != i/j){
+                x.print("d x\n");
+                y.print("d y\n");
+                (x / y).print("d /\n");
+                printf("\ni:%d\nj:%d\n/:%d\n", i, j, i/j);
+                exit(0);
+            }
+        }
+    }
 
     // x = 0b00101001;
     // y = 21;
