@@ -161,9 +161,12 @@ public:
 };
 
 /*
+SPLITED IN TO MULTIPLE METHODS WILL BE GOOD IDEA
+?TODO    add SHL method without handle_overflow (most left bit will be skipped)
+?TODO    add SHR method without handle_overflow (lefts empty cells (mask000 or mask111))
 
-TODO    SHL - add argument handle_overflow
-TODO    SHR - add argument handle_overflow
+?TODO    add addition without overflow detection (adding won't increase variable lenght)
+?TODO    add subtraction without overflow detection (subtracting won't increase variable lenght)
 
 TODO    printBinaryApproximation
 TODO    printDecimalApproximation

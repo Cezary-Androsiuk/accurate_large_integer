@@ -229,37 +229,15 @@ const bool ALi::sign() const{
  * @return true if value is 0\
  * @return false if value is something other than 0
  */
-const bool ALi::is_0(const Cell* const handle) const{
-    // if(this->length == 1 && this->begin_ptr->var == mask000) return true;
-    // else return false;
-
-    // if(handle == nullptr){
-    //     if(this->begin_ptr->var == 0){
-    //         if(this->begin_ptr->L != this->begin_ptr)
-    //             return this->is_0(this->begin_ptr->L);
-    //         else return true;
-    //     }
-    //     else return false;
-    // }
-    // else{
-    //     if(handle->var != mask000){
-    //         if(handle->L != this->begin_ptr)
-    //             return this->is_0(handle->L);
-    //         else return true;
-    //     }
-    //     else return false;
-    // }
-
-    if(handle == nullptr){
+const bool ALi::is_0(const Cell* const handle = nullptr) const{
+    if(handle == nullptr)
         return this->is_0(this->begin_ptr);
-    }else{
-        if(handle->var == mask000){
-            if(handle->L != this->begin_ptr)
-                return this->is_0(handle->L);
-            else return true;
-        }
-        else return false;
+    else if(handle->var == mask000){
+        if(handle->L != this->begin_ptr)
+            return this->is_0(handle->L);
+        else return true;
     }
+    else return false;
 }
     // #
     
@@ -271,7 +249,7 @@ const bool ALi::is_0(const Cell* const handle) const{
  * @return true if value is 1\
  * @return false if value is something other than 1
  */
-const bool ALi::is_p1(const Cell* const handle) const{
+const bool ALi::is_p1(const Cell* const handle = nullptr) const{
     // if(this->length == 1 && this->begin_ptr->var == mask001) return true;
     // else return false;
 
@@ -297,7 +275,7 @@ const bool ALi::is_p1(const Cell* const handle) const{
  * @return true if value is 2\
  * @return false if value is something other than 2
  */
-const bool ALi::is_p2(const Cell* const handle) const{
+const bool ALi::is_p2(const Cell* const handle = nullptr) const{
     if(handle == nullptr){
         if(this->begin_ptr->var == 2){
             if(this->begin_ptr->L != this->begin_ptr)
@@ -320,7 +298,7 @@ const bool ALi::is_p2(const Cell* const handle) const{
  * @return true if value is -1\
  * @return false if value is something other than -1
  */
-const bool ALi::is_n1(const Cell* const handle) const{
+const bool ALi::is_n1(const Cell* const handle = nullptr) const{
     if(handle == nullptr){
         if(this->begin_ptr->var == mask111){
             if(this->begin_ptr->L != this->begin_ptr)
@@ -343,7 +321,7 @@ const bool ALi::is_n1(const Cell* const handle) const{
  * @return true if value is -2,
  * @return false if value is something other than -2
  */
-const bool ALi::is_n2(const Cell* const handle) const{
+const bool ALi::is_n2(const Cell* const handle = nullptr) const{
     if(handle == nullptr){
         if(this->begin_ptr->var == mask110){
             if(this->begin_ptr->L != this->begin_ptr)
