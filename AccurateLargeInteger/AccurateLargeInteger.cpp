@@ -1585,15 +1585,15 @@ ALi ALi::division(const ALi& right) const{
     else if(this->is_0()){ // 0 / R = 0
         return 0;
     }
-    // if left value has smaller difference between his value and 0 than right has, then result will be allways 0
-    // else if(this->modulo().smallerThan(right.modulo())){
-    //     return 0;
-    // }
-    // if left and right values have equal difference between they and 0 then result will be 1 or -1 (depends from their signs)
-    // i will not check this cause [checking / changing value / saving] given to function data could be slower than just comuting it 
-    // but from other side working on realy large numbers just checking could save us a lot of time
-
-
+    else if(this->absoluteValue().equal(right.absoluteValue())){ // |L / R| = 1    |L| == |R| 
+        if(this->sign() == right.sign())                         // L / R = 1      L == R
+            return 1;
+        else                                                     // L / R = -1     L == -(R)
+            return -1;
+    }
+    else if(this->absoluteValue().smallerThan(right.absoluteValue())){ // L / R = 0   L < R
+        return 0;
+    }
 
 
     ALi slider;
