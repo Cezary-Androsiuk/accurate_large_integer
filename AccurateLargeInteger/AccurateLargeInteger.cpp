@@ -865,8 +865,8 @@ void ALi::absoluteValueAssign(){
     // #
 /**
  * @brief check if left object is equal to right object
- * @param right object
- * @return true left equal right
+ * @param right ALi object
+ * @return true left equal right\
  * @return false left not equal right
  */
 const bool ALi::equal(const ALi& right) const{
@@ -884,8 +884,8 @@ const bool ALi::equal(const ALi& right) const{
 }
 /**
  * @brief check if left object is greater than right object
- * @param right object
- * @return true left is greater
+ * @param right ALi object
+ * @return true left is greater\
  * @return false left is not grater
  */
 const bool ALi::greaterThan(const ALi& right) const{
@@ -945,8 +945,8 @@ const bool ALi::greaterThan(const ALi& right) const{
 }
 /**
  * @brief check if left object is smaller than right object
- * @param right object
- * @return true left is smaller
+ * @param right ALi object
+ * @return true left is smaller\
  * @return false left is not smaller
  */
 const bool ALi::smallerThan(const ALi& right) const{
@@ -1010,10 +1010,10 @@ const bool ALi::smallerThan(const ALi& right) const{
     
     // #
 /**
- * @brief increment ALi by one
- * 
+ * @brief increment value of the variable by one
+ * @param handle_overflow boolean variable describe what to do when overflow occur (true: increase length of variable / false: keep length fixed and switch value sign)
  */
-void ALi::increment(const bool &handle_overflow){
+void ALi::increment(const bool &handle_overflow = true){
     // incrementing binary is acctually easy:
     // going through each bit from right
     // if is 1 then set to 0
@@ -1052,11 +1052,12 @@ void ALi::increment(const bool &handle_overflow){
     // this->optymize();
 }
 /**
- * @brief 
- * @param right 
- * @return ALi 
+ * @brief adding up two ALi variable values
+ * @param right ALi object
+ * @param handle_overflow ( = true) boolean variable describe what to do when overflow occur (true: increase length of variable / false: keep length fixed and switch value sign)
+ * @return ALi object
  */
-ALi ALi::addition(const ALi& right, const bool &handle_overflow) const{
+ALi ALi::addition(const ALi& right, const bool &handle_overflow = true) const{
     if(right.is_0()){ // L + 0 = L
         return *this;
     }
@@ -1125,10 +1126,11 @@ ALi ALi::addition(const ALi& right, const bool &handle_overflow) const{
     return out;
 }
 /**
- * @brief 
- * @param right 
+ * @brief adding up two ALi variable values and assigns to the current one
+ * @param right ALi object
+ * @param handle_overflow ( = true) boolean variable describe what to do when overflow occur (true: increase length of variable / false: keep length fixed and switch value sign)
  */
-void ALi::additionAssign(const ALi& right, const bool &handle_overflow){
+void ALi::additionAssign(const ALi& right, const bool &handle_overflow = true){
     if(right.is_0()){ // L += 0 == L
         return;
     }
@@ -1201,10 +1203,11 @@ void ALi::additionAssign(const ALi& right, const bool &handle_overflow){
     this->optymize();
 }
 /**
- * @brief 
- * @param right 
+ * @brief adding up two ALi variable values and assigns to the current variable
+ * @param right ALi object
+ * @param handle_overflow ( = true) boolean variable describe what to do when overflow occur (true: increase length of variable / false: keep length fixed and switch value sign)
  */
-void ALi::additionAssign2(const ALi& right, const bool &handle_overflow){
+void ALi::additionAssign2(const ALi& right, const bool &handle_overflow = true){
     if(right.is_0()){ // L += 0 == L
         return;
     }
@@ -1280,10 +1283,10 @@ void ALi::additionAssign2(const ALi& right, const bool &handle_overflow){
     
     // #
 /**
- * @brief increment ALi by one
- * 
+ * @brief decrement value of the variable by one
+ * @param handle_overflow ( = true) boolean variable describe what to do when overflow occur (true: increase length of variable / false: keep length fixed and switch value sign)
  */
-void ALi::decrement(const bool &handle_overflow){
+void ALi::decrement(const bool &handle_overflow = true){
     Cell *handle = this->begin_ptr;
     while(handle->var == mask000 && handle != this->begin_ptr->R){
         handle->var = mask111; // (1)00000000 -> (0)11111111
@@ -1297,11 +1300,12 @@ void ALi::decrement(const bool &handle_overflow){
     this->optymize();
 }
 /**
- * @brief 
- * @param right 
- * @return ALi 
+ * @brief subtracting ALi variable value fron the current variable value
+ * @param right ALi object
+ * @param handle_overflow ( = true) boolean variable describe what to do when overflow occur (true: increase length of variable / false: keep length fixed and switch value sign)
+ * @return ALi object
  */
-ALi ALi::subtraction(const ALi& right, const bool &handle_overflow) const{
+ALi ALi::subtraction(const ALi& right, const bool &handle_overflow = true) const{
     if(right.is_0()){ // L - 0 = L
         return *this;
     }
@@ -1344,10 +1348,11 @@ ALi ALi::subtraction(const ALi& right, const bool &handle_overflow) const{
     //#############################
 }
 /**
- * @brief 
- * @param right 
+ * @brief subtracting ALi variable value fron the current variable value and assigns to the current one
+ * @param right ALi object
+ * @param handle_overflow ( = true) boolean variable describe what to do when overflow occur (true: increase length of variable / false: keep length fixed and switch value sign)
  */
-void ALi::subtractionAssign(const ALi& right, const bool &handle_overflow){
+void ALi::subtractionAssign(const ALi& right, const bool &handle_overflow = true){
     if(right.is_0()){ // L -= 0 == L
         return;
     }
@@ -1394,9 +1399,9 @@ void ALi::subtractionAssign(const ALi& right, const bool &handle_overflow){
     
     // #
 /**
- * @brief 
- * @param right 
- * @return ALi 
+ * @brief multiplies current variable value by ALi variable value
+ * @param right ALi object
+ * @return ALi object
  */
 ALi ALi::multiplication(const ALi& right) const{
     if(right.is_0()){ // L * 0 = 0
@@ -1482,8 +1487,8 @@ ALi ALi::multiplication(const ALi& right) const{
     return slider;
 }
 /**
- * @brief 
- * @param right 
+ * @brief multiplies current variable value by ALi variable value and assigns to the current one
+ * @param right ALi object
  */
 void ALi::multiplicationAssign(const ALi& right){
     if(right.is_0()){ // L *= 0 == 0
@@ -1571,9 +1576,9 @@ void ALi::multiplicationAssign(const ALi& right){
 
     // #
 /**
- * @brief 
- * @param right 
- * @return ALi 
+ * @brief divides current variable value by ALi variable value, rounds to integer
+ * @param right ALi object
+ * @return ALi object
  */
 ALi ALi::division(const ALi& right) const{
     if(right.is_0()){ // L / 0 = !
@@ -1716,8 +1721,8 @@ ALi ALi::division(const ALi& right) const{
     return out;
 }
 /**
- * @brief 
- * @param right 
+ * @brief divides current variable value by ALi variable value, rounds to integer and assigns to the current one
+ * @param right ALi object
  */
 void ALi::divisionAssign(const ALi& right){
     
@@ -1767,7 +1772,7 @@ void ALi::print(const char* type_text) const{
  * @param additionText 
  * @param approximationPrecision simply how many digits (counting from left and without variable sign) will be printed
  */
-void ALi::printApproximation(const char* type_text, unsigned long long approximationPrecision) const{
+void ALi::printApproximation(const char* type_text, unsigned long long approximationPrecision = 2) const{
     // switch (type){
     // case 'b': this->printBinaryApproximation(approximationPrecision); break;
     // case 'd': this->printDecimalApproximation(approximationPrecision); break;
@@ -1801,7 +1806,7 @@ void ALi::file(const char* type_path){
  * @brief set separator sign which should shown every 8 bits (byte)
  * @param separatorSign default is '\0'(all bytes will be concatenated) separate every byte from others (easier to read)
  */
-void ALi::setSeparator(const char& separator){
+void ALi::setSeparator(const char& separator = '\0'){
     this->separator = separator;
 }
 /**

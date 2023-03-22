@@ -162,6 +162,9 @@ public:
 
 /*
 
+TODO    SHL - add argument handle_overflow
+TODO    SHR - add argument handle_overflow
+
 TODO    printBinaryApproximation
 TODO    printDecimalApproximation
 
