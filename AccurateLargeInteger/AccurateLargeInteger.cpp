@@ -1762,6 +1762,7 @@ void ALi::divisionAssign(const ALi& right){
  */
 ALi ALi::modulo(const ALi& right) const{
     printf("modulo is not finished yet\n");
+    return 0;
 }
 /**
  * @brief 
@@ -1780,8 +1781,35 @@ void ALi::moduloAssign(const ALi& right){
  * @param right 
  * @return ALi 
  */
+// ALi ALi::exp_recursive(const ALi& left, const ALi& right) const{
+//     if(right.begin_ptr->var & mask001)
+//         return this->exp_recursive()
+// }
+/**
+ * @brief 
+ * @param right 
+ * @return ALi 
+ */
 ALi ALi::exponentiation(const ALi& right) const{
     printf("exponentiation is not finished yet\n");
+    ALi out(*this);
+    out >> "d Y\n";
+    out.multiplicationAssign(out);
+    out >> "d Y\n";
+    return out;
+    ALi notEvenOut(1);
+    ALi exponent(right);
+    while(!exponent.is_p1()){
+        out >> "d X\n";
+        if(exponent.begin_ptr->var & mask001){
+            notEvenOut.multiplicationAssign(out);
+            exponent.decrement();
+        }
+        out.multiplicationAssign(out);
+        exponent.SHR();
+    }
+    out.multiplicationAssign(notEvenOut);
+    return out;
 }
 /**
  * @brief 

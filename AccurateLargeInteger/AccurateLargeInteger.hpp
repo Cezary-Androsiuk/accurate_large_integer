@@ -123,6 +123,7 @@ protected: public:
     void moduloAssign(const ALi& right);
 
     // Exponentiation
+    ALi exp_recursive(const ALi& left, const ALi& right) const;
     ALi exponentiation(const ALi& right) const;
     void exponentiationAssign(const ALi& right);
 
