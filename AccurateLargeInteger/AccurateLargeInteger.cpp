@@ -1600,41 +1600,18 @@ ALi ALi::division(const ALi& right) const{
     ALi factor(right);
     factor.invert();
     ALi out;
-
-    // align
-    // while(factor.length < slider.length)
-    //     factor.newCell(mask000);
-    
-    // const Cell* rhandle = right.begin_ptr;
-    // do{
-    //     factor.newCell(rhandle->var);
-    //     rhandle = rhandle->L;
-    // }while(rhandle != right.begin_ptr);
     const Cell* hdl = this->begin_ptr->R;
     do{
         unsigned long long mask = mask100;
         do{
-            // printf("  ");
-            // slider >> "b\n";
-            // system("sleep 1");
             if(hdl->var & mask) slider.PLSB(1);
             else                slider.PLSB(0);
-
-            // printf("  ");
-            // slider >> "b\n";
             if(!slider.smallerThan(right)){
-                // printf("- ");
-                // right >> "b\n";
-                // printf("+ ");
-                // factor >> "b\n";
                 slider.additionAssign(factor,false);
                 out.PLSB(1);
             }
             else 
                 out.PLSB(0);
-
-            // printf("  ");
-            // slider >> "b\n\n";
             mask >>= 1;
         }while(mask > 0);
         hdl = hdl->R;
@@ -1703,7 +1680,75 @@ ALi ALi::division(const ALi& right) const{
  * @param right ALi object
  */
 void ALi::divisionAssign(const ALi& right){
+    if(right.is_0()){ // L /= 0 == !
+        printf("Zero division!\nassigned: 0\n");
+        this->clear();
+        return;
+    }
+    else if(right.is_p1()){ // L /= 1 == L
+        return;
+    }
+    else if(right.is_p2()){ // L /= 2 == L.SHR()
+        this->SHR();
+        return;
+    }
+    else if(right.is_n1()){ // L /= -1 == -L
+        this->invert();
+        return;
+    }
+    else if(right.is_n2()){ // L /= -2 == -L.SHR()
+        this->SHR();
+        this->invert();
+        return;
+    }
+    else if(this->is_0()){ // 0 /= R == 0
+        this->clear();
+        return;
+    }
+    else if(this->absoluteValue().equal(right.absoluteValue())){ // |L /= R| == 1    |L| == |R| 
+        if(this->sign() == right.sign()){                        // L /= R == 1      L == R
+            this->assignment(1);
+            return;
+        }
+        else{                                                    // L /= R == -1     L == -(R)
+            this->assignment(-1);
+            return;
+        }
+    }
+    else if(this->absoluteValue().smallerThan(right.absoluteValue())){ // L /= R == 0   L < R
+        this->clear();
+        return;
+    }
     
+    // There is possibility to use only factor and *this objects but to do so i need to use "for" what i really don't want to do because of iterator limits.
+    // this variable msb could be used to slider.plsb(...)
+    // check if slider is larger or equal to factor, \
+        if so add factor to slider (do it without overflow handle actions) and then this->plsb(1)\
+        else this->plsb(0)
+    // after plsb operation, this variable length need to keep the same lenght as before (no mather if overflow occur)
+    // to avoid useless + and - cell operations i should implement //! PLSB() method without overflow handle and change current PLSB() method name to something like PLSB_hdl_ofl()
+    // problem is that algorithm need to be executed (number of bits) times 
+    ALi slider;
+    ALi factor(right);
+    factor.invert();
+    ALi out;
+    const Cell* hdl = this->begin_ptr->R;
+    do{
+        unsigned long long mask = mask100;
+        do{
+            if(hdl->var & mask) slider.PLSB(1);
+            else                slider.PLSB(0);
+            if(!slider.smallerThan(right)){
+                slider.additionAssign(factor,false);
+                out.PLSB(1);
+            }
+            else 
+                out.PLSB(0);
+            mask >>= 1;
+        }while(mask > 0);
+        hdl = hdl->R;
+    }while(hdl != this->begin_ptr);
+    this->assignment(out);
 }
     // #
     
