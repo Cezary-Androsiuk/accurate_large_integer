@@ -1767,27 +1767,27 @@ void ALi::divisionAssign(const ALi& right){
  */
 ALi ALi::modulo(const ALi& right) const{
     printf("modulo is not finished yet\n");
-    if(right.is_0()){ // L %= 0 == !
+    if(right.is_0()){ // L % 0 = !
         printf("Zero division!\nreturned: 0\n");
         return 0;
     }
-    else if(this->is_0()){
+    else if(this->is_0()){ // 0 % R = 0
         return 0;
     }
-    else if(right.is_p1()){
+    else if(right.is_p1()){ // L % 1 = 0
         return 0;
     }
-    else if(right.is_n1()){
+    else if(right.is_n1()){ // L % -1 = 0
         return 0;
     }
-    else if(right.is_p2()){
+    else if(right.is_p2()){ // L % 2 = L.LSB()
         return this->begin_ptr->var & mask001;
     }
-    else if(right.is_n2()){
+    else if(right.is_n2()){ // L % -2 = L.LSB()
         return this->begin_ptr->var & mask001;
     }
-    else if(!this->absoluteValue().greaterThan(right.absoluteValue())){
-        return 0;
+    else if(!this->absoluteValue().greaterThan(right.absoluteValue())){ // |L| < |R| => L % R = L
+        return *this;
     }
 
     ALi slider;
@@ -1820,27 +1820,26 @@ void ALi::moduloAssign(const ALi& right){
         this->clear();
         return;
     }
-    else if(this->is_0()){
+    else if(this->is_0()){ // 0 %= R == 0
         return;
     }
-    else if(right.is_p1()){
+    else if(right.is_p1()){ // L %= 1 == 0
         this->clear();
         return;
     }
-    else if(right.is_n1()){
+    else if(right.is_n1()){ // L %= -1 == 0
         this->clear();
         return;
     }
-    else if(right.is_p2()){
+    else if(right.is_p2()){ // L %= 2 == L.LSB()
         this->assignment(this->begin_ptr->var & mask001);
         return;
     }
-    else if(right.is_n2()){
+    else if(right.is_n2()){ // L %= -2 == L.LSB()
         this->assignment(this->begin_ptr->var & mask001);
         return;
     }
-    else if(!this->absoluteValue().greaterThan(right.absoluteValue())){
-        this->clear();
+    else if(!this->absoluteValue().greaterThan(right.absoluteValue())){ // |L| < |R| => L %= R == L
         return;
     }
 
