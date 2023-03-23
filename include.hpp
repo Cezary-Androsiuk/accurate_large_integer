@@ -4,12 +4,12 @@
 #include <cstdio>
 #include <string>
 #include "BPrint/BPrint.hpp"
-#include "Timer/Timer.hpp"
-#include <ctime>
 
 
-#include <iostream> // unit tests
-#include <random> // unit tests
+#include <iostream>           // unit tests
+#include <random>            // unit tests
+#include <ctime>            // unit tests
+#include "Timer/Timer.hpp" // unit tests
 
 
 #define CELL_TYPE unsigned long long
