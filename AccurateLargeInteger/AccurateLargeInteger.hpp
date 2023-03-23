@@ -118,6 +118,14 @@ protected: public:
     ALi division(const ALi& right) const;
     void divisionAssign(const ALi& right);
 
+    // Modulo
+    ALi modulo(const ALi& right) const;
+    void moduloAssign(const ALi& right);
+
+    // Exponentiation
+    ALi exponentiation(const ALi& right) const;
+    void exponentiationAssign(const ALi& right);
+
 public:
     // Public
     void print(const char* type_text) const;
@@ -158,6 +166,12 @@ public:
     // in this class division will be integer type, to get rational number result before division object need to be casted to rational class object
     ALi  operator /  (const ALi& right) const;
     void operator /= (const ALi& right);
+
+    ALi  operator %  (const ALi& right) const;
+    void operator %= (const ALi& right);
+
+    ALi  operator ^  (const ALi& right) const;
+    void operator ^= (const ALi& right);
 };
 
 /*

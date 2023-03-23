@@ -1752,6 +1752,47 @@ void ALi::divisionAssign(const ALi& right){
 }
     // #
     
+    // # Modulo
+
+    // #
+/**
+ * @brief 
+ * @param right 
+ * @return ALi 
+ */
+ALi ALi::modulo(const ALi& right) const{
+    printf("modulo is not finished yet\n");
+}
+/**
+ * @brief 
+ * @param right 
+ */
+void ALi::moduloAssign(const ALi& right){
+    printf("moduloAssign is not finished yet\n");
+}
+    // #
+    
+    // # Exponentiation
+
+    // #
+/**
+ * @brief 
+ * @param right 
+ * @return ALi 
+ */
+ALi ALi::exponentiation(const ALi& right) const{
+    printf("exponentiation is not finished yet\n");
+}
+/**
+ * @brief 
+ * @param right 
+ */
+void ALi::exponentiationAssign(const ALi& right){
+    printf("exponentiationAssign is not finished yet\n");
+}
+    
+    // #
+    
     // #
     
     // #
@@ -1941,4 +1982,18 @@ ALi  ALi::operator /  (const ALi& right) const{
 }
 void ALi::operator /= (const ALi& right){
     this->divisionAssign(right);
+}
+
+ALi  ALi::operator %  (const ALi& right) const{
+    return this->modulo(right);
+}
+void ALi::operator %= (const ALi& right){
+    this->moduloAssign(right);
+}
+
+ALi  ALi::operator ^  (const ALi& right) const{
+    return this->exponentiation(right);
+}
+void ALi::operator ^= (const ALi& right){
+    this->exponentiationAssign(right);
 }
