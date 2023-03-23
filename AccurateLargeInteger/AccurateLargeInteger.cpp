@@ -1843,7 +1843,49 @@ ALi ALi::exponentiation(const ALi& right) const{
  * @param right 
  */
 void ALi::exponentiationAssign(const ALi& right){
-    printf("exponentiationAssign is not finished yet\n");
+    if(this->is_0()){ // 0 ^= R == 0
+        return;
+    }
+    else if(this->is_p1()){ // 1 ^= R == 1
+        return;
+    }
+    else if(this->is_n1()){ // R % 2 = 0 => -1 ^= R == 1    R % 2 = 1 => -1 ^= R == -1    
+        if(right.begin_ptr->var & mask001){ 
+            return;
+        }
+        else{
+            this->invert();
+            return;
+        }
+    }
+    else if(right.is_0()){ // L ^= 0 == 1
+        this->assignment(1);
+        return;
+    }
+    else if(right.is_p1()){ // L ^= 1 == L
+        return;
+    }
+    else if(right.is_p2()){ // L ^= 2 == L * L
+        this->multiplicationAssign(*this);
+        return;
+    }
+    else if(right.sign()){ // L ^= R == 0     R < 0
+        this->clear();
+        return;
+    }
+
+    ALi notEvenOut(1);
+    ALi exponent(right);
+    while(!exponent.is_p1()){
+        // out >> "d X\n";
+        if(exponent.begin_ptr->var & mask001){
+            notEvenOut.multiplicationAssign(*this);
+            exponent.decrement();
+        }
+        this->multiplicationAssign(*this);
+        exponent.SHR();
+    }
+    this->multiplicationAssign(notEvenOut);
 }
     
     // #
