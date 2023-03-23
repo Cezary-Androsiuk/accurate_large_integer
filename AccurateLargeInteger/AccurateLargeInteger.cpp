@@ -1767,7 +1767,47 @@ void ALi::divisionAssign(const ALi& right){
  */
 ALi ALi::modulo(const ALi& right) const{
     printf("modulo is not finished yet\n");
-    return 0;
+    if(right.is_0()){ // L %= 0 == !
+        printf("Zero division!\nreturned: 0\n");
+        return 0;
+    }
+    else if(this->is_0()){
+        return 0;
+    }
+    else if(right.is_p1()){
+        return 0;
+    }
+    else if(right.is_n1()){
+        return 0;
+    }
+    else if(right.is_p2()){
+        return this->begin_ptr->var & mask001;
+    }
+    else if(right.is_n2()){
+        return this->begin_ptr->var & mask001;
+    }
+    else if(!this->absoluteValue().greaterThan(right.absoluteValue())){
+        return 0;
+    }
+
+    ALi slider;
+    ALi factor(right);
+    factor.invert();
+    const Cell* hdl = this->begin_ptr->R;
+    do{
+        unsigned long long mask = mask100;
+        do{
+            if(hdl->var & mask) slider.PLSB(1);
+            else                slider.PLSB(0);
+            if(!slider.smallerThan(right)){
+                slider.additionAssign(factor,false);
+            }
+            mask >>= 1;
+        }while(mask > 0);
+        hdl = hdl->R;
+    }while(hdl != this->begin_ptr);
+
+    return slider;
 }
 /**
  * @brief 
@@ -1781,15 +1821,6 @@ void ALi::moduloAssign(const ALi& right){
     // # Exponentiation
 
     // #
-/**
- * @brief 
- * @param right 
- * @return ALi 
- */
-// ALi ALi::exp_recursive(const ALi& left, const ALi& right) const{
-//     if(right.begin_ptr->var & mask001)
-//         return this->exp_recursive()
-// }
 /**
  * @brief 
  * @param right 

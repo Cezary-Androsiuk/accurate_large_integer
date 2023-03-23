@@ -176,6 +176,11 @@ public:
 };
 
 /*
+TODO check if in any of previously implemeted methods contains "if" errors - exceptions are in wrong order
+
+
+
+
 SPLITED IN TO MULTIPLE METHODS WILL BE GOOD IDEA
 ?TODO    add SHL method without handle_overflow (most left bit will be skipped)
 ?TODO    add SHR method without handle_overflow (lefts empty cells (mask000 or mask111))

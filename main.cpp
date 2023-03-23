@@ -79,19 +79,13 @@ int main(){
     z1.setSeparator(' ');
     z2.setSeparator(' ');
 
-
-    // x = 100;
-    x = 91;
-    y = 17;
+    x = -18;
+    y = 3;
 
     x >> "d\n";
     y >> "d\n";
-    z = x ^ y;
+    z = x % y;
     z >> "d\n";
-
-    x ^= y;
-    x >> "d\n";
-
 
     // x = 0b00101001;
     // y = 21;
