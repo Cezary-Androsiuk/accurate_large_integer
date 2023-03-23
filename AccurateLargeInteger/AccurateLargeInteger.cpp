@@ -1815,6 +1815,56 @@ ALi ALi::modulo(const ALi& right) const{
  */
 void ALi::moduloAssign(const ALi& right){
     printf("moduloAssign is not finished yet\n");
+    if(right.is_0()){ // L %= 0 == !
+        printf("Zero division!\nassigned: 0\n");
+        this->clear();
+        return;
+    }
+    else if(this->is_0()){
+        return;
+    }
+    else if(right.is_p1()){
+        this->clear();
+        return;
+    }
+    else if(right.is_n1()){
+        this->clear();
+        return;
+    }
+    else if(right.is_p2()){
+        this->assignment(this->begin_ptr->var & mask001);
+        return;
+    }
+    else if(right.is_n2()){
+        this->assignment(this->begin_ptr->var & mask001);
+        return;
+    }
+    else if(!this->absoluteValue().greaterThan(right.absoluteValue())){
+        this->clear();
+        return;
+    }
+
+
+    // just like divisionAssign method, there is a way by with what cost :c 
+    // if i will find better divisionAssign algorithm then i can change this moduloAssign algorithm
+
+    ALi slider;
+    ALi factor(right);
+    factor.invert();
+    const Cell* hdl = this->begin_ptr->R;
+    do{
+        unsigned long long mask = mask100;
+        do{
+            if(hdl->var & mask) slider.PLSB(1);
+            else                slider.PLSB(0);
+            if(!slider.smallerThan(right)){
+                slider.additionAssign(factor,false);
+            }
+            mask >>= 1;
+        }while(mask > 0);
+        hdl = hdl->R;
+    }while(hdl != this->begin_ptr);
+
 }
     // #
     
