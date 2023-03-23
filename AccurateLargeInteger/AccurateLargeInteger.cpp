@@ -1796,16 +1796,38 @@ void ALi::moduloAssign(const ALi& right){
  * @return ALi 
  */
 ALi ALi::exponentiation(const ALi& right) const{
-    printf("exponentiation is not finished yet\n");
+    if(this->is_0()){ // 0 ^ R = 0
+        return 0;
+    }
+    else if(this->is_p1()){ // 1 ^ R = 1
+        return 1;
+    }
+    else if(this->is_n1()){ // R % 2 = 0 => -1 ^ R = 1    R % 2 = 1 => -1 ^ R = -1    
+        if(right.begin_ptr->var & mask001){ 
+            return -1;
+        }
+        else{
+            return 1;
+        }
+    }
+    else if(right.is_0()){ // L ^ 0 = 1
+        return 1;
+    }
+    else if(right.is_p1()){ // L ^ 1 = L
+        return *this;
+    }
+    else if(right.is_p2()){ // L ^ 2 = L * L
+        return this->multiplication(*this);
+    }
+    else if(right.sign()){ // L ^ R = 0     R < 0
+        return 0;
+    }
+
     ALi out(*this);
-    out >> "d Y\n";
-    out.multiplicationAssign(out);
-    out >> "d Y\n";
-    return out;
     ALi notEvenOut(1);
     ALi exponent(right);
     while(!exponent.is_p1()){
-        out >> "d X\n";
+        // out >> "d X\n";
         if(exponent.begin_ptr->var & mask001){
             notEvenOut.multiplicationAssign(out);
             exponent.decrement();
