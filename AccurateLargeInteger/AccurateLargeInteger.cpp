@@ -1512,6 +1512,11 @@ void ALi::multiplicationAssign(const ALi& right){
         this->invert();
         return;
     }
+    else if(this == &right){ // L and R are the same object
+        ALi left_cpy(right);
+        this->multiplicationAssign(left_cpy);
+        return;
+    }
 
     ALi factor;
     const bool lsign = this->sign();
