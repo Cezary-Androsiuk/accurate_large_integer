@@ -1882,7 +1882,7 @@ ALi ALi::exponentiation(const ALi& right) const{
     else if(this->is_p1()){ // 1 ^ R = 1
         return 1;
     }
-    else if(this->is_n1()){ // R % 2 = 0 => -1 ^ R = 1    R % 2 = 1 => -1 ^ R = -1    
+    else if(this->is_n1()){ // R,LSB() = 0 => -1 ^ R = 1    R.LSB() = 1 => -1 ^ R = -1    
         if(right.begin_ptr->var & mask001){ 
             return -1;
         }
@@ -1929,7 +1929,7 @@ void ALi::exponentiationAssign(const ALi& right){
     else if(this->is_p1()){ // 1 ^= R == 1
         return;
     }
-    else if(this->is_n1()){ // R % 2 = 0 => -1 ^= R == 1    R % 2 = 1 => -1 ^= R == -1    
+    else if(this->is_n1()){ // R.LSB() = 0 => -1 ^= R == 1    R.LSB() = 1 => -1 ^= R == -1    
         if(right.begin_ptr->var & mask001){ 
             return;
         }
