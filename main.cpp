@@ -79,12 +79,12 @@ int main(){
     z1.setSeparator(' ');
     z2.setSeparator(' ');
 
-    x = -18;
-    y = 3;
+    x = 9876;
+    y = 1234;
 
     x >> "d\n";
     y >> "d\n";
-    z = x % y;
+    z = x ^ y;
     z >> "d\n";
 
     // x = 0b00101001;

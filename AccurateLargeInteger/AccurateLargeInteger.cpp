@@ -1902,7 +1902,7 @@ ALi ALi::exponentiation(const ALi& right) const{
     else if(right.sign()){ // L ^ R = 0     R < 0
         return 0;
     }
-
+    
     ALi out(*this);
     ALi notEvenOut(1);
     ALi exponent(right);
