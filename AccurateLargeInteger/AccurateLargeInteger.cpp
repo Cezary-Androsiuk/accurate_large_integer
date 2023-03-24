@@ -94,13 +94,31 @@ const bool ALi::delCell(){
     
     // #
 /**
- * @brief execute shift right operation
+ * @brief 
+ */
+void ALi::shr_(){
+    // works just like an >> operator for signed values
+    Cell* handle = this->begin_ptr->R;
+    bool buffer[2] = {0,this->sign()};
+    /*[0] - cell bit out*/    /*[1] - cell bit in*/
+
+    do{
+        buffer[0] = handle->var & mask001;
+        handle->var >>= 1; 
+        if(buffer[1]) handle->var |= mask100;
+        else handle->var &= mask011;
+        buffer[1] = buffer[0]; 
+        handle = handle->R;
+    } while (handle != this->begin_ptr->R);
+}
+/**
+ * @brief execute shift right operation with variable controll systems
  * @example 0000 1010 -> 0000 0101
  * @example 0011 1010 -> 0001 1101
  * @example 1000 0000 -> 1100 0000
  * @example 1000 0111 -> 1100 0011
  */
-void ALi::SHR(){
+void ALi::shr_ext(){
     // works just like an >> operator for signed values
     Cell* handle = this->begin_ptr->R;
     bool buffer[2] = {0,this->sign()};
@@ -117,14 +135,32 @@ void ALi::SHR(){
     this->optymize();
 }
 /**
- * @brief execute shift left operation
+ * @brief 
+ */
+void ALi::shl_(){
+    // works just like an << operator for signed values
+    Cell* handle = this->begin_ptr; 
+    bool buffer[2] = {0,0};
+    /*[0] - cell bit out*/    /*[1] - cell bit in*/
+
+    do{
+        buffer[0] = handle->var & mask100;
+        handle->var <<= 1;
+        if(buffer[1]) handle->var |= mask001;
+        else handle->var &= mask110;
+        buffer[1] = buffer[0];
+        handle = handle->L;
+    }while(handle != this->begin_ptr);
+}
+/**
+ * @brief execute shift left operation with variable controll systems
  * @example 0011 0110 -> 0110 1100
  * @example 1101 0000 -> 1010 0000
  * @example 1011 0110 -> 1111 0110 1100
  * @example 1000 0000 -> 1111 0000 0000
  * @example 0111 0010 -> 0000 1110 0100
  */
-void ALi::SHL(){
+void ALi::shl_ext(){
     // works just like an << operator for signed values
     Cell* handle = this->begin_ptr; 
     bool buffer[2] = {0,0};
@@ -139,9 +175,9 @@ void ALi::SHL(){
         handle = handle->L;
     }while(handle != this->begin_ptr);
 
-    // where most left bit after SHL changed their value, then overflow has occurred
+    // where most left bit after shl_ext changed their value, then overflow has occurred
     if((this->begin_ptr->R->var & mask100) != (buffer[1] ? mask100 : mask000)){
-        if(buffer[1]) // check if value was positive or negative before SHL
+        if(buffer[1]) // check if value was positive or negative before shl_ext
             this->newCell(mask111); // was negative
         else 
             this->newCell(mask000); // was positive
@@ -203,9 +239,9 @@ void ALi::PLSB(const bool& bit){
         handle = handle->L;
     }while(handle != this->begin_ptr);
 
-    // where most left bit after SHL changed their value, then overflow has occurred
+    // where most left bit after shl_ext changed their value, then overflow has occurred
     if((this->begin_ptr->R->var & mask100) != (buffer[1] ? mask100 : mask000)){
-        if(buffer[1]) // check if value was positive or negative before SHL
+        if(buffer[1]) // check if value was positive or negative before shl_ext
             this->newCell(mask111); // was negative
         else 
             this->newCell(mask000); // was positive
@@ -1388,9 +1424,9 @@ ALi ALi::multiplication(const ALi& right) const{
     else if(right.is_p1()){ // L * 1 = L
         return *this;
     }
-    else if(right.is_p2()){ // L * 2 = L.SHL()
+    else if(right.is_p2()){ // L * 2 = L.shl_ext()
         ALi out(*this);
-        out.SHL();
+        out.shl_ext();
         return out;
     }
     else if(right.is_n1()){ // L * -1 = -L
@@ -1398,9 +1434,9 @@ ALi ALi::multiplication(const ALi& right) const{
         out.invert();
         return out;
     }
-    else if(right.is_n2()){ // L * -2 = -L.SHL()
+    else if(right.is_n2()){ // L * -2 = -L.shl_ext()
         ALi out(*this);
-        out.SHL();
+        out.shl_ext();
         out.invert();
         return out;
     }
@@ -1410,9 +1446,9 @@ ALi ALi::multiplication(const ALi& right) const{
     else if(this->is_p1()){ // 1 * R = R
         return right;
     }
-    else if(this->is_p2()){ // 2 * R = R.SHL()
+    else if(this->is_p2()){ // 2 * R = R.shl_ext()
         ALi out(right);
-        out.SHL();
+        out.shl_ext();
         return out;
     }
     else if(this->is_n1()){ // -1 * R = -R
@@ -1420,9 +1456,9 @@ ALi ALi::multiplication(const ALi& right) const{
         out.invert();
         return out;
     }
-    else if(this->is_n2()){ // -2 * R = -R.SHL()
+    else if(this->is_n2()){ // -2 * R = -R.shl_ext()
         ALi out(right);
-        out.SHL();
+        out.shl_ext();
         out.invert();
         return out;
     }
@@ -1454,10 +1490,10 @@ ALi ALi::multiplication(const ALi& right) const{
             break;
         // 00 & 11
         }
-        slider.SHR();
+        slider.shr_ext();
         ++i;
     }
-    slider.SHR();
+    slider.shr_ext();
 
     // idk why for negative left, do not work and needs +1
     if(this->sign()) slider.increment();
@@ -1476,16 +1512,16 @@ void ALi::multiplicationAssign(const ALi& right){
     else if(right.is_p1()){ // L *= 1 == L
         return;
     }
-    else if(right.is_p2()){ // L *= 2 == L.SHL()
-        this->SHL();
+    else if(right.is_p2()){ // L *= 2 == L.shl_ext()
+        this->shl_ext();
         return;
     }
     else if(right.is_n1()){ // L *= -1 == -L
         this->invert();
         return;
     }
-    else if(right.is_n2()){ // L *= -2 == -L.SHL()
-        this->SHL();
+    else if(right.is_n2()){ // L *= -2 == -L.shl_ext()
+        this->shl_ext();
         this->invert();
         return;
     }
@@ -1496,9 +1532,9 @@ void ALi::multiplicationAssign(const ALi& right){
         this->assignment(right);
         return;
     }
-    else if(this->is_p2()){ // 2 *= R == R.SHL()
+    else if(this->is_p2()){ // 2 *= R == R.shl_ext()
         this->assignment(right);
-        this->SHL();
+        this->shl_ext();
         return;
     }
     else if(this->is_n1()){ // -1 *= R == -R
@@ -1506,9 +1542,9 @@ void ALi::multiplicationAssign(const ALi& right){
         this->invert();
         return;
     }
-    else if(this->is_n2()){ // -2 *= R == -R.SHL()
+    else if(this->is_n2()){ // -2 *= R == -R.shl_ext()
         this->assignment(right);
-        this->SHL();
+        this->shl_ext();
         this->invert();
         return;
     }
@@ -1545,10 +1581,10 @@ void ALi::multiplicationAssign(const ALi& right){
             break;
         // 00 & 11
         }
-        this->SHR();
+        this->shr_ext();
         ++i;
     }
-    this->SHR();
+    this->shr_ext();
 
     // idk why for negative left, do not work and needs +1
     if(lsign) this->increment();
@@ -1571,9 +1607,9 @@ ALi ALi::division(const ALi& right) const{
     else if(right.is_p1()){ // L / 1 = L
         return *this;
     }
-    else if(right.is_p2()){ // L / 2 = L.SHR()
+    else if(right.is_p2()){ // L / 2 = L.shr_ext()
         ALi out(*this);
-        out.SHR();
+        out.shr_ext();
         return out;
     }
     else if(right.is_n1()){ // L / -1 = -L
@@ -1581,9 +1617,9 @@ ALi ALi::division(const ALi& right) const{
         out.invert();
         return out;
     }
-    else if(right.is_n2()){ // L / -2 = -L.SHR()
+    else if(right.is_n2()){ // L / -2 = -L.shr_ext()
         ALi out(*this);
-        out.SHR();
+        out.shr_ext();
         out.invert();
         return out;
     }
@@ -1693,16 +1729,16 @@ void ALi::divisionAssign(const ALi& right){
     else if(right.is_p1()){ // L /= 1 == L
         return;
     }
-    else if(right.is_p2()){ // L /= 2 == L.SHR()
-        this->SHR();
+    else if(right.is_p2()){ // L /= 2 == L.shr_ext()
+        this->shr_ext();
         return;
     }
     else if(right.is_n1()){ // L /= -1 == -L
         this->invert();
         return;
     }
-    else if(right.is_n2()){ // L /= -2 == -L.SHR()
-        this->SHR();
+    else if(right.is_n2()){ // L /= -2 == -L.shr_ext()
+        this->shr_ext();
         this->invert();
         return;
     }
@@ -1913,7 +1949,7 @@ ALi ALi::exponentiation(const ALi& right) const{
             exponent.decrement();
         }
         out.multiplicationAssign(out);
-        exponent.SHR();
+        exponent.shr_ext();
     }
     out.multiplicationAssign(notEvenOut);
     return out;
@@ -1963,7 +1999,7 @@ void ALi::exponentiationAssign(const ALi& right){
             exponent.decrement();
         }
         this->multiplicationAssign(*this);
-        exponent.SHR();
+        exponent.shr_ext();
     }
     this->multiplicationAssign(notEvenOut);
 }

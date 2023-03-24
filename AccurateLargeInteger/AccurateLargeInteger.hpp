@@ -38,8 +38,10 @@ protected:
     const bool delCell();
 
 protected: public:
-    void SHR();
-    void SHL();
+    void shr_();
+    void shr_ext();
+    void shl_();
+    void shl_ext();
     void PMSB(const bool& bit);
     void PLSB(const bool& bit);
 
