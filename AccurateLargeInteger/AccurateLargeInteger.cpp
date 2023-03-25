@@ -543,38 +543,6 @@ void ALi::printDecimal() const{
         }
     }while(handle != this->begin_ptr);
 
-
-    // CELL_TYPE BCDincrement(CELL_TYPE cell){
-    //     // result can't exceed the range of CELL_TYPE
-    //     // and assume there won't be nibble(4bits) greater than 1001 to save one if statement
-    //     CELL_TYPE result = 0;
-    //     int i=0;
-    //     while(cell != 0){
-    //         CELL_TYPE nibble = cell & 0b00001111;
-    //         cell >>= 4;
-    //         if(nibble > 4) nibble += 3;
-    //         for(int j=0; j<i; ++j) nibble <<= 4;
-    //         result |= nibble;
-    //         ++i;
-    //     }
-    //     return result;
-    // }
-    // do{
-    //     handle = handle->R;
-    //     CELL_TYPE mask = mask100;
-    //     while(mask != 0){
-    //         bcd.PLSB((handle->var & mask ? 1 : 0));
-    //         const bool old_bcdsign = bcd.sign();
-    //         Cell* bcdhandle = bcd.begin_ptr;
-    //         do{
-    //             bcdhandle = bcdhandle->R;
-    //             bcdhandle->var = BCDincrement(bcdhandle->var);
-    //         }while(bcdhandle != bcd.begin_ptr);
-    //         if(old_bcdsign != bcd.sign()) bcd.newCell(mask000);
-    //         mask >>= 1;
-    //     }
-    // }while(handle != this->begin_ptr);
-
     // print binary-coded decimal
     std::string rev;
     while(bcd.begin_ptr->R->var != 0){ 
