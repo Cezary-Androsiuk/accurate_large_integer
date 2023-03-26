@@ -58,15 +58,15 @@ protected: public:
     void negate();
     void invert();
 
-protected:
+protected: public:
     // might be a good idea to split the class to ALi and ALi_stdio (standard input output)
     // Print
     void printBinary() const;
     void printDecimal() const;
     
     // Print Approximation
-    void printBinaryApproximation(unsigned long long appPrec) const;
-    void printDecimalApproximation(unsigned long long appPrec) const;
+    void printBinaryApproximation(ALi appPrec = 1) const;
+    void printDecimalApproximation(ALi appPrec = 1) const;
 
     // Store
     void export_cells(const char* path) const;

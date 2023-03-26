@@ -574,19 +574,169 @@ void ALi::printDecimal() const{
  * @brief prints value of the variable in binary format, using scientific notation
  * @param appPrec precision (how many bytes should be printed after a dot)
  */
-void ALi::printBinaryApproximation(unsigned long long appPrec) const{
-    // precision is in default 0 result will be X * 2^n 
-    // for 3 result will be X.XXX * 2^n 
+void ALi::printBinaryApproximation(ALi appPrec) const{
+    // // precision is in default 1 result will be X * 2^n 
+    // // for 4 result will be XXXX * 2^n 
+    /*
+    00000001 -> 00000001e+0
+    00000010 -> 00000001e+1
+    00000100 -> 00000001e+2
+    00001000 -> 00000001e+3
+    00010000 -> 00000001e+4
+    00100000 -> 00000001e+5
+    01000000 -> 00000001e+6
+    10000000 -> 00000001e+7
+    */
+    ALi currentValuePrecision(this->length);
+    currentValuePrecision.multiplicationAssign(BITS_PER_VAR);
+    currentValuePrecision.decrement();
 
-    printf("printBinaryApproximation is not finished yet\n");
+    if(appPrec.is_0()){
+        // Zero precision? you will get what you want
+        printf("0");
+        return;
+    }
+
+    // need more advanced computing cause precision 1 starts at the msb 
+    if(appPrec.equal(currentValuePrecision)){
+        this->printBinary();
+        printf(" * 2^0");
+        return;
+    }
+
+    // if(appPrec.greaterThan(currentValuePrecision)){
+    //     printf("current variable contains value which precision is ");
+    //     currentValuePrecision.printDecimal();
+    //     printf(" bits\ncan't get more precision like ");
+    //     appPrec.printDecimal();
+    //     printf(" bits\n");
+    //     return;
+    // }
+
+    // ALi skippedPrecision(currentValuePrecision.subtraction(appPrec));
+
+    // const Cell* handle = this->begin_ptr->R;
+    // while(!appPrec.smallerThan(BITS_PER_BYTE)){ // larger or equal
+    //     // printing whole cells
+    //     appPrec.subtractionAssign(64);
+    //     // the same system like in printBinary() method
+    //     printf("%s%c", BPrint::binary_x64(handle->var, ULL_VAR_SEP).c_str(),this->separator);
+    //     handle = handle->R;
+    // }
+    // //!TESTS
+    // if(appPrec.sign()){
+    //     printf("negative\n");
+    //     exit(0);
+    // }
+
+    // CELL_TYPE mask = mask100;
+    // while(!appPrec.is_0()){
+    //     // printing bits thats count is smaller than single cell 
+    //     appPrec.decrement();
+    //     printf("%c",(handle->var & mask ? '1' : '0'));
+    //     mask >>= 1;
+    // }
+    // printf(" * 2^");
+    // skippedPrecision.printDecimal();
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // ALi currentValuePrecision(this->length);
+    // currentValuePrecision.multiplicationAssign(BITS_PER_VAR);
+    // currentValuePrecision.decrement();
+
+    // const Cell* handle = this->begin_ptr->R;
+    // if(handle->var == mask000 || handle->var == mask111){
+    //     if(handle == handle->R){
+    //         if(this->sign())
+    //             printf("11 * 2^0");
+    //         else
+    //             printf("00 * 2^0");
+    //         return;
+    //     }
+
+    //     currentValuePrecision.subtractionAssign(BITS_PER_VAR);
+    //     handle = handle->R;
+    // }
+    // CELL_TYPE mask = mask100;
+    // while((handle->var & mask ? true : false) == this->sign()){
+    //     mask >>= 1;
+    //     currentValuePrecision.decrement();
+    // }
+    // if(this->sign())
+    //     printf("10 * 2^");
+    // else
+    //     printf("01 * 2^");
+    // currentValuePrecision.printDecimal();
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // const Cell* handle = this->begin_ptr->R;
+    // if(handle == handle->R){
+    //     this->printBinary();
+    //     return;
+    // }
+
+    // ALi currentValuePrecision(this->length-1);
+    // currentValuePrecision.multiplicationAssign(BITS_PER_VAR);
+    
+    // if(handle->var == mask000 || handle->var == mask111){
+    //     currentValuePrecision.subtractionAssign(BITS_PER_VAR);
+    //     printf("%s%c", BPrint::binary_x64(handle->var, ULL_VAR_SEP).c_str(),this->separator);
+    //     handle = handle->R;
+    // }
+    // printf("%s", BPrint::binary_x64(handle->var, ULL_VAR_SEP).c_str());
+    // printf("e+");
+    // currentValuePrecision.printDecimal();
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    const Cell* handle = this->begin_ptr->R;
+    if(handle == handle->R){
+        this->printBinary();
+        return;
+    }
+
+    // ALi currentValuePrecision(this->length);
+    // currentValuePrecision.multiplicationAssign(BITS_PER_VAR);
+
+    if(handle->var == mask000 || handle->var == mask111){
+        currentValuePrecision.subtractionAssign(BITS_PER_VAR);
+        handle = handle->R;
+    }
+    CELL_TYPE mask = mask100;
+    while((handle->var & mask ? true : false) == this->sign()){
+        mask >>= 1;
+        currentValuePrecision.decrement();
+    }
+    printf("%s", BPrint::binary_x64(1, ULL_VAR_SEP).c_str());
+    printf("e+");
+    currentValuePrecision.printDecimal();
+    // printf("printBinaryApproximation is not finished yet\n");
 }
 /**
  * @brief prints value of the variable in decimal format, using scientific notation
  * @param appPrec precision (how many bytes should be printed after a dot)
  */
-void ALi::printDecimalApproximation(unsigned long long appPrec) const{
-    // precision is in default 0 result will be X * 10^n 
-    // for 3 result will be X.XXX * 10^n  
+void ALi::printDecimalApproximation(ALi appPrec) const{
+    // precision is in default 1 result will be X * 10^n 
+    // for 4 result will be XXXX * 10^n
+    ALi currentValuePrecision(this->length);
+    currentValuePrecision.multiplicationAssign(BITS_PER_VAR);
+
+    if(appPrec.equal(currentValuePrecision)){
+        this->printDecimal();
+        printf(" * 10^0");
+        return;
+    }
+
+    if(appPrec.greaterThan(currentValuePrecision)){
+        printf("current variable contains value which precision is ");
+        // ! the given appPrec will tell about digits no bits
+        // currentValuePrecision.printDecimal();
+        // printf(" bits\ncan't get more precision like ");
+        // appPrec.printDecimal();
+        // printf(" bits\n");
+        return;
+    }
+
 
     printf("printDecimalApproximation is not finished yet\n");
 }

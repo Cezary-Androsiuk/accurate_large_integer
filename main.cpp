@@ -79,13 +79,46 @@ int main(){
     z1.setSeparator(' ');
     z2.setSeparator(' ');
 
-    x = 9876;
-    y = 1234;
+    // int a = 123123123;
+    // printf("%s\n",BPrint::binary_x64(a," ").c_str());
+    // printf("\n");
+    // char* e = (char*)&d;
+    // printf("%s\n",BPrint::binary_x8(*(e+1)).c_str());
+    // double a = 0;
+    // for(int j=0; j<64; j++){
+    //     char* b = (char*)&a; 
+    //     for(int i=0; i<sizeof(a); i++){
+    //         printf("%s ",BPrint::binary_x8(*(b+(sizeof(a) -i -1))).c_str());
+    //     }
+    //     printf("%g \n", a);
+    //     a++;
+    // }
+    // long double b = 1; 
+    // std::cout << sizeof(a) << std::endl;
+    // std::cout << sizeof(b) << std::endl;
 
-    x >> "d\n";
-    y >> "d\n";
-    z = x ^ y;
-    z >> "d\n";
+
+
+    x = 0x7FFFFFFFFFFFFFFF;
+    x *= 0x7FFFFFFFFFFFFFFF;
+    x *= 16;
+    // x = 1;
+    x.printBinary();
+    // // printf("\n");
+    // // x.printBinaryApproximation(64);
+    // // printf("\n");
+    // // x.printBinaryApproximation(65);
+    printf("\n");
+    x.printBinaryApproximation();
+    printf("\n");
+
+    // x = 9876;
+    // y = 1234;
+
+    // x >> "d\n";
+    // y >> "d\n";
+    // z = x ^ y;
+    // z >> "d\n";
 
     // x = 0b00101001;
     // y = 21;
