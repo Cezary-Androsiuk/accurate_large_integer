@@ -99,9 +99,11 @@ int main(){
 
 
 
-    x = 0x7FFFFFFFFFFFFFFF;
-    x *= 0x7FFFFFFFFFFFFFFF;
-    x *= 16;
+    // x = 0x7FFFFFFFFFFFFFFF;
+    // x = 10;
+    // x *= 0x7FFFFFFFFFFFFFFF;
+    // x *= -1;
+    // x *= 16;
     // x = 1;
     x.printBinary();
     // // printf("\n");
@@ -109,7 +111,7 @@ int main(){
     // // printf("\n");
     // // x.printBinaryApproximation(65);
     printf("\n");
-    x.printBinaryApproximation();
+    x.printBinaryApproximation(10);
     printf("\n");
 
     // x = 9876;

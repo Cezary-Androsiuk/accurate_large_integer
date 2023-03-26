@@ -575,128 +575,16 @@ void ALi::printDecimal() const{
  * @param appPrec precision (how many bytes should be printed after a dot)
  */
 void ALi::printBinaryApproximation(ALi appPrec) const{
-    // // precision is in default 1 result will be X * 2^n 
-    // // for 4 result will be XXXX * 2^n 
-    /*
-    00000001 -> 00000001e+0
-    00000010 -> 00000001e+1
-    00000100 -> 00000001e+2
-    00001000 -> 00000001e+3
-    00010000 -> 00000001e+4
-    00100000 -> 00000001e+5
-    01000000 -> 00000001e+6
-    10000000 -> 00000001e+7
-    */
-    ALi currentValuePrecision(this->length);
-    currentValuePrecision.multiplicationAssign(BITS_PER_VAR);
-    currentValuePrecision.decrement();
-
-    if(appPrec.is_0()){
+    if(appPrec.is_0() || appPrec.sign() || this->is_0()){
         // Zero precision? you will get what you want
         printf("0");
         return;
     }
-
-    // need more advanced computing cause precision 1 starts at the msb 
-    if(appPrec.equal(currentValuePrecision)){
-        this->printBinary();
-        printf(" * 2^0");
-        return;
-    }
-
-    // if(appPrec.greaterThan(currentValuePrecision)){
-    //     printf("current variable contains value which precision is ");
-    //     currentValuePrecision.printDecimal();
-    //     printf(" bits\ncan't get more precision like ");
-    //     appPrec.printDecimal();
-    //     printf(" bits\n");
-    //     return;
-    // }
-
-    // ALi skippedPrecision(currentValuePrecision.subtraction(appPrec));
-
-    // const Cell* handle = this->begin_ptr->R;
-    // while(!appPrec.smallerThan(BITS_PER_BYTE)){ // larger or equal
-    //     // printing whole cells
-    //     appPrec.subtractionAssign(64);
-    //     // the same system like in printBinary() method
-    //     printf("%s%c", BPrint::binary_x64(handle->var, ULL_VAR_SEP).c_str(),this->separator);
-    //     handle = handle->R;
-    // }
-    // //!TESTS
-    // if(appPrec.sign()){
-    //     printf("negative\n");
-    //     exit(0);
-    // }
-
-    // CELL_TYPE mask = mask100;
-    // while(!appPrec.is_0()){
-    //     // printing bits thats count is smaller than single cell 
-    //     appPrec.decrement();
-    //     printf("%c",(handle->var & mask ? '1' : '0'));
-    //     mask >>= 1;
-    // }
-    // printf(" * 2^");
-    // skippedPrecision.printDecimal();
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    // ALi currentValuePrecision(this->length);
-    // currentValuePrecision.multiplicationAssign(BITS_PER_VAR);
-    // currentValuePrecision.decrement();
-
-    // const Cell* handle = this->begin_ptr->R;
-    // if(handle->var == mask000 || handle->var == mask111){
-    //     if(handle == handle->R){
-    //         if(this->sign())
-    //             printf("11 * 2^0");
-    //         else
-    //             printf("00 * 2^0");
-    //         return;
-    //     }
-
-    //     currentValuePrecision.subtractionAssign(BITS_PER_VAR);
-    //     handle = handle->R;
-    // }
-    // CELL_TYPE mask = mask100;
-    // while((handle->var & mask ? true : false) == this->sign()){
-    //     mask >>= 1;
-    //     currentValuePrecision.decrement();
-    // }
-    // if(this->sign())
-    //     printf("10 * 2^");
-    // else
-    //     printf("01 * 2^");
-    // currentValuePrecision.printDecimal();
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    // const Cell* handle = this->begin_ptr->R;
-    // if(handle == handle->R){
-    //     this->printBinary();
-    //     return;
-    // }
-
-    // ALi currentValuePrecision(this->length-1);
-    // currentValuePrecision.multiplicationAssign(BITS_PER_VAR);
     
-    // if(handle->var == mask000 || handle->var == mask111){
-    //     currentValuePrecision.subtractionAssign(BITS_PER_VAR);
-    //     printf("%s%c", BPrint::binary_x64(handle->var, ULL_VAR_SEP).c_str(),this->separator);
-    //     handle = handle->R;
-    // }
-    // printf("%s", BPrint::binary_x64(handle->var, ULL_VAR_SEP).c_str());
-    // printf("e+");
-    // currentValuePrecision.printDecimal();
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+    ALi currentValuePrecision(this->length);
+    currentValuePrecision.multiplicationAssign(BITS_PER_VAR);
+    
     const Cell* handle = this->begin_ptr->R;
-    if(handle == handle->R){
-        this->printBinary();
-        return;
-    }
-
-    // ALi currentValuePrecision(this->length);
-    // currentValuePrecision.multiplicationAssign(BITS_PER_VAR);
-
     if(handle->var == mask000 || handle->var == mask111){
         currentValuePrecision.subtractionAssign(BITS_PER_VAR);
         handle = handle->R;
@@ -706,10 +594,40 @@ void ALi::printBinaryApproximation(ALi appPrec) const{
         mask >>= 1;
         currentValuePrecision.decrement();
     }
-    printf("%s", BPrint::binary_x64(1, ULL_VAR_SEP).c_str());
+    // currentValuePrecision contains msb position
+
+    if(appPrec.greaterThan(currentValuePrecision)){
+        printf("current variable contains value which precision is ");
+        currentValuePrecision.printDecimal();
+        printf(" bits\ncan't get more precision like ");
+        appPrec.printDecimal();
+        printf(" bits\n");
+        return;
+    }
+
+    if(appPrec.equal(currentValuePrecision)){
+        this->printBinary();
+        return;
+    }
+    
+    printf("%s",(handle->var & mask ? "01" : "10"));
+    mask >>= 1;
+    appPrec.decrement();
+    currentValuePrecision.decrement();
+    if(!appPrec.is_0()) printf(".");
+
+    while(!appPrec.is_0()){
+        appPrec.decrement();
+        currentValuePrecision.decrement();
+        printf("%c",(handle->var & mask ? '1' : '0'));
+        mask >>= 1;
+        if(mask == mask000){
+            handle = handle->R;
+            mask = mask100;
+        }
+    }
     printf("e+");
     currentValuePrecision.printDecimal();
-    // printf("printBinaryApproximation is not finished yet\n");
 }
 /**
  * @brief prints value of the variable in decimal format, using scientific notation
