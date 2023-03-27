@@ -41,7 +41,7 @@ ALi::ALi(const char* type, const char* sourcePath) : ALi(){
     this->readFile(type,sourcePath);
 }
 /**
- * @brief Destroy the ALi object
+ * @brief Destroy the ALi object 
  * deletes all dynamically allocated cells
  */
 ALi::~ALi(){
@@ -2204,8 +2204,14 @@ void ALi::exponentiationAssign(const ALi& right){
     
     // #
 /**
- * @brief print variable as a binary or decimal
- * @param additionText "b...","d..." type and text what will be printed at the end of variable
+ * @brief print variable as a binary or decimal (also with approximations)\
+ * @brief print("d\n");\
+ * @brief print("b\n");\
+ * @brief print("ad\n");\
+ * @brief print("ab\n");\
+ * @brief print("a12d\n");\
+ * @brief print("a12b\n");
+ * @param additionText type and text what will be printed at the end of variable
  */
 void ALi::print(const char* type_text) const{
     switch (*type_text){
@@ -2281,8 +2287,14 @@ const bool ALi::isEmpty() const{
     
     // #
 /**
- * @brief print() shortcut 
- * @brief "d\n" - decimal print with new line 
+ * @brief print() shortcut \
+ * @brief print variable as a binary or decimal (also with approximations)\
+ * @brief >> "d\n";\
+ * @brief >> "b\n";\
+ * @brief >> "ad\n";\
+ * @brief >> "ab\n";\
+ * @brief >> "a12d\n";\
+ * @brief >> "a12b\n";
  * @param right "xtext" x-type of print (b/d), text-additional text
  */
 void ALi::operator >> (const char* right) const{
