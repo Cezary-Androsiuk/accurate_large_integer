@@ -105,22 +105,22 @@ int main(){
     // x *= -1;
     // x *= 16;
     // x = 1;
-    x.printBinary();
+    // x.printBinary();
     // // printf("\n");
     // // x.printBinaryApproximation(64);
     // // printf("\n");
     // // x.printBinaryApproximation(65);
-    printf("\n");
-    x.printBinaryApproximation(10);
-    printf("\n");
+    // printf("\n");
+    // x.printBinaryApproximation(10);
+    // printf("\n");
 
-    // x = 9876;
-    // y = 1234;
+    x = 9876;
+    y = 12345;
 
-    // x >> "d\n";
-    // y >> "d\n";
-    // z = x ^ y;
-    // z >> "d\n";
+    x >> "d\n";
+    y >> "d\n";
+    z = x ^ y;
+    z >> "d\n";
 
     // x = 0b00101001;
     // y = 21;
