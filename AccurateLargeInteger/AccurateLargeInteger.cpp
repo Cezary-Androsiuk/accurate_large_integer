@@ -615,7 +615,6 @@ void ALi::printDecimalApproximation(ALi appPrec) const{
         return;
     }
 
-
     printf("printDecimalApproximation is not finished yet\n");
 }
     // #
@@ -2209,29 +2208,28 @@ void ALi::exponentiationAssign(const ALi& right){
  * @param additionText "b...","d..." type and text what will be printed at the end of variable
  */
 void ALi::print(const char* type_text) const{
-    switch (type_text[0]){
+    switch (*type_text){
         case 'b': this->printBinary(); break;
         case 'd': this->printDecimal(); break;
-        default: printf("print: unknown type: '%c'\nbinary: 'b'\n decimal: 'd'\n",type_text[0]); return;
+        case 'a':{
+            type_text++;
+            std::string number;
+            while('0' <= *type_text && *type_text <= '9'){
+                number += *type_text;
+                type_text++;
+            }
+            switch (*type_text){
+                case 'b': this->printBinaryApproximation(std::atoi(number.c_str())); break;
+                case 'd': this->printDecimalApproximation(std::atoi(number.c_str())); break;
+                default: printf("print: unknown approximation type: '%c'\nbinary: 'b'\n decimal: 'd'\n",*type_text); return;
+            }
+        }
+        default: printf("print: unknown type: '%c'\nbinary: 'b'\n decimal: 'd'\n",*type_text); return;
     }
     while(*type_text != '\0'){
-        ++type_text;
+        type_text++;
         printf("%c",*type_text);
     }
-}
-/**
- * @brief printing binary variable in scientific notation format
- * @param type
- * @param additionText 
- * @param approximationPrecision simply how many digits (counting from left and without variable sign) will be printed
- */
-void ALi::printApproximation(const char* type_text, unsigned long long approximationPrecision) const{
-    // switch (type){
-    // case 'b': this->printBinaryApproximation(approximationPrecision); break;
-    // case 'd': this->printDecimalApproximation(approximationPrecision); break;
-    // default: printf("unknown type!\n"); return;
-    // }
-    // printf("%s",additionText);
 }
 /**
  * @brief actions on files around variable

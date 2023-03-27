@@ -130,14 +130,12 @@ protected: public:
     void moduloAssign(const ALi& right);
 
     // Exponentiation
-    ALi exp_recursive(const ALi& left, const ALi& right) const;
     ALi exponentiation(const ALi& right) const;
     void exponentiationAssign(const ALi& right);
 
 public:
     // Public
     void print(const char* type_text) const;
-    void printApproximation(const char* type_text, unsigned long long approximationPrecision = 2) const;
     void file(const char* type_path);
     
     // Get / Set
