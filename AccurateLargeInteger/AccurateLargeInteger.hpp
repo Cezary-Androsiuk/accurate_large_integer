@@ -102,13 +102,15 @@ protected: public:
     const bool smallerThan(const ALi& right) const;
 
     // Addition
-    void increment(const bool &handle_overflow = true);
+    void increment_();
+    void increment_ext();
     ALi addition(const ALi& right, const bool &handle_overflow = true) const;
     void additionAssign(const ALi& right, const bool &handle_overflow = true);
     void additionAssign2(const ALi& right, const bool &handle_overflow = true);
 
     // Subtraction
-    void decrement(const bool &handle_overflow = true);
+    void decrement_();
+    void decrement_ext();
     ALi subtraction(const ALi& right, const bool &handle_overflow = true) const;
     void subtractionAssign(const ALi& right, const bool &handle_overflow = true);
 

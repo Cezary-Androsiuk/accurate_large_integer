@@ -394,52 +394,12 @@ void ALi::clear(){
  * @example 0000 0000 1100 0101 -> 0000 1100 0101
  */
 void ALi::optymize(){
-    // -- 1 -- // 
-    // const Cell* const handle = this->begin_ptr->R;
-    // if(handle != this->begin_ptr){
-    //     if((handle->var == mask111 && handle->R->var & mask100) || (handle->var == mask000 && ~handle->R->var & mask100)){
-    //         this->delCell();
-    //         this->optymize();
-    //     }
-    // }
-
-    // -- 2 -- //
-    // const Cell* const handle = this->begin_ptr->R;
-    // if((handle != this->begin_ptr && handle->var == mask111 && handle->R->var & mask100) || 
-    // (handle != this->begin_ptr && handle->var == mask000 && ~handle->R->var & mask100)){
-    //         this->delCell();
-    //         this->optymize();
-    // }
-
-    // -- 3 -- //
     const Cell* const handle = this->begin_ptr->R; //last cell
     if(handle != this->begin_ptr &&
     ((handle->var == mask111 && handle->R->var & mask100) || (handle->var == mask000 && ~handle->R->var & mask100))){
             this->delCell();
             this->optymize();
     }
-
-    // -- 4 -- //
-    // if(this->begin_ptr->R != this->begin_ptr && 
-    // ((this->begin_ptr->R->var == mask111 && this->begin_ptr->R->R->var & mask100) || 
-    // (this->begin_ptr->R->var == mask000 && ~this->begin_ptr->R->R->var & mask100))){
-    //         this->delCell();
-    //         this->optymize();
-    // }
-
-    // -- 5 -- //
-    // if(this->sign()){
-    //     while(this->begin_ptr->R->var == mask111 && 
-    //     this->begin_ptr->R->R->var & mask100 &&
-    //     this->begin_ptr->R != this->begin_ptr)
-    //         this->delCell();
-    // }
-    // else{ // is positive
-    //     while(this->begin_ptr->R->var == mask000 && 
-    //     ~this->begin_ptr->R->R->var & mask100 &&
-    //     this->begin_ptr->R != this->begin_ptr)
-    //         this->delCell();
-    // }
 }
 /**
  * @brief change every single bit to oposite value
@@ -456,7 +416,7 @@ void ALi::negate(){
  */
 void ALi::invert(){
     this->negate();
-    this->increment();
+    this->increment_();
 }
     // #
     
@@ -592,7 +552,7 @@ void ALi::printBinaryApproximation(ALi appPrec) const{
     CELL_TYPE mask = mask100;
     while((handle->var & mask ? true : false) == this->sign()){
         mask >>= 1;
-        currentValuePrecision.decrement();
+        currentValuePrecision.decrement_ext();
     }
     // currentValuePrecision contains msb position
 
@@ -612,13 +572,13 @@ void ALi::printBinaryApproximation(ALi appPrec) const{
     
     printf("%s",(handle->var & mask ? "01" : "10"));
     mask >>= 1;
-    appPrec.decrement();
-    currentValuePrecision.decrement();
+    appPrec.decrement_ext();
+    currentValuePrecision.decrement_ext();
     if(!appPrec.is_0()) printf(".");
 
     while(!appPrec.is_0()){
-        appPrec.decrement();
-        currentValuePrecision.decrement();
+        appPrec.decrement_ext();
+        currentValuePrecision.decrement_ext();
         printf("%c",(handle->var & mask ? '1' : '0'));
         mask >>= 1;
         if(mask == mask000){
@@ -1061,9 +1021,19 @@ const bool ALi::smallerThan(const ALi& right) const{
     // #
 /**
  * @brief increment value of the variable by one
- * @param handle_overflow boolean variable describe what to do when overflow occur (true: increase length of variable / false: keep length fixed and switch value sign)
  */
-void ALi::increment(const bool &handle_overflow){
+void ALi::increment_(){
+    Cell *handle = this->begin_ptr;
+    while(handle->var == mask111 && handle != this->begin_ptr->R){
+        handle->var = mask000; // 11111111 -> (1)00000000
+        handle = handle->L;
+    }
+    ++handle->var;
+}
+/**
+ * @brief increment value of the variable by one
+ */
+void ALi::increment_ext(){
     // incrementing binary is acctually easy:
     // going through each bit from right
     // if is 1 then set to 0
@@ -1089,7 +1059,7 @@ void ALi::increment(const bool &handle_overflow){
     // 00000010                                         -> [00000010]
     // 01111111  11111111                               ->  00000000 [01111111] 00000000
     // 01111111  11110011                               ->  01111111 [11110011]
-    if(handle_overflow && !this->sign() && handle->var == mask011 && handle == this->begin_ptr->R){
+    if(!this->sign() && handle->var == mask011 && handle == this->begin_ptr->R){
         this->newCell(mask000);
     }
     // 10101101  11111111  11111111  11111111  11111111 -> [10101110] 00000000  00000000  00000000  00000000
@@ -1099,7 +1069,7 @@ void ALi::increment(const bool &handle_overflow){
     // 01111111  11111111                               ->  00000000 [10000000] 00000000
     // 01111111  11110011                               ->  01111111 [11110100]
     ++handle->var;
-    // this->optymize();
+    this->optymize();
 }
 /**
  * @brief adding up two ALi variable values
@@ -1113,12 +1083,12 @@ ALi ALi::addition(const ALi& right, const bool &handle_overflow) const{
     }
     else if (right.is_p1()){ // L + 1 = ++L
         ALi out(*this);
-        out.increment();
+        out.increment_ext();
         return out;
     }
     else if (right.is_n1()){ // L + -1 = --L
         ALi out(*this);
-        out.decrement();
+        out.decrement_ext();
         return out;
     }
     else if (this->is_0()){ // 0 + R = R
@@ -1126,12 +1096,12 @@ ALi ALi::addition(const ALi& right, const bool &handle_overflow) const{
     }
     else if (this->is_p1()){ // 1 + R = ++R
         ALi out(right);
-        out.increment();
+        out.increment_ext();
         return out;
     }
     else if (this->is_n1()){ // -1 + R = --R
         ALi out(right);
-        out.decrement();
+        out.decrement_ext();
         return out;
     }
 
@@ -1185,11 +1155,11 @@ void ALi::additionAssign(const ALi& right, const bool &handle_overflow){
         return;
     }
     else if (right.is_p1()){ // L += 1 == ++L
-        this->increment();
+        this->increment_ext();
         return;
     }
     else if (right.is_n1()){ // L += -1 == --L
-        this->decrement();
+        this->decrement_ext();
         return;
     }
     else if (this->is_0()){ // 0 += R == R
@@ -1198,12 +1168,12 @@ void ALi::additionAssign(const ALi& right, const bool &handle_overflow){
     }
     else if (this->is_p1()){ // 1 += R == ++R
         this->assignment(right);
-        this->increment();
+        this->increment_ext();
         return;
     }
     else if (this->is_n1()){ // -1 += R == --R
         this->assignment(right);
-        this->decrement();
+        this->decrement_ext();
         return;
     }
     
@@ -1252,81 +1222,6 @@ void ALi::additionAssign(const ALi& right, const bool &handle_overflow){
         this->newCell(lmask.var);
     this->optymize();
 }
-/**
- * @brief adding up two ALi variable values and assigns to the current variable
- * @param right ALi object
- * @param handle_overflow ( = true) boolean variable describe what to do when overflow occur (true: increase length of variable / false: keep length fixed and switch value sign)
- */
-void ALi::additionAssign2(const ALi& right, const bool &handle_overflow){
-    if(right.is_0()){ // L += 0 == L
-        return;
-    }
-    else if (right.is_p1()){ // L += 1 == ++L
-        this->increment();
-        return;
-    }
-    else if (right.is_n1()){ // L += -1 == --L
-        this->decrement();
-        return;
-    }
-    else if (this->is_0()){ // 0 += R == R
-        this->assignment(right);
-        return;
-    }
-    else if (this->is_p1()){ // 1 += R == ++R
-        this->assignment(right);
-        this->increment();
-        return;
-    }
-    else if (this->is_n1()){ // -1 += R == --R
-        this->assignment(right);
-        this->decrement();
-        return;
-    }
-    
-    // this->assignment(this->addition(right));
-
-    ALi* const lobj = this; 
-    Cell* const lgh = lobj->begin_ptr;
-    Cell* lh = lgh->L;
-    const bool lsign = lobj->sign();
-    Cell lmask{
-        lmask.var = (lsign ? mask111 : mask000),
-        lmask.L = &lmask,
-        lmask.R = &lmask
-    };
-
-    const ALi* const robj = &right;
-    const Cell* const rgh = robj->begin_ptr;
-    const Cell* rh = rgh->L;
-    const bool rsign = robj->sign();
-    Cell rmask{
-        rmask.var = (rsign ? mask111 : mask000),
-        rmask.L = &rmask,
-        rmask.R = &rmask
-    };
-    
-    unsigned char carry = 0;
-    carry = __builtin_add_overflow(lgh->var,rgh->var,&lgh->var);
-        
-    while(lh != lgh || rh != rgh){ // continue if both are not their global handles !(lh == lgh && rh == rgh)
-
-        if(lh == lgh) this->newCell(lmask.var + rh->var + carry);
-        else lh->var += rh->var + carry;
-
-        if(lh->var < rh->var || (lh->var <= rh->var && carry)) carry = 1;
-        else carry = 0;
-
-        lh = lh->L;
-        rh = rh->L;
-        if(lh == lgh) lh = &lmask;
-        if(rh == rgh) rh = &rmask;
-    }
-    // overflow can only appear when both operation argument sign values are equal
-    if(handle_overflow && lsign == rsign && lsign != this->sign())
-        this->newCell(lmask.var);
-    this->optymize();
-}
     // #
     
     // # Subtraction
@@ -1334,16 +1229,27 @@ void ALi::additionAssign2(const ALi& right, const bool &handle_overflow){
     // #
 /**
  * @brief decrement value of the variable by one
- * @param handle_overflow ( = true) boolean variable describe what to do when overflow occur (true: increase length of variable / false: keep length fixed and switch value sign)
  */
-void ALi::decrement(const bool &handle_overflow){
+void ALi::decrement_(){
+    Cell *handle = this->begin_ptr;
+    while(handle->var == mask000 && handle != this->begin_ptr->R){
+        handle->var = mask111; // (1)00000000 -> (0)11111111
+        handle = handle->L;
+    }
+    handle->var--;
+}
+/**
+ * @brief decrement value of the variable by one
+ */
+void ALi::decrement_ext(){
+    this->optymize();
     Cell *handle = this->begin_ptr;
     while(handle->var == mask000 && handle != this->begin_ptr->R){
         handle->var = mask111; // (1)00000000 -> (0)11111111
         handle = handle->L;
     }
     // if number is negative, overflow can occur cause we are adding two negative numbers
-    if(handle_overflow && this->sign() && (handle->var == mask100 && handle == this->begin_ptr->R)){
+    if(this->sign() && (handle->var == mask100 && handle == this->begin_ptr->R)){
         this->newCell(mask111);
     }
     handle->var--;
@@ -1361,12 +1267,12 @@ ALi ALi::subtraction(const ALi& right, const bool &handle_overflow) const{
     }
     else if(right.is_p1()){ // L - 1 = --L
         ALi out(*this);
-        out.decrement();
+        out.decrement_ext();
         return out;
     }
     else if(right.is_n1()){ // L - -1 = ++L
         ALi out(*this);
-        out.increment();
+        out.increment_ext();
         return out;
     }
     else if(this->is_0()){ // 0 - R = -R
@@ -1376,13 +1282,13 @@ ALi ALi::subtraction(const ALi& right, const bool &handle_overflow) const{
     }
     else if(this->is_p1()){ // 1 - R = -(--R)
         ALi out(right);
-        out.decrement();
+        out.decrement_ext();
         out.invert();
         return out;
     }
     else if(this->is_n1()){ // -1 - R = -(++R)
         ALi out(right);
-        out.increment();
+        out.increment_ext();
         out.invert();
         return out;
     }
@@ -1407,11 +1313,11 @@ void ALi::subtractionAssign(const ALi& right, const bool &handle_overflow){
         return;
     }
     else if(right.is_p1()){ // L -= 1 == --L
-        this->decrement();
+        this->decrement_ext();
         return;
     }
     else if(right.is_n1()){ // L -= -1 == ++L
-        this->increment();
+        this->increment_ext();
         return;
     }
     else if(this->is_0()){ // 0 -= R == -R
@@ -1421,13 +1327,13 @@ void ALi::subtractionAssign(const ALi& right, const bool &handle_overflow){
     }
     else if(this->is_p1()){ // 1 -= R == -(--R)
         this->assignment(right);
-        this->decrement();
+        this->decrement_ext();
         this->invert();
         return;
     }
     else if(this->is_n1()){ // -1 -= R == -(++R)
         this->assignment(right);
-        this->increment();
+        this->increment_ext();
         this->invert();
         return;
     }
@@ -1532,7 +1438,7 @@ ALi ALi::multiplication(const ALi& right) const{
     slider.shr_ext();
 
     // idk why for negative left, do not work and needs +1
-    if(this->sign()) slider.increment();
+    if(this->sign()) slider.increment_ext();
 
     return slider;
 }
@@ -1623,7 +1529,7 @@ void ALi::multiplicationAssign(const ALi& right){
     this->shr_ext();
 
     // idk why for negative left, do not work and needs +1
-    if(lsign) this->increment();
+    if(lsign) this->increment_ext();
 }
     // #
     
@@ -1982,7 +1888,7 @@ ALi ALi::exponentiation(const ALi& right) const{
         // out >> "d X\n";
         if(exponent.begin_ptr->var & mask001){
             notEvenOut.multiplicationAssign(out);
-            exponent.decrement();
+            exponent.decrement_ext();
         }
         out.multiplicationAssign(out);
         exponent.shr_ext();
@@ -2032,7 +1938,7 @@ void ALi::exponentiationAssign(const ALi& right){
         // out >> "d X\n";
         if(exponent.begin_ptr->var & mask001){
             notEvenOut.multiplicationAssign(*this);
-            exponent.decrement();
+            exponent.decrement_ext();
         }
         this->multiplicationAssign(*this);
         exponent.shr_ext();
@@ -2190,11 +2096,11 @@ bool ALi::operator >= (const ALi& right) const{
 
 ALi  ALi::operator ++ (int){
     ALi out(*this);
-    this->increment();
+    this->increment_ext();
     return out;
 }
 ALi  ALi::operator ++ (){
-    this->increment();
+    this->increment_ext();
     return *this;
 }
 ALi  ALi::operator +  (const ALi& right) const{
@@ -2205,11 +2111,11 @@ void ALi::operator += (const ALi& right){
 }
 
 ALi  ALi::operator -- (int){
-    this->decrement();
+    this->decrement_ext();
     return *this;
 }
 ALi  ALi::operator -- (){
-    this->decrement();
+    this->decrement_ext();
     return *this;
 }
 ALi  ALi::operator -  (const ALi& right) const{
