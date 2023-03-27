@@ -2119,12 +2119,7 @@ ALi ALi::exponentiation(const ALi& right) const{
     ALi out(*this);
     ALi notEvenOut(1);
     ALi exponent(right);
-    printf("in 1\n");
     while(!exponent.is_p1()){
-        // out >> "d X\n";
-        out.printBinaryApproximation(1);
-        printf("\n");
-        // exponent >> "b\n";
         if(exponent.begin_ptr->var & mask001){
             notEvenOut.multiplicationAssign(out);
             exponent.decrement_ext();
