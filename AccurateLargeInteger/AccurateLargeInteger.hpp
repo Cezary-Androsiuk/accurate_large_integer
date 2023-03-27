@@ -106,14 +106,16 @@ protected: public:
     void increment_ext();
     ALi addition_(const ALi& right) const;
     ALi addition_ext(const ALi& right) const;
-    void additionAssign(const ALi& right, const bool &handle_overflow = true);
+    void additionAssign_(const ALi& right);
+    void additionAssign_ext(const ALi& right);
 
     // Subtraction
     void decrement_();
     void decrement_ext();
     ALi subtraction_(const ALi& right) const;
     ALi subtraction_ext(const ALi& right) const;
-    void subtractionAssign(const ALi& right, const bool &handle_overflow = true);
+    void subtractionAssign_(const ALi& right);
+    void subtractionAssign_ext(const ALi& right);
 
     // Multiplication
     ALi multiplication(const ALi& right) const;
