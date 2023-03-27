@@ -1077,7 +1077,78 @@ void ALi::increment_ext(){
  * @param handle_overflow ( = true) boolean variable describe what to do when overflow occur (true: increase length of variable / false: keep length fixed and switch value sign)
  * @return ALi object
  */
-ALi ALi::addition(const ALi& right, const bool &handle_overflow) const{
+ALi ALi::addition_(const ALi& right) const{
+    if(right.is_0()){ // L + 0 = L
+        return *this;
+    }
+    else if (right.is_p1()){ // L + 1 = ++L
+        ALi out(*this);
+        out.increment_ext();
+        return out;
+    }
+    else if (right.is_n1()){ // L + -1 = --L
+        ALi out(*this);
+        out.decrement_ext();
+        return out;
+    }
+    else if (this->is_0()){ // 0 + R = R
+        return right;
+    }
+    else if (this->is_p1()){ // 1 + R = ++R
+        ALi out(right);
+        out.increment_ext();
+        return out;
+    }
+    else if (this->is_n1()){ // -1 + R = --R
+        ALi out(right);
+        out.decrement_ext();
+        return out;
+    }
+
+    
+    ALi out;
+
+    const Cell* const lgh = this->begin_ptr;
+    const Cell* lh = lgh->L;
+    Cell lmask{
+        lmask.var = (this->sign() ? mask111 : mask000),
+        lmask.L = &lmask,
+        lmask.R = &lmask
+    };
+
+    const Cell* const rgh = right.begin_ptr;
+    const Cell* rh = rgh->L;
+    Cell rmask{
+        rmask.var = (right.sign() ? mask111 : mask000),
+        rmask.L = &rmask,
+        rmask.R = &rmask
+    };
+
+    unsigned char carry = __builtin_add_overflow(lgh->var, rgh->var, &out.begin_ptr->var);
+    if(lh == lgh) lh = &lmask;
+    if(rh == rgh) rh = &rmask;
+
+    CELL_TYPE sum;
+    while(lh != &lmask || rh != &rmask){
+        carry  = __builtin_add_overflow(lh->var,carry,&sum);
+        carry += __builtin_add_overflow(rh->var,sum  ,&sum);
+        out.newCell(sum);
+
+        lh = lh->L;
+        rh = rh->L;
+        if(lh == lgh) lh = &lmask;
+        if(rh == rgh) rh = &rmask;
+    }
+    out.optymize();
+    return out;
+}
+/**
+ * @brief adding up two ALi variable values
+ * @param right ALi object
+ * @param handle_overflow ( = true) boolean variable describe what to do when overflow occur (true: increase length of variable / false: keep length fixed and switch value sign)
+ * @return ALi object
+ */
+ALi ALi::addition_ext(const ALi& right) const{
     if(right.is_0()){ // L + 0 = L
         return *this;
     }
@@ -1140,7 +1211,7 @@ ALi ALi::addition(const ALi& right, const bool &handle_overflow) const{
         if(rh == rgh) rh = &rmask;
     }
     // overflow can only appear when both operation argument sign values are equal
-    if(handle_overflow && this->sign() == right.sign() && this->sign() != out.sign())
+    if(this->sign() == right.sign() && this->sign() != out.sign())
         out.newCell(lmask.var);
     out.optymize();
     return out;
@@ -1261,7 +1332,7 @@ void ALi::decrement_ext(){
  * @param handle_overflow ( = true) boolean variable describe what to do when overflow occur (true: increase length of variable / false: keep length fixed and switch value sign)
  * @return ALi object
  */
-ALi ALi::subtraction(const ALi& right, const bool &handle_overflow) const{
+ALi ALi::subtraction_(const ALi& right) const{
     if(right.is_0()){ // L - 0 = L
         return *this;
     }
@@ -1300,7 +1371,55 @@ ALi ALi::subtraction(const ALi& right, const bool &handle_overflow) const{
     ALi right_(right);
     right_.invert();
 
-    return this->addition(right_,handle_overflow);
+    return this->addition_(right_);
+    //#############################
+}
+/**
+ * @brief subtracting ALi variable value fron the current variable value
+ * @param right ALi object
+ * @param handle_overflow ( = true) boolean variable describe what to do when overflow occur (true: increase length of variable / false: keep length fixed and switch value sign)
+ * @return ALi object
+ */
+ALi ALi::subtraction_ext(const ALi& right) const{
+    if(right.is_0()){ // L - 0 = L
+        return *this;
+    }
+    else if(right.is_p1()){ // L - 1 = --L
+        ALi out(*this);
+        out.decrement_ext();
+        return out;
+    }
+    else if(right.is_n1()){ // L - -1 = ++L
+        ALi out(*this);
+        out.increment_ext();
+        return out;
+    }
+    else if(this->is_0()){ // 0 - R = -R
+        ALi out(right);
+        out.invert();
+        return out;
+    }
+    else if(this->is_p1()){ // 1 - R = -(--R)
+        ALi out(right);
+        out.decrement_ext();
+        out.invert();
+        return out;
+    }
+    else if(this->is_n1()){ // -1 - R = -(++R)
+        ALi out(right);
+        out.increment_ext();
+        out.invert();
+        return out;
+    }
+    else if(this->equal(right)){ // L - R = 0    L==R
+        return ALi(0);
+    }
+
+    //############################# not large impact to efficiency (+x)-(+y) == (+x)+(-y)
+    ALi right_(right);
+    right_.invert();
+
+    return this->addition_ext(right_);
     //#############################
 }
 /**
@@ -2104,7 +2223,7 @@ ALi  ALi::operator ++ (){
     return *this;
 }
 ALi  ALi::operator +  (const ALi& right) const{
-    return this->addition(right);
+    return this->addition_ext(right);
 }
 void ALi::operator += (const ALi& right){
     this->additionAssign(right);
@@ -2119,7 +2238,7 @@ ALi  ALi::operator -- (){
     return *this;
 }
 ALi  ALi::operator -  (const ALi& right) const{
-    return this->subtraction(right);
+    return this->subtraction_ext(right);
 }
 void ALi::operator -= (const ALi& right){
     this->subtractionAssign(right);

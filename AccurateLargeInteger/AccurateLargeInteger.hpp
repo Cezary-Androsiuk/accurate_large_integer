@@ -104,14 +104,15 @@ protected: public:
     // Addition
     void increment_();
     void increment_ext();
-    ALi addition(const ALi& right, const bool &handle_overflow = true) const;
+    ALi addition_(const ALi& right) const;
+    ALi addition_ext(const ALi& right) const;
     void additionAssign(const ALi& right, const bool &handle_overflow = true);
-    void additionAssign2(const ALi& right, const bool &handle_overflow = true);
 
     // Subtraction
     void decrement_();
     void decrement_ext();
-    ALi subtraction(const ALi& right, const bool &handle_overflow = true) const;
+    ALi subtraction_(const ALi& right) const;
+    ALi subtraction_ext(const ALi& right) const;
     void subtractionAssign(const ALi& right, const bool &handle_overflow = true);
 
     // Multiplication
