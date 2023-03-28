@@ -62,12 +62,12 @@ protected: public:
 protected: public:
     // might be a good idea to split the class to ALi and ALi_stdio (standard input output)
     // Print
-    void printBinary() const;
-    void printDecimal() const;
+    void print_02() const;
+    void print_10() const;
     
     // Print Approximation
-    void printBinaryApproximation(ALi appPrec = 1) const;
-    void printDecimalApproximation(ALi appPrec = 1) const;
+    void printApproximation_02(ALi appPrec = 1) const;
+    void printApproximation_10(ALi appPrec = 1) const;
 
     // Store
     void export_cells(const char* path) const;
@@ -89,9 +89,9 @@ protected: public:
     void assignment(const signed long long& source);
 
     // Assignment String
-    void assignment_str_02(std::string source);
-    void assignment_str_10(std::string source);
-    void assignment_str(const std::string& source);
+    void assignmentString_02(std::string source);
+    void assignmentString_10(std::string source);
+    void assignmentString(const std::string& source);
 
     // Special
     ALi absoluteValue() const;

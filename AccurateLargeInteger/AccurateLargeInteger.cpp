@@ -37,7 +37,7 @@ ALi::ALi(const signed long long& source) : ALi(){
  * @param source value which will be the source to build ALi
  */
 ALi::ALi(const std::string& source) : ALi(){
-    this->assignment_str(source);
+    this->assignmentString(source);
 }
 /**
  * @brief Construct a new ALi object by using existing file with value
@@ -452,7 +452,7 @@ void ALi::invert(){
 /**
  * @brief prints value of the variable in binary format
  */
-void ALi::printBinary() const{
+void ALi::print_02() const{
     const Cell* handle = this->begin_ptr->R;
     do{
         printf("%s%c", BPrint::binary_x64(handle->var, ULL_VAR_SEP).c_str(),this->separator);
@@ -462,13 +462,13 @@ void ALi::printBinary() const{
 /**
  * @brief prints value of the variable in decimal format
  */
-void ALi::printDecimal() const{
+void ALi::print_10() const{
     // if it is negative invert and print '-' sign
     if(this->sign()){
         printf("-");
         ALi tmp(*this);
         tmp.invert();
-        tmp.printDecimal();
+        tmp.print_10();
         return;
     }
     else if(this->is_0()){
@@ -541,7 +541,7 @@ void ALi::printDecimal() const{
  * @brief prints value of the variable in binary format, using scientific notation
  * @param appPrec precision (how many bytes should be printed after a dot)
  */
-void ALi::printBinaryApproximation(ALi appPrec) const{
+void ALi::printApproximation_02(ALi appPrec) const{
     if(appPrec.is_0() || appPrec.sign() || this->is_0()){
         // Zero precision? you will get what you want
         printf("0");
@@ -565,15 +565,15 @@ void ALi::printBinaryApproximation(ALi appPrec) const{
 
     if(appPrec.greaterThan(currentValuePrecision)){
         printf("current variable contains value which precision is ");
-        currentValuePrecision.printDecimal();
+        currentValuePrecision.print_10();
         printf(" bits\ncan't get more precision like ");
-        appPrec.printDecimal();
+        appPrec.print_10();
         printf(" bits\n");
         return;
     }
 
     if(appPrec.equal(currentValuePrecision)){
-        this->printBinary();
+        this->print_02();
         return;
     }
     
@@ -594,20 +594,20 @@ void ALi::printBinaryApproximation(ALi appPrec) const{
         }
     }
     printf("e+");
-    currentValuePrecision.printDecimal();
+    currentValuePrecision.print_10();
 }
 /**
  * @brief prints value of the variable in decimal format, using scientific notation
  * @param appPrec precision (how many bytes should be printed after a dot)
  */
-void ALi::printDecimalApproximation(ALi appPrec) const{
+void ALi::printApproximation_10(ALi appPrec) const{
     // precision is in default 1 result will be X * 10^n 
     // for 4 result will be XXXX * 10^n
     ALi currentValuePrecision(this->length);
     currentValuePrecision.multiplicationAssign(BITS_PER_VAR);
 
     if(appPrec.equal(currentValuePrecision)){
-        this->printDecimal();
+        this->print_10();
         printf(" * 10^0");
         return;
     }
@@ -790,7 +790,7 @@ void ALi::readFile_02(FILE* const file){
         if('0' <= buffer && buffer <= '1')
             filedata += buffer;
 
-    this->assignment_str_02(filedata);
+    this->assignmentString_02(filedata);
 }
 /**
  * @brief read value of the variable from file with readable decimal form, only ['0',...,'9'] will be read
@@ -803,7 +803,7 @@ void ALi::readFile_10(FILE* const file){
         if('0' <= buffer && buffer <= '9' || buffer == '-')
             filedata += buffer;
 
-    this->assignment_str_10(filedata);
+    this->assignmentString_10(filedata);
 }
 /**
  * @brief read value of the variable from file with readable form, only significant characters will be interpreted
@@ -883,7 +883,7 @@ void ALi::assignment(const signed long long& source){
  * @brief build current variable using std::strng with binary type value
  * @param source std::string with ONLY binary value like "10010101010"
  */
-void ALi::assignment_str_02(std::string source){
+void ALi::assignmentString_02(std::string source){
     this->clear();
 
     const char* cstrdata = source.c_str();
@@ -898,7 +898,7 @@ void ALi::assignment_str_02(std::string source){
  * @brief build current variable using std::strng with decimal type value
  * @param source std::string with decimal value like "324178676" or "-567898765"
  */
-void ALi::assignment_str_10(std::string source){
+void ALi::assignmentString_10(std::string source){
     std::string binarySource;
     binarySource += (source[0] == '-' ? '1' : '0');
 
@@ -918,7 +918,7 @@ void ALi::assignment_str_10(std::string source){
         }
         binarySource.insert(binarySource.begin()+1,(restOfDivision ? '1' : '0'));
     }
-    this->assignment_str_02(binarySource);
+    this->assignmentString_02(binarySource);
 }
 /**
  * @brief build current variable using std::string his with type and value
@@ -928,10 +928,10 @@ void ALi::assignment_str_10(std::string source){
  * @example "b1110101010101"
  * @example "d-765238745629"
  */
-void ALi::assignment_str(const std::string& type_source){
+void ALi::assignmentString(const std::string& type_source){
     switch(type_source[0]){
-        case 'b': this->assignment_str_02(type_source.substr(1)); break;
-        case 'd': this->assignment_str_10(type_source.substr(1)); break;
+        case 'b': this->assignmentString_02(type_source.substr(1)); break;
+        case 'd': this->assignmentString_10(type_source.substr(1)); break;
         default: printf("print: unknown type: '%c'\nbinary: 'b'\n decimal: 'd'\n",type_source[0]); return;
     }
 }
@@ -2308,8 +2308,8 @@ void ALi::exponentiationAssign(const ALi& right){
  */
 void ALi::print(const char* str) const{
     switch (*str){
-        case 'b': this->printBinary(); break;
-        case 'd': this->printDecimal(); break;
+        case 'b': this->print_02(); break;
+        case 'd': this->print_10(); break;
         case 'a':{
             str++;
             std::string number;
@@ -2318,8 +2318,8 @@ void ALi::print(const char* str) const{
                 str++;
             }
             switch (*str){
-                case 'b': this->printBinaryApproximation(std::atoi(number.c_str())); break;
-                case 'd': this->printDecimalApproximation(std::atoi(number.c_str())); break;
+                case 'b': this->printApproximation_02(std::atoi(number.c_str())); break;
+                case 'd': this->printApproximation_10(std::atoi(number.c_str())); break;
                 default: printf("print: unknown approximation type: '%c'\nbinary: 'b'\n decimal: 'd'\n",*str); return;
             }
         }
@@ -2400,7 +2400,7 @@ void ALi::operator >> (const char* right) const{
  * @param right "xvalue" x-type of value (b/d), value-value
  */
 void ALi::operator << (const char* right){
-    this->assignment_str(right);
+    this->assignmentString(right);
 }
 /**
  * @brief 
