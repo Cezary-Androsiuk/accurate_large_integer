@@ -839,14 +839,9 @@ void ALi::assignment_str_10(std::string source){
 
         for(char& c: source){
             if(47 < c && c < 58){
-                if(c % 2 == 0){
-                    c = ((c - 48) / 2 + restOfDivision) + 48; // (c - 1) / 2  == c / 2
-                    restOfDivision = 0;
-                }
-                else{
-                    c = ((c - 48) / 2 + restOfDivision) + 48; // (c - 1) / 2  == c / 2
-                    restOfDivision = 5;
-                }
+                int cmod2 = c % 2;
+                c = ((c - 48) / 2 + restOfDivision) + 48; // (c - 1) / 2  == c / 2
+                restOfDivision = (cmod2 ? 5 : 0);
             }
         }
         binarySource.insert(binarySource.begin()+1,(restOfDivision ? '1' : '0'));
