@@ -809,9 +809,6 @@ void ALi::assignment(const signed long long& source){
 void ALi::assignment_str_02(std::string source){
     this->clear();
 
-    for(const char c : std::string("123"))
-        source.erase(remove(source.begin(), source.end(), c), source.end());
-
     if(source[0] == '1')
         this->begin_ptr->var = mask111;
 
@@ -829,37 +826,32 @@ void ALi::assignment_str_02(std::string source){
  */
 void ALi::assignment_str_10(std::string source){
     this->clear();
-    // if(source[0] == '-')
     
     std::string binarySource;
+    binarySource += (source[0] == '-' ? '1' : '0');
 
     int restOfDivision;
-    while(source != "1"){
+    while(source != "0"){
         restOfDivision = 0;
-        // printf("%s\n",source.c_str());
+        while(!(48 < source[0] && source[0] < 58)){ // if first char is something other than ('1' - '9')
+            source.erase(source.begin());
+        }
+
         for(char& c: source){
             if(47 < c && c < 58){
                 if(c % 2 == 0){
-                    c = ((c - 48) / 2 + restOfDivision) + 48;
-                    
+                    c = ((c - 48) / 2 + restOfDivision) + 48; // (c - 1) / 2  == c / 2
                     restOfDivision = 0;
                 }
                 else{
-                    c = (((c - 1) - 48) / 2 + restOfDivision) + 48;
-
+                    c = ((c - 48) / 2 + restOfDivision) + 48; // (c - 1) / 2  == c / 2
                     restOfDivision = 5;
                 }
             }
         }
-
-        while(!(48 < source[0] && source[0] < 58)) // if first sign is not '1' - '9'
-            source.erase(source.begin());
-
-        // printf("%s - %c",source.c_str(), (restOfDivision ? '1' : '0'));
-
-        binarySource += (restOfDivision ? '1' : '0');
+        binarySource.insert(binarySource.begin()+1,(restOfDivision ? '1' : '0'));
     }
-    binarySource += (restOfDivision ? '1' : '0');
+
     this->assignment_str_02(binarySource);
 
     // printf("assignment_10 is not finished yet\n");
