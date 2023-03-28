@@ -88,8 +88,8 @@ protected: public:
     void assignment(const signed long long& source);
 
     // Assignment String
-    void assignment_02(std::string source);
-    void assignment_10(std::string source);
+    void assignment_str_02(std::string source);
+    void assignment_str_10(std::string source);
     void assignment_str(const std::string& source);
 
     // Special

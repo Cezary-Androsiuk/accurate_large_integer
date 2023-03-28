@@ -806,7 +806,7 @@ void ALi::assignment(const signed long long& source){
  * @brief build current variable using std::strng with binary type value
  * @param source std::string with binary type value used as a source
  */
-void ALi::assignment_02(std::string source){
+void ALi::assignment_str_02(std::string source){
     this->clear();
 
     for(const char c : std::string("123"))
@@ -827,7 +827,7 @@ void ALi::assignment_02(std::string source){
  * @brief build current variable using std::strng with decimal type value
  * @param source std::string with decimal type value used as a source
  */
-void ALi::assignment_10(std::string source){
+void ALi::assignment_str_10(std::string source){
     this->clear();
     // if(source[0] == '-')
     
@@ -860,7 +860,7 @@ void ALi::assignment_10(std::string source){
         binarySource += (restOfDivision ? '1' : '0');
     }
     binarySource += (restOfDivision ? '1' : '0');
-    this->assignment_02(binarySource);
+    this->assignment_str_02(binarySource);
 
     // printf("assignment_10 is not finished yet\n");
 }
@@ -874,8 +874,8 @@ void ALi::assignment_10(std::string source){
  */
 void ALi::assignment_str(const std::string& type_source){
     switch(type_source[0]){
-        case 'b': this->assignment_02(type_source.substr(1)); break;
-        case 'd': this->assignment_10(type_source.substr(1)); break;
+        case 'b': this->assignment_str_02(type_source.substr(1)); break;
+        case 'd': this->assignment_str_10(type_source.substr(1)); break;
         default: printf("print: unknown type: '%c'\nbinary: 'b'\n decimal: 'd'\n",type_source[0]); return;
     }
 }
