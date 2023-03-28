@@ -26,19 +26,26 @@ ALi::ALi(const ALi& source) : ALi(){
     this->assignment(source);
 }
 /**
- * @brief Construct a new ALi object by using intiger value
+ * @brief Construct a new ALi object by using an intiger value
  * @param source value which will be the source to build ALi
  */
 ALi::ALi(const signed long long& source) : ALi(){
     this->begin_ptr->var = source;
 }
 /**
+ * @brief Construct a new ALi object by using the std::string value
+ * @param source value which will be the source to build ALi
+ */
+ALi::ALi(const std::string& source) : ALi(){
+    this->assignment_str(source);
+}
+/**
  * @brief Construct a new ALi object by using existing file with value
  * @param type what value of the variable format will be expected [binary/decimal]
  * @param path path to file where value is stored in readable type
  */
-ALi::ALi(const char* type, const char* sourcePath) : ALi(){
-    this->readFile(type,sourcePath);
+ALi::ALi(const char type, const std::string& sourcePath) : ALi(){
+    this->readFile(std::string(type + sourcePath));
 }
 /**
  * @brief Destroy the ALi object 
@@ -687,16 +694,16 @@ void ALi::writeFile_10(FILE* const file) const{
  * @param type in what format value of the variable should be saved [binary/decimal]
  * @param path path to file where value of the variable should be saved
  */
-void ALi::writeFile(const char* type, const char* path) const{
-    FILE* file = fopen(path,"w");
+void ALi::writeFile(std::string str) const{
+    FILE* file = fopen(str.substr(1).c_str(),"w");
     if(file == NULL){
-        printf("File \"%s\" not found!\n",path);
+        printf("File \"%s\" not found!\n",str.substr(1).c_str());
         return;
     }
-    switch (type[0]){
+    switch (str[0]){
         case 'b': this->writeFile_02(file); break;
         case 'd': this->writeFile_10(file); break;
-        default: printf("writeFile: unknown type: '%c'\nbinary: 'b'\n decimal: 'd'\n",type[0]); return;
+        default: printf("writeFile: unknown type: '%c'\nbinary: 'b'\n decimal: 'd'\n",str[0]); return;
     }
     fclose(file);
 }
@@ -710,39 +717,42 @@ void ALi::writeFile(const char* type, const char* path) const{
  * @param file already opened file to operate on
  */
 void ALi::readFile_02(FILE* const file){
-    std::string fdata;
+    std::string filedata;
     char buffer;
     while(fread(&buffer, 1, 1, file) != 0)
-        if(buffer == '0' || buffer == '1')
-            fdata += buffer;
-    const char* cstrdata = fdata.c_str();
-    this->begin_ptr->var = (*cstrdata=='0' ? mask000 : mask111);
-    while(*cstrdata != '\0')
-        this->PLSB((*(cstrdata++)=='0' ? 0 : 1)); // x++ increment after returning value
-    this->optymize();
+        if('0' <= buffer && buffer <= '1')
+            filedata += buffer;
+
+    this->assignment_str_02(filedata);
 }
 /**
  * @brief read value of the variable from file with readable decimal form, only ['0',...,'9'] will be read
  * @param file already opened file to operate on
  */
 void ALi::readFile_10(FILE* const file){
+    std::string filedata;
+    char buffer;
+    while(fread(&buffer, 1, 1, file) != 0)
+        if('0' <= buffer && buffer <= '9' || buffer == '-')
+            filedata += buffer;
 
+    this->assignment_str_10(filedata);
 }
 /**
  * @brief read value of the variable from file with readable form, only significant characters will be interpreted
  * @param type what value of the variable format will be expected [binary/decimal]
  * @param path path to file from where value of the variable should be read
  */
-void ALi::readFile(const char* type, const char* path){
-    FILE* file = fopen(path,"r");
+void ALi::readFile(std::string str){
+    FILE* file = fopen(str.substr(1).c_str(),"r");
     if(file == NULL){
-        printf("File \"%s\" not found!\n",path);
+        printf("File \"%s\" not found!\n",str.substr(1).c_str());
         return;
     }
-    switch (type[0]){
+    switch (str[0]){
         case 'b': this->readFile_02(file); break;
         case 'd': this->readFile_10(file); break;
-        default: printf("readFile: unknown type: '%c'\nbinary: 'b'\n decimal: 'd'\n",type[0]); return;
+        default: printf("readFile: unknown type: '%c'\nbinary: 'b'\n decimal: 'd'\n",str[0]); return;
     }
     fclose(file);
 }
@@ -804,29 +814,24 @@ void ALi::assignment(const signed long long& source){
     // #
 /**
  * @brief build current variable using std::strng with binary type value
- * @param source std::string with binary type value used as a source
+ * @param source std::string with ONLY binary value like "10010101010"
  */
 void ALi::assignment_str_02(std::string source){
     this->clear();
 
-    if(source[0] == '1')
-        this->begin_ptr->var = mask111;
+    const char* cstrdata = source.c_str();
+    // x++ increment after returning value
+    this->begin_ptr->var = (*(cstrdata++)=='0' ? mask000 : mask111);
+    while(*cstrdata != '\0')
+        this->PLSB((*(cstrdata++)=='0' ? 0 : 1));
 
-    for(char c: source){
-        switch(c){
-            case '0': this->PLSB(0); break;
-            case '1': this->PLSB(1); break;
-            default: break;
-        }
-    }
+    this->optymize();
 }
 /**
  * @brief build current variable using std::strng with decimal type value
- * @param source std::string with decimal type value used as a source
+ * @param source std::string with decimal value like "324178676" or "-567898765"
  */
 void ALi::assignment_str_10(std::string source){
-    this->clear();
-    
     std::string binarySource;
     binarySource += (source[0] == '-' ? '1' : '0');
 
@@ -846,10 +851,7 @@ void ALi::assignment_str_10(std::string source){
         }
         binarySource.insert(binarySource.begin()+1,(restOfDivision ? '1' : '0'));
     }
-
     this->assignment_str_02(binarySource);
-
-    // printf("assignment_10 is not finished yet\n");
 }
 /**
  * @brief build current variable using std::string his with type and value
@@ -2235,47 +2237,45 @@ void ALi::exponentiationAssign(const ALi& right){
  * @brief print("ab\n");\
  * @brief print("a12d\n");\
  * @brief print("a12b\n");
- * @param additionText type and text what will be printed at the end of variable
+ * @param str type and text what will be printed at the end of variable
  */
-void ALi::print(const char* type_text) const{
-    switch (*type_text){
+void ALi::print(const char* str) const{
+    switch (*str){
         case 'b': this->printBinary(); break;
         case 'd': this->printDecimal(); break;
         case 'a':{
-            type_text++;
+            str++;
             std::string number;
-            while('0' <= *type_text && *type_text <= '9'){
-                number += *type_text;
-                type_text++;
+            while('0' <= *str && *str <= '9'){
+                number += *str;
+                str++;
             }
-            switch (*type_text){
+            switch (*str){
                 case 'b': this->printBinaryApproximation(std::atoi(number.c_str())); break;
                 case 'd': this->printDecimalApproximation(std::atoi(number.c_str())); break;
-                default: printf("print: unknown approximation type: '%c'\nbinary: 'b'\n decimal: 'd'\n",*type_text); return;
+                default: printf("print: unknown approximation type: '%c'\nbinary: 'b'\n decimal: 'd'\n",*str); return;
             }
         }
-        default: printf("print: unknown type: '%c'\nbinary: 'b'\n decimal: 'd'\n",*type_text); return;
+        default: printf("print: unknown type: '%c'\nbinary: 'b'\n decimal: 'd'\n",*str); return;
     }
-    while(*type_text != '\0'){
-        type_text++;
-        printf("%c",*type_text);
+    while(*str != '\0'){
+        str++;
+        printf("%c",*str);
     }
 }
 /**
  * @brief actions on files around variable
- * @param path path to file or direction
- * @param action type of action write('w') or read('r')
- * @param type type of file, readable('r') or binary('b')
+ * @brief print("wbfile.txt");\
+ * @brief print("wdfile.txt");\
+ * @brief print("rbfile.txt");\
+ * @brief print("rdfile.txt");
+ * @param str type and text what will be printed at the end of variable
  */
-void ALi::file(const char* type_path){
-    std::string str(type_path);
-    const char action = str[0];
-    const char type[] = {str[1],'\0'};
-    str.erase(0,2);
-    switch (action){
-        case 'w': this->writeFile(type,str.c_str()); break;
-        case 'r': this->readFile(type,str.c_str()); break;
-        default: printf("file: unknown action: '%c'\nread: 'r'\n write: 'w'\n",type[0]); return;
+void ALi::file(std::string str){
+    switch (str[0]){
+        case 'w': this->writeFile(str.substr(1)); break;
+        case 'r': this->readFile(str.substr(1)); break;
+        default: printf("file: unknown action: '%c'\nread: 'r'\n write: 'w'\n",str[0]); return;
     }
 }
     // #

@@ -30,7 +30,8 @@ public:
     ALi();//
     ALi(const ALi& source);
     ALi(const signed long long& source);
-    ALi(const char* type, const char* sourcePath);
+    ALi(const std::string& source);
+    ALi(const char type, const std::string& sourcePath);
     ~ALi();
 
 protected:
@@ -75,12 +76,12 @@ protected: public:
     // File Write
     void writeFile_02(FILE* const file) const;
     void writeFile_10(FILE* const file) const;
-    void writeFile(const char* type, const char* path) const;
+    void writeFile(std::string str) const;
 
     // File Read
     void readFile_02(FILE* const file);
     void readFile_10(FILE* const file);
-    void readFile(const char* type, const char* path);
+    void readFile(std::string str);
     
 protected: public:
     // Assignment
@@ -135,8 +136,8 @@ protected: public:
 
 public:
     // Public
-    void print(const char* type_text) const;
-    void file(const char* type_path);
+    void print(const char* str) const;
+    void file(std::string str);
     
     // Get / Set
     void setSeparator(const char& separatorSign = '\0');
