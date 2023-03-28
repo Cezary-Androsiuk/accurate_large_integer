@@ -113,14 +113,16 @@ int main(){
     // printf("\n");
     // x.printBinaryApproximation(10);
     // printf("\n");
-
-    x = 9876;
-    y = 12345;
-
+    // x.assignment_10("d1234567890");
+    x.assignment_02("b100011001110");
     x >> "d\n";
-    y >> "d\n";
-    z = x ^ y;
-    z >> "d\n";
+    // x = 9876;
+    // y = 12345;
+
+    // x >> "d\n";
+    // y >> "d\n";
+    // z = x ^ y;
+    // z >> "d\n";
 
     // x = 0b00101001;
     // y = 21;

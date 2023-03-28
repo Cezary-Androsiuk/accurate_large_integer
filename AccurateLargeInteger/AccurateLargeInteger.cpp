@@ -802,17 +802,24 @@ void ALi::assignment(const signed long long& source){
     // # Assignment string
     
     // #
+void ALi::clearStringFromChars(std::string& source, const std::string& toDelete){
+    for(const char c : toDelete)
+        source.erase(remove(source.begin(), source.end(), c), source.end());
+}
 /**
  * @brief build current variable using std::strng with binary type value
  * @param source std::string with binary type value used as a source
  */
-void ALi::assignment_02(const std::string& source){
+void ALi::assignment_02(std::string source){
     this->clear();
-    if(source[1] == '1')
+
+    this->clearStringFromChars(source, "123");
+
+    if(source[0] == '1')
         this->begin_ptr->var = mask111;
 
-    for(char src: source){
-        switch(src){
+    for(char c: source){
+        switch(c){
             case '0': this->PLSB(0); break;
             case '1': this->PLSB(1); break;
             default: break;
@@ -823,8 +830,42 @@ void ALi::assignment_02(const std::string& source){
  * @brief build current variable using std::strng with decimal type value
  * @param source std::string with decimal type value used as a source
  */
-void ALi::assignment_10(const std::string& source){
-    printf("assignment_10 is not finished yet\n");
+void ALi::assignment_10(std::string source){
+    this->clear();
+    // if(source[0] == '-')
+    
+    std::string binarySource;
+
+    int restOfDivision;
+    while(source != "1"){
+        restOfDivision = 0;
+        // printf("%s\n",source.c_str());
+        for(char& c: source){
+            if(47 < c && c < 58){
+                if(c % 2 == 0){
+                    c = ((c - 48) / 2 + restOfDivision) + 48;
+                    
+                    restOfDivision = 0;
+                }
+                else{
+                    c = (((c - 1) - 48) / 2 + restOfDivision) + 48;
+
+                    restOfDivision = 5;
+                }
+            }
+        }
+
+        while(!(48 < source[0] && source[0] < 58)) // if first sign is not '1' - '9'
+            source.erase(source.begin());
+
+        // printf("%s - %c",source.c_str(), (restOfDivision ? '1' : '0'));
+
+        binarySource += (restOfDivision ? '1' : '0');
+    }
+    binarySource += (restOfDivision ? '1' : '0');
+    this->assignment_02(binarySource);
+
+    // printf("assignment_10 is not finished yet\n");
 }
 /**
  * @brief build current variable using std::string his with type and value
@@ -835,10 +876,9 @@ void ALi::assignment_10(const std::string& source){
  * @example "d-765238745629"
  */
 void ALi::assignment_str(const std::string& type_source){
-    std::string value(type_source);
     switch(type_source[0]){
-        case 'b': this->assignment_02(value); break;
-        case 'd': this->assignment_10(value); break;
+        case 'b': this->assignment_02(type_source.substr(1)); break;
+        case 'd': this->assignment_10(type_source.substr(1)); break;
         default: printf("print: unknown type: '%c'\nbinary: 'b'\n decimal: 'd'\n",type_source[0]); return;
     }
 }
