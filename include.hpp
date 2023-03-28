@@ -5,7 +5,7 @@
 #include <string>
 #include "BPrint/BPrint.hpp"
 
-#include <algorithm> // clearStringFromChars
+#include <algorithm> // assignment_02
 
 #include <iostream>           // unit tests
 #include <random>            // unit tests

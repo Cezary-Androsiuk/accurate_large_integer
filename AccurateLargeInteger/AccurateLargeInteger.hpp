@@ -88,7 +88,6 @@ protected: public:
     void assignment(const signed long long& source);
 
     // Assignment String
-    static void clearStringFromChars(std::string& source, const std::string& toDelete);
     void assignment_02(std::string source);
     void assignment_10(std::string source);
     void assignment_str(const std::string& source);

@@ -802,10 +802,6 @@ void ALi::assignment(const signed long long& source){
     // # Assignment string
     
     // #
-void ALi::clearStringFromChars(std::string& source, const std::string& toDelete){
-    for(const char c : toDelete)
-        source.erase(remove(source.begin(), source.end(), c), source.end());
-}
 /**
  * @brief build current variable using std::strng with binary type value
  * @param source std::string with binary type value used as a source
@@ -813,7 +809,8 @@ void ALi::clearStringFromChars(std::string& source, const std::string& toDelete)
 void ALi::assignment_02(std::string source){
     this->clear();
 
-    this->clearStringFromChars(source, "123");
+    for(const char c : std::string("123"))
+        source.erase(remove(source.begin(), source.end(), c), source.end());
 
     if(source[0] == '1')
         this->begin_ptr->var = mask111;
