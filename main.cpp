@@ -113,7 +113,7 @@ int main(){
     // printf("\n");
     // x.printBinaryApproximation(10);
     // printf("\n");
-    x.assignment_str_10("1234567890");
+    x.assignment_str_10("1234567812312312312312312390");
     // x.assignment_str_02("b100011001110");
     x >> "d\n";
     // x = 9876;

@@ -687,7 +687,74 @@ void ALi::writeFile_02(FILE* const file) const{
  * @param file already opened file to operate on
  */
 void ALi::writeFile_10(FILE* const file) const{
-    printf("writeFile_10 is not finished yet\n");
+    // Rebuided printDecimal method
+    // if it is negative invert and print '-' sign
+    if(this->sign()){
+        fwrite("-", sizeof(char), 1, file);
+        ALi tmp(*this);
+        tmp.invert();
+        tmp.writeFile_10(file);
+        return;
+    }
+    else if(this->is_0()){
+        fwrite("0", sizeof(char), 1, file);
+        return;
+    }
+    
+    ALi bcd; // 0
+    const Cell* handle = this->begin_ptr;
+    // change binary to binary-coded decimal
+    do{
+        handle = handle->R;
+        CELL_TYPE mask = mask100;
+        while(mask != 0){
+            bcd.PLSB((handle->var & mask ? 1 : 0));
+            const bool old_bcdsign = bcd.sign();
+            Cell* bcdhandle = bcd.begin_ptr;
+            do{
+                bcdhandle = bcdhandle->R;
+
+                // keep BCD formation on each nibble
+                // 0000(0000) 0001(0001) 0010(0010) 0011(0011) 0100(0100)
+                // 0101(1000) 0110(1001) 0111(1010) 1000(1011) 1001(1100)
+                CELL_TYPE result = 0;
+                int i=0;
+                while(bcdhandle->var != 0){
+                    CELL_TYPE nibble = bcdhandle->var & 0b00001111;
+                    bcdhandle->var >>= 4;
+                    if(nibble > 4) nibble += 3;
+                    for(int j=0; j<i; ++j) nibble <<= 4;
+                    
+                    result |= nibble;
+                    ++i;
+                }
+                bcdhandle->var = result;
+            }while(bcdhandle != bcd.begin_ptr);
+            if(old_bcdsign != bcd.sign()) bcd.newCell(mask000);
+            mask >>= 1;
+        }
+    }while(handle != this->begin_ptr);
+
+    // print binary-coded decimal
+    std::string rev;
+    while(bcd.begin_ptr->R->var != 0){ 
+        const char nibble = bcd.begin_ptr->R->var & 0b00001111;
+        rev = std::string(1,(nibble > 4 ? nibble+45 : nibble+48)) + rev; 
+        bcd.begin_ptr->R->var >>= 4;
+    }
+    fwrite(rev.c_str(), sizeof(char), rev.length(), file);
+    bcd.delCell();
+    if(bcd.is_0()) return;
+
+    do{
+        std::string rev;
+        for(int i=0; i<16; ++i){
+            const char nibble = bcd.begin_ptr->R->var & 0b00001111; 
+            rev = std::string(1,(nibble > 4 ? nibble+45 : nibble+48)) + rev; 
+            bcd.begin_ptr->R->var >>= 4;
+        }
+        fwrite(rev.c_str(), sizeof(char), rev.length(), file);
+    }while(bcd.delCell());
 }
 /**
  * @brief save value of the variable to file in readable form with separator sign every 8 bits (using BPrint)
