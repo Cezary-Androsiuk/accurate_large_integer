@@ -133,11 +133,19 @@ protected: public:
     // Exponentiation
     ALi exponentiation(const ALi& right) const;
     void exponentiationAssign(const ALi& right);
+    
 
 public:
     // Public
     void print(const char* str) const;
     void file(std::string str);
+
+    // x ^ e (mod n)
+    ALi powmod(ALi e, const ALi& n) const;
+    void powmodAssign(ALi e, const ALi& n);
+
+    // Prime detection
+    bool isPrime() const;
     
     // Get / Set
     void setSeparator(const char& separatorSign = '\0');

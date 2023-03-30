@@ -2071,7 +2071,6 @@ void ALi::divisionAssign(const ALi& right){
  * @return ALi 
  */
 ALi ALi::modulo(const ALi& right) const{
-    printf("modulo is not finished yet\n");
     if(right.is_0()){ // L % 0 = !
         printf("Zero division!\nreturned: 0\n");
         return 0;
@@ -2119,7 +2118,6 @@ ALi ALi::modulo(const ALi& right) const{
  * @param right 
  */
 void ALi::moduloAssign(const ALi& right){
-    printf("moduloAssign is not finished yet\n");
     if(right.is_0()){ // L %= 0 == !
         printf("Zero division!\nassigned: 0\n");
         this->clear();
@@ -2168,7 +2166,7 @@ void ALi::moduloAssign(const ALi& right){
         }while(mask > 0);
         hdl = hdl->R;
     }while(hdl != this->begin_ptr);
-
+    this->assignment(slider);
 }
     // #
     
@@ -2344,6 +2342,110 @@ void ALi::file(std::string str){
         case 'r': this->readFile(str.substr(1)); break;
         default: printf("file: unknown action: '%c'\nread: 'r'\n write: 'w'\n",str[0]); return;
     }
+}
+    // #
+    
+    // # x ^ e (mod n)
+    
+    // #
+
+/**
+ * @brief 
+ * @param e 
+ * @param n 
+ * @return ALi 
+ */
+ALi ALi::powmod(ALi e, const ALi& n) const{
+    // a^(n+m) = a^n * a^m
+    // (a*b)mod n = ((a mod n) * (b mod n)) mod n
+    // (a^10) mod n = ( ((a^9) mod n) (a mod n) ) mod n
+    /*
+    10^2 mod 8 = 100 mod 8  = 4
+    10^2 mod 8 = (10 mod 8)(10 mod 8) mod 8 = 2 * 2 mod 8 = 4
+    */
+}
+/**
+ * @brief 
+ * @param e 
+ * @param n 
+ */
+void ALi::powmodAssign(ALi e, const ALi& n){
+    if(n.is_0()){
+        this->moduloAssign(n);
+        return;
+    }
+    else if(this->is_0()){
+        return;
+    }
+    else if(this->is_p1()){
+        this->moduloAssign(n);
+        return;
+    }
+    else if(this->is_n1()){
+        this->exponentiationAssign(e);
+        this->moduloAssign(n);
+        return;
+    }
+    else if(e.is_0()){
+        this->assignment(1);
+        this->moduloAssign(n);
+        return;
+    }
+    else if(e.sign()){
+        this->clear();
+        return;
+    }
+    // a^(n+m) = a^n * a^m
+    // (a*b)mod n = ((a mod n) * (b mod n)) mod n
+    // (a^10) mod n = ( ((a^9) mod n) (a mod n) ) mod n
+    /*
+    10^2 mod 8 = 100 mod 8  = 4
+    10^2 mod 8 = (10 mod 8)(10 mod 8) mod 8 = 2 * 2 mod 8 = 4
+
+    123^8 mod 7 = (123 mod 7)(123^7 mod 7) mod 7 = 
+    (123 mod 7)
+        ((123 mod 7)
+            ((123 mod 7)
+                ((123 mod 7)
+                    ((123 mod 7)
+                        ((123 mod 7)
+                            ((123 mod 7)(123 mod 7) mod 7) 
+                        mod 7) 
+                    mod 7) 
+                mod 7) 
+            mod 7) 
+        mod 7) 
+    mod 7 = 4 (4 (4 (4 (4 (4 (4*4 mod 7) mod 7) mod 7) mod 7) mod 7) mod 7) mod 7 =
+               4 (4 (4 (4 (4 (4*2 mod 7) mod 7) mod 7) mod 7) mod 7) mod 7 =
+                  4 (4 (4 (4 (4*1 mod 7) mod 7) mod 7) mod 7) mod 7 =
+                     4 (4 (4 (4*4 mod 7) mod 7) mod 7) mod 7 =
+                        4 (4 (4*2 mod 7) mod 7) mod 7 =
+                           4 (4*1 mod 7) mod 7 =
+                              4*4 mod 7 =
+                                  2
+    */
+
+    this->moduloAssign(n);
+    this->print("d\n");
+    ALi leftModuled(*this);
+    while(!e.is_0()){
+        this->multiplicationAssign(leftModuled);
+        this->moduloAssign(n);
+        e.decrement_ext();
+    }
+}
+    // #
+    
+    // # Prime detection
+    
+    // #
+/**
+ * @brief 
+ * @return true 
+ * @return false 
+ */
+bool ALi::isPrime() const{
+
 }
     // #
     

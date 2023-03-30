@@ -99,23 +99,10 @@ int main(){
 
 
 
-    // x = 0x7FFFFFFFFFFFFFFF;
-    // x = 10;
-    // x *= 0x7FFFFFFFFFFFFFFF;
-    // x *= -1;
-    // x *= 16;
-    // x = 1;
-    // x.printBinary();
-    // // printf("\n");
-    // // x.printBinaryApproximation(64);
-    // // printf("\n");
-    // // x.printBinaryApproximation(65);
-    // printf("\n");
-    // x.printBinaryApproximation(10);
-    // printf("\n");
-    x.assignmentString_10("1234567812312312312312312390");
-    // x.assignment_str_02("b100011001110");
+    x = 123;
+    x.powmodAssign(8, 7);
     x >> "d\n";
+
     // x = 9876;
     // y = 12345;
 
