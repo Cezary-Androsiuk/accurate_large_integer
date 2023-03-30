@@ -97,11 +97,20 @@ int main(){
     // std::cout << sizeof(a) << std::endl;
     // std::cout << sizeof(b) << std::endl;
 
+    for(ALi i(0); i<20000; i++){
+        printf("%s ", (i.isPrime() ? "true " : "false"));
+        i >> "d\n";
+    }
 
 
-    x = 123;
-    x.powmodAssign(8, 7);
-    x >> "d\n";
+
+    // x = 123;
+    // x.powmodAssign(8, 7);
+    // x >> "d\n";
+
+    // x = 123;
+    // y = x.powmod(8, 7);
+    // y >> "d\n";
 
     // x = 9876;
     // y = 12345;

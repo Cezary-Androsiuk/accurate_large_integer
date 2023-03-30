@@ -2355,21 +2355,61 @@ void ALi::file(std::string str){
  * @param n 
  * @return ALi 
  */
-ALi ALi::powmod(ALi e, const ALi& n) const{
+ALi ALi::powmod(const ALi& e, const ALi& n) const{
+    if(n.is_0()){
+        return this->modulo(n);
+    }
+    else if(this->is_0()){
+        return *this;
+    }
+    else if(this->is_p1()){
+        return this->modulo(n);
+    }
+    else if(this->is_n1()){
+        return this->exponentiation(e).modulo(n);
+    }
+    else if(e.is_0()){
+        return ALi(1).modulo(n);
+    }
+    else if(e.sign()){
+        return 0;
+    }
     // a^(n+m) = a^n * a^m
     // (a*b)mod n = ((a mod n) * (b mod n)) mod n
     // (a^10) mod n = ( ((a^9) mod n) (a mod n) ) mod n
     /*
     10^2 mod 8 = 100 mod 8  = 4
     10^2 mod 8 = (10 mod 8)(10 mod 8) mod 8 = 2 * 2 mod 8 = 4
+
+    123^8 mod 7 = (123 mod 7)(123^7 mod 7) mod 7 = 
+    (123 mod 7)((123 mod 7)((123 mod 7)((123 mod 7)((123 mod 7)((123 mod 7)
+        ((123 mod 7)(123 mod 7) mod 7) mod 7) mod 7) mod 7) mod 7) mod 7) mod 7 =
+    4 (4 (4 (4 (4 (4 (4*4 mod 7) mod 7) mod 7) mod 7) mod 7) mod 7) mod 7 =
+       4 (4 (4 (4 (4 (4*2 mod 7) mod 7) mod 7) mod 7) mod 7) mod 7 =
+          4 (4 (4 (4 (4*1 mod 7) mod 7) mod 7) mod 7) mod 7 =
+             4 (4 (4 (4*4 mod 7) mod 7) mod 7) mod 7 =
+                4 (4 (4*2 mod 7) mod 7) mod 7 =
+                   4 (4*1 mod 7) mod 7 =
+                      4*4 mod 7 =
+                          2
     */
+    
+    ALi out(this->modulo(n));
+    ALi exponent(e.subtraction_ext(1));
+    ALi leftModuled(out);
+    while(!exponent.is_0()){
+        out.multiplicationAssign(leftModuled);
+        out.moduloAssign(n);
+        exponent.decrement_ext();
+    }
+    return out;
 }
 /**
  * @brief 
  * @param e 
  * @param n 
  */
-void ALi::powmodAssign(ALi e, const ALi& n){
+void ALi::powmodAssign(const ALi& e, const ALi& n){
     if(n.is_0()){
         this->moduloAssign(n);
         return;
@@ -2403,35 +2443,25 @@ void ALi::powmodAssign(ALi e, const ALi& n){
     10^2 mod 8 = (10 mod 8)(10 mod 8) mod 8 = 2 * 2 mod 8 = 4
 
     123^8 mod 7 = (123 mod 7)(123^7 mod 7) mod 7 = 
-    (123 mod 7)
-        ((123 mod 7)
-            ((123 mod 7)
-                ((123 mod 7)
-                    ((123 mod 7)
-                        ((123 mod 7)
-                            ((123 mod 7)(123 mod 7) mod 7) 
-                        mod 7) 
-                    mod 7) 
-                mod 7) 
-            mod 7) 
-        mod 7) 
-    mod 7 = 4 (4 (4 (4 (4 (4 (4*4 mod 7) mod 7) mod 7) mod 7) mod 7) mod 7) mod 7 =
-               4 (4 (4 (4 (4 (4*2 mod 7) mod 7) mod 7) mod 7) mod 7) mod 7 =
-                  4 (4 (4 (4 (4*1 mod 7) mod 7) mod 7) mod 7) mod 7 =
-                     4 (4 (4 (4*4 mod 7) mod 7) mod 7) mod 7 =
-                        4 (4 (4*2 mod 7) mod 7) mod 7 =
-                           4 (4*1 mod 7) mod 7 =
-                              4*4 mod 7 =
-                                  2
+    (123 mod 7)((123 mod 7)((123 mod 7)((123 mod 7)((123 mod 7)((123 mod 7)
+        ((123 mod 7)(123 mod 7) mod 7) mod 7) mod 7) mod 7) mod 7) mod 7) mod 7 =
+    4 (4 (4 (4 (4 (4 (4*4 mod 7) mod 7) mod 7) mod 7) mod 7) mod 7) mod 7 =
+       4 (4 (4 (4 (4 (4*2 mod 7) mod 7) mod 7) mod 7) mod 7) mod 7 =
+          4 (4 (4 (4 (4*1 mod 7) mod 7) mod 7) mod 7) mod 7 =
+             4 (4 (4 (4*4 mod 7) mod 7) mod 7) mod 7 =
+                4 (4 (4*2 mod 7) mod 7) mod 7 =
+                   4 (4*1 mod 7) mod 7 =
+                      4*4 mod 7 =
+                          2
     */
 
     this->moduloAssign(n);
-    this->print("d\n");
+    ALi exponent(e.subtraction_ext(1));
     ALi leftModuled(*this);
-    while(!e.is_0()){
+    while(!exponent.is_0()){
         this->multiplicationAssign(leftModuled);
         this->moduloAssign(n);
-        e.decrement_ext();
+        exponent.decrement_ext();
     }
 }
     // #
@@ -2445,7 +2475,22 @@ void ALi::powmodAssign(ALi e, const ALi& n){
  * @return false 
  */
 bool ALi::isPrime() const{
+    if(this->sign()) return false;
+    else if(this->is_0()) return false;
+    else if(this->is_p1()) return false;
+    else if(this->is_p2()) return true;
 
+    if(this->begin_ptr->var & mask001){ // odd
+        ALi divider(3);
+        ALi half(this->division(2));
+        while(divider.smallerThan(half)){
+            if(this->modulo(divider).is_0())
+                return false;
+            divider.increment_ext();
+        }
+        return true;
+    }
+    return false; // even
 }
     // #
     

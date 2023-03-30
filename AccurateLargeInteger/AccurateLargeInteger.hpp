@@ -141,8 +141,8 @@ public:
     void file(std::string str);
 
     // x ^ e (mod n)
-    ALi powmod(ALi e, const ALi& n) const;
-    void powmodAssign(ALi e, const ALi& n);
+    ALi powmod(const ALi& e, const ALi& n) const;
+    void powmodAssign(const ALi& e, const ALi& n);
 
     // Prime detection
     bool isPrime() const;
