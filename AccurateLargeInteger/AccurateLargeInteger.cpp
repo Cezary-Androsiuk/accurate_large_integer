@@ -2093,7 +2093,7 @@ ALi ALi::modulo(const ALi& right) const{
     else if(!this->absoluteValue().greaterThan(right.absoluteValue())){ // |L| < |R| => L % R = L
         return *this;
     }
-
+    
     ALi slider;
     ALi factor(right);
     factor.invert();
@@ -2484,8 +2484,11 @@ bool ALi::isPrime() const{
         ALi divider(3);
         ALi half(this->division(2));
         while(divider.smallerThan(half)){
-            if(this->modulo(divider).is_0())
+            if(this->modulo(divider).is_0()){
+                // this->modulo(divider) >> "d\n";
+                divider >> "d\n";
                 return false;
+            }
             divider.increment_ext();
         }
         return true;
