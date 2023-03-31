@@ -1908,7 +1908,7 @@ ALi ALi::division(const ALi& right) const{
 
     ALi slider;
     ALi factor(right);
-    factor.invert();
+    factor.invert(); // to execute addition operations instead of subtraction
     ALi out;
     const Cell* hdl = this->begin_ptr->R;
     do{
@@ -2077,6 +2077,9 @@ ALi ALi::modulo(const ALi& right) const{
     }
     else if(this->is_0()){ // 0 % R = 0
         return 0;
+    }
+    else if(this->sign()){
+        return this->multiplication(-1).modulo(right).multiplication(-1);
     }
     else if(right.is_p1()){ // L % 1 = 0
         return 0;
