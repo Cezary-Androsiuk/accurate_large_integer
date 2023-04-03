@@ -125,8 +125,6 @@ protected: public:
     // Division
     ALi division(const ALi& right) const;
     void divisionAssign(const ALi& right);
-    ALi division2(const ALi& right) const;
-    void division2Assign(const ALi& right);
     
 
     // Modulo
