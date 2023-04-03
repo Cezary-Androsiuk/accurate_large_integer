@@ -2060,6 +2060,167 @@ void ALi::divisionAssign(const ALi& right){
     }while(hdl != this->begin_ptr);
     this->assignment(out);
 }
+/**
+ * @brief divides current variable value by ALi variable value, rounds to integer
+ * @param right ALi object
+ * @return ALi object
+ */
+ALi ALi::division2(const ALi& right) const{
+    if(right.is_0()){ // L / 0 = !
+        printf("Zero division!\nreturned: 0\n");
+        return 0;
+    }
+    else if(right.is_p1()){ // L / 1 = L
+        return *this;
+    }
+    else if(right.is_p2()){ // L / 2 = L.shr_ext()
+        ALi out(*this);
+        out.shr_ext();
+        return out;
+    }
+    else if(right.is_n1()){ // L / -1 = -L
+        ALi out(*this);
+        out.invert();
+        return out;
+    }
+    else if(right.is_n2()){ // L / -2 = -L.shr_ext()
+        ALi out(*this);
+        out.shr_ext();
+        out.invert();
+        return out;
+    }
+    else if(this->is_0()){ // 0 / R = 0
+        return 0;
+    }
+    // else if(this->absoluteValue().equal(right.absoluteValue())){ // |L / R| = 1    |L| == |R| 
+    //     if(this->sign() == right.sign())                         // L / R = 1      L == R
+    //         return 1;
+    //     else                                                     // L / R = -1     L == -(R)
+    //         return -1;
+    // }
+    // else if(this->absoluteValue().smallerThan(right.absoluteValue())){ // L / R = 0   L < R
+    //     return 0;
+    // }
+    else if(right.sign()){
+        // return this->division2(right.absoluteValue()).multiplication(-1);
+        return this->multiplication(-1).division2(right.absoluteValue());
+    }
+
+
+
+    ALi out;
+    ALi slider;
+    ALi ndivisor(right);
+    ndivisor.invert();
+
+    if(!this->sign()){
+        // Left positive
+        const Cell* hdl = this->begin_ptr->R;
+        do{
+            CELL_TYPE mask = mask100;
+            while(mask > 0){
+                slider.PLSB(hdl->var & mask ? 1 : 0);
+                mask >>= 1;
+                if(!slider.smallerThan(right)){
+                    slider.additionAssign_(ndivisor);
+                    out.PLSB(1);
+                }
+                else 
+                    out.PLSB(0);
+            }
+            hdl = hdl->R;
+        }while(hdl != this->begin_ptr->R);
+        
+    }
+    else{
+        // Left negative
+        out.begin_ptr->var = mask111;
+        slider.begin_ptr->var = mask111;
+        const Cell* hdl = this->begin_ptr->R;
+        do{
+            CELL_TYPE mask = mask100;
+            while(mask > 0){
+                slider.PLSB(hdl->var & mask ? 1 : 0);
+                mask >>= 1;
+                if(slider.smallerThan(ndivisor)){
+                    slider.additionAssign_(right);
+                    out.PLSB(0);
+                }
+                else 
+                    out.PLSB(1);
+            }
+            hdl = hdl->R;
+        }while(hdl != this->begin_ptr->R);
+    }
+    return out;
+}
+/**
+ * @brief divides current variable value by ALi variable value, rounds to integer and assigns to the current one
+ * @param right ALi object
+ */
+void ALi::division2Assign(const ALi& right){
+    if(right.is_0()){ // L /= 0 == !
+        printf("Zero division!\nassigned: 0\n");
+        this->clear();
+        return;
+    }
+    else if(right.is_p1()){ // L /= 1 == L
+        return;
+    }
+    else if(right.is_p2()){ // L /= 2 == L.shr_ext()
+        this->shr_ext();
+        return;
+    }
+    else if(right.is_n1()){ // L /= -1 == -L
+        this->invert();
+        return;
+    }
+    else if(right.is_n2()){ // L /= -2 == -L.shr_ext()
+        this->shr_ext();
+        this->invert();
+        return;
+    }
+    else if(this->is_0()){ // 0 /= R == 0
+        this->clear();
+        return;
+    }
+    else if(this->absoluteValue().equal(right.absoluteValue())){ // |L /= R| == 1    |L| == |R| 
+        if(this->sign() == right.sign()){                        // L /= R == 1      L == R
+            this->assignment(1);
+            return;
+        }
+        else{                                                    // L /= R == -1     L == -(R)
+            this->assignment(-1);
+            return;
+        }
+    }
+    else if(this->absoluteValue().smallerThan(right.absoluteValue())){ // L /= R == 0   L < R
+        this->clear();
+        return;
+    }
+    
+    ALi slider;
+    ALi factor(right);
+    factor.invert();
+    ALi out;
+    const Cell* hdl = this->begin_ptr->R;
+    do{
+        unsigned long long mask = mask100;
+        do{
+            if(hdl->var & mask) slider.PLSB(1);
+            else                slider.PLSB(0);
+            if(!slider.smallerThan(right)){
+                slider.additionAssign_(factor);
+                out.PLSB(1);
+            }
+            else 
+                out.PLSB(0);
+            mask >>= 1;
+        }while(mask > 0);
+        hdl = hdl->R;
+    }while(hdl != this->begin_ptr);
+    this->assignment(out);
+}
     // #
     
     // # Modulo

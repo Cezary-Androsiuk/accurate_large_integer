@@ -78,11 +78,48 @@ int main(){
     z.setSeparator(' ');
     z1.setSeparator(' ');
     z2.setSeparator(' ');
+    int xi, yi;
 
-    x = -7;
-    y = -3;
-    z = x.division(y);
+    
+    xi = 7;
+    yi = 3;
+    printf("%d / %d = %d = ", xi, yi, xi/yi);
+    x = xi;
+    y = yi;
+    z = x.division2(y);
     z >> "d\n";
+    
+    xi = -7;
+    yi = 3;
+    printf("%d / %d = %d = ", xi, yi, xi/yi);
+    x = xi;
+    y = yi;
+    z = x.division2(y);
+    z >> "d\n";
+    
+    xi = 7;
+    yi = -3;
+    printf("%d / %d = %d = ", xi, yi, xi/yi);
+    x = xi;
+    y = yi;
+    z = x.division2(y);
+    z >> "d\n";
+    
+    xi = -7;
+    yi = -3;
+    printf("%d / %d = %d = ", xi, yi, xi/yi);
+    x = xi;
+    y = yi;
+    z = x.division2(y);
+    z >> "d\n";
+
+
+
+
+    // x = -7;
+    // y = -3;
+    // z = x.division(y);
+    // z >> "d\n";
 
     // -7 --2*3 = 
 

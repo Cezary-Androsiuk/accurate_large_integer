@@ -125,6 +125,9 @@ protected: public:
     // Division
     ALi division(const ALi& right) const;
     void divisionAssign(const ALi& right);
+    ALi division2(const ALi& right) const;
+    void division2Assign(const ALi& right);
+    
 
     // Modulo
     ALi modulo(const ALi& right) const;
@@ -133,7 +136,10 @@ protected: public:
     // Exponentiation
     ALi exponentiation(const ALi& right) const;
     void exponentiationAssign(const ALi& right);
-    
+
+
+    // Rooting
+    ALi squareRootAlternative(const ALi& right) const;
 
 public:
     // Public
@@ -201,6 +207,8 @@ SPLITED IN TO MULTIPLE METHODS WILL BE GOOD IDEA
 
 ?TODO    add addition without overflow detection (adding won't increase variable lenght)
 ?TODO    add subtraction without overflow detection (subtracting won't increase variable lenght)
+
+!TODO   handle exception when assignmentString("b0010 1101") gets something other than 0 or 1
 
 TODO    printBinaryApproximation
 TODO    printDecimalApproximation
