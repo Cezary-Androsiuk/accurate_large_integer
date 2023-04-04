@@ -2075,9 +2075,6 @@ ALi ALi::modulo(const ALi& right) const{
     else if(this->is_0()){ // 0 % R = 0
         return 0;
     }
-    else if(this->sign()){
-        return this->multiplication(-1).modulo(right).multiplication(-1);
-    }
     else if(right.is_p1()){ // L % 1 = 0
         return 0;
     }
@@ -2095,46 +2092,46 @@ ALi ALi::modulo(const ALi& right) const{
     }
     else if(right.sign()){
         // return this->modulo(right.absoluteValue()).multiplication(-1);
-        return this->multiplication(-1).modulo(right.absoluteValue());
+        // return this->multiplication(-1).modulo(right.absoluteValue());
     }
 
+    // (A mod B) = A - (A div B) * B
+    return this->subtraction_ext(this->division(right).multiplication(right));
+//     ALi slider;
+//     ALi ndivisor(right);
+//     ndivisor.invert();
 
-
-    ALi slider;
-    ALi ndivisor(right);
-    ndivisor.invert();
-
-    if(!this->sign()){
-        // Left positive
-        const Cell* hdl = this->begin_ptr->R;
-        do{
-            CELL_TYPE mask = mask100;
-            while(mask > 0){
-                slider.PLSB(hdl->var & mask ? 1 : 0);
-                mask >>= 1;
-                if(!slider.smallerThan(right))
-                    slider.additionAssign_(ndivisor);
-            }
-            hdl = hdl->R;
-        }while(hdl != this->begin_ptr->R);
+//     if(!this->sign()){
+//         // Left positive
+//         const Cell* hdl = this->begin_ptr->R;
+//         do{
+//             CELL_TYPE mask = mask100;
+//             while(mask > 0){
+//                 slider.PLSB(hdl->var & mask ? 1 : 0);
+//                 mask >>= 1;
+//                 if(!slider.smallerThan(right))
+//                     slider.additionAssign_(ndivisor);
+//             }
+//             hdl = hdl->R;
+//         }while(hdl != this->begin_ptr->R);
         
-    }
-    else{
-        // Left negative
-        slider.begin_ptr->var = mask111;
-        const Cell* hdl = this->begin_ptr->R;
-        do{
-            CELL_TYPE mask = mask100;
-            while(mask > 0){
-                slider.PLSB(hdl->var & mask ? 1 : 0);
-                mask >>= 1;
-                if(slider.smallerThan(ndivisor))
-                    slider.additionAssign_(right);
-            }
-            hdl = hdl->R;
-        }while(hdl != this->begin_ptr->R);
-    }
-    return slider;
+//     }
+//     else{
+//         // Left negative
+//         slider.begin_ptr->var = mask111;
+//         const Cell* hdl = this->begin_ptr->R;
+//         do{
+//             CELL_TYPE mask = mask100;
+//             while(mask > 0){
+//                 slider.PLSB(hdl->var & mask ? 1 : 0);
+//                 mask >>= 1;
+//                 if(slider.smallerThan(ndivisor))
+//                     slider.additionAssign_(right);
+//             }
+//             hdl = hdl->R;
+//         }while(hdl != this->begin_ptr->R);
+//     }
+//     return slider;
 }
 /**
  * @brief 
@@ -2165,31 +2162,12 @@ void ALi::moduloAssign(const ALi& right){
         this->assignment(this->begin_ptr->var & mask001);
         return;
     }
-    else if(!this->absoluteValue().greaterThan(right.absoluteValue())){ // |L| < |R| => L %= R == L
-        return;
-    }
+    // else if(!this->absoluteValue().greaterThan(right.absoluteValue())){ // |L| < |R| => L %= R == L
+    //     return;
+    // }
 
-
-    // just like divisionAssign method, there is a way by with what cost :c 
-    // if i will find better divisionAssign algorithm then i can change this moduloAssign algorithm
-
-    ALi slider;
-    ALi factor(right);
-    factor.invert();
-    const Cell* hdl = this->begin_ptr->R;
-    do{
-        unsigned long long mask = mask100;
-        do{
-            if(hdl->var & mask) slider.PLSB(1);
-            else                slider.PLSB(0);
-            if(!slider.smallerThan(right)){
-                slider.additionAssign_(factor);
-            }
-            mask >>= 1;
-        }while(mask > 0);
-        hdl = hdl->R;
-    }while(hdl != this->begin_ptr);
-    this->assignment(slider);
+    // (A mod B) = A - (A div B) * B
+    this->subtractionAssign_ext(this->division(right).multiplication(right));
 }
     // #
     
