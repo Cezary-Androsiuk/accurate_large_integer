@@ -83,35 +83,47 @@ int main(){
     
     xi = 7;
     yi = 3;
-    printf("%d / %d = %d = ", xi, yi, xi/yi);
+    printf("%d / %d = \t", xi, yi);
     x = xi;
     y = yi;
     z = x.division(y);
-    z >> "d\n";
+    z >> "d \tr";
+    z = x.modulo(y);
+    z >> "d\t";
+    printf("expected 2 r1\n");
     
     xi = -7;
     yi = 3;
-    printf("%d / %d = %d = ", xi, yi, xi/yi);
+    printf("%d / %d = \t", xi, yi);
     x = xi;
     y = yi;
     z = x.division(y);
-    z >> "d\n";
+    z >> "d \tr";
+    z = x.modulo(y);
+    z >> "d\t";
+    printf("expected -3 r2\n");
     
     xi = 7;
     yi = -3;
-    printf("%d / %d = %d = ", xi, yi, xi/yi);
+    printf("%d / %d = \t", xi, yi);
     x = xi;
     y = yi;
     z = x.division(y);
-    z >> "d\n";
+    z >> "d \tr";
+    z = x.modulo(y);
+    z >> "d\t";
+    printf("expected -3 r-2\n");
     
     xi = -7;
     yi = -3;
-    printf("%d / %d = %d = ", xi, yi, xi/yi);
+    printf("%d / %d = \t", xi, yi);
     x = xi;
     y = yi;
     z = x.division(y);
-    z >> "d\n";
+    z >> "d \tr";
+    z = x.modulo(y);
+    z >> "d\t";
+    printf("expected 2 r-1\n");
 
 
 
@@ -119,37 +131,37 @@ int main(){
 
 
         
-    xi = 7;
-    yi = 3;
-    printf("%d / %d = %d = ", xi, yi, xi/yi);
-    x = xi;
-    y = yi;
-    x.divisionAssign(y);
-    x >> "d\n";
+    // xi = 7;
+    // yi = 3;
+    // printf("%d / %d = %d = ", xi, yi, xi/yi);
+    // x = xi;
+    // y = yi;
+    // x.divisionAssign(y);
+    // x >> "d\n";
     
-    xi = -7;
-    yi = 3;
-    printf("%d / %d = %d = ", xi, yi, xi/yi);
-    x = xi;
-    y = yi;
-    x.divisionAssign(y);
-    x >> "d\n";
+    // xi = -7;
+    // yi = 3;
+    // printf("%d / %d = %d = ", xi, yi, xi/yi);
+    // x = xi;
+    // y = yi;
+    // x.divisionAssign(y);
+    // x >> "d\n";
     
-    xi = 7;
-    yi = -3;
-    printf("%d / %d = %d = ", xi, yi, xi/yi);
-    x = xi;
-    y = yi;
-    x.divisionAssign(y);
-    x >> "d\n";
+    // xi = 7;
+    // yi = -3;
+    // printf("%d / %d = %d = ", xi, yi, xi/yi);
+    // x = xi;
+    // y = yi;
+    // x.divisionAssign(y);
+    // x >> "d\n";
     
-    xi = -7;
-    yi = -3;
-    printf("%d / %d = %d = ", xi, yi, xi/yi);
-    x = xi;
-    y = yi;
-    x.divisionAssign(y);
-    x >> "d\n";
+    // xi = -7;
+    // yi = -3;
+    // printf("%d / %d = %d = ", xi, yi, xi/yi);
+    // x = xi;
+    // y = yi;
+    // x.divisionAssign(y);
+    // x >> "d\n";
 
 
 

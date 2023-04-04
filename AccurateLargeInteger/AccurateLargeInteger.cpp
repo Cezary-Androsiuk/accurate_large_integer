@@ -2093,24 +2093,47 @@ ALi ALi::modulo(const ALi& right) const{
     else if(!this->absoluteValue().greaterThan(right.absoluteValue())){ // |L| < |R| => L % R = L
         return *this;
     }
-    
-    ALi slider;
-    ALi factor(right);
-    factor.invert();
-    const Cell* hdl = this->begin_ptr->R;
-    do{
-        unsigned long long mask = mask100;
-        do{
-            if(hdl->var & mask) slider.PLSB(1);
-            else                slider.PLSB(0);
-            if(!slider.smallerThan(right)){
-                slider.additionAssign_(factor);
-            }
-            mask >>= 1;
-        }while(mask > 0);
-        hdl = hdl->R;
-    }while(hdl != this->begin_ptr);
+    else if(right.sign()){
+        // return this->modulo(right.absoluteValue()).multiplication(-1);
+        return this->multiplication(-1).modulo(right.absoluteValue());
+    }
 
+
+
+    ALi slider;
+    ALi ndivisor(right);
+    ndivisor.invert();
+
+    if(!this->sign()){
+        // Left positive
+        const Cell* hdl = this->begin_ptr->R;
+        do{
+            CELL_TYPE mask = mask100;
+            while(mask > 0){
+                slider.PLSB(hdl->var & mask ? 1 : 0);
+                mask >>= 1;
+                if(!slider.smallerThan(right))
+                    slider.additionAssign_(ndivisor);
+            }
+            hdl = hdl->R;
+        }while(hdl != this->begin_ptr->R);
+        
+    }
+    else{
+        // Left negative
+        slider.begin_ptr->var = mask111;
+        const Cell* hdl = this->begin_ptr->R;
+        do{
+            CELL_TYPE mask = mask100;
+            while(mask > 0){
+                slider.PLSB(hdl->var & mask ? 1 : 0);
+                mask >>= 1;
+                if(slider.smallerThan(ndivisor))
+                    slider.additionAssign_(right);
+            }
+            hdl = hdl->R;
+        }while(hdl != this->begin_ptr->R);
+    }
     return slider;
 }
 /**
