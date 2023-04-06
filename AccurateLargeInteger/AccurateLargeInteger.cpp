@@ -2082,56 +2082,103 @@ ALi ALi::modulo(const ALi& right) const{
         return 0;
     }
     else if(right.is_p2()){ // L % 2 = L.LSB()
-        return this->begin_ptr->var & mask001;
+        return (this->begin_ptr->var & mask001 ? 1 : 0);
     }
     else if(right.is_n2()){ // L % -2 = L.LSB()
-        return this->begin_ptr->var & mask001;
+        return (this->begin_ptr->var & mask001 ? -1 : 0);
     }
-    else if(!this->absoluteValue().greaterThan(right.absoluteValue())){ // |L| < |R| => L % R = L
+    // Extra exceptions
+    ALi abs_l(this->absoluteValue());
+    ALi abs_r(right.absoluteValue());
+
+    if(abs_l.smallerThan(abs_r.absoluteValue())){ // |L| < |R| => L % R = L
+        if(this->sign() != right.sign())
+            return right.addition_ext(*this);
         return *this;
     }
-    else if(right.sign()){
-        // return this->modulo(right.absoluteValue()).multiplication(-1);
-        // return this->multiplication(-1).modulo(right.absoluteValue());
+    else if(abs_l.equal(abs_r)){
+        return 0;
     }
 
     // (A mod B) = A - (A div B) * B
-    return this->subtraction_ext(this->division(right).multiplication(right));
-//     ALi slider;
-//     ALi ndivisor(right);
-//     ndivisor.invert();
+    ALi out(this->subtraction_ext(this->division(right).multiplication(right)));
 
-//     if(!this->sign()){
-//         // Left positive
-//         const Cell* hdl = this->begin_ptr->R;
-//         do{
-//             CELL_TYPE mask = mask100;
-//             while(mask > 0){
-//                 slider.PLSB(hdl->var & mask ? 1 : 0);
-//                 mask >>= 1;
-//                 if(!slider.smallerThan(right))
-//                     slider.additionAssign_(ndivisor);
-//             }
-//             hdl = hdl->R;
-//         }while(hdl != this->begin_ptr->R);
+    return out;
+}
+ALi ALi::modulo2(const ALi& right) const{
+    if(right.is_0()){ // L % 0 = !
+        printf("Zero division!\nreturned: 0\n");
+        return 0;
+    }
+    else if(this->is_0()){ // 0 % R = 0
+        return 0;
+    }
+    else if(right.is_p1()){ // L % 1 = 0
+        return 0;
+    }
+    else if(right.is_n1()){ // L % -1 = 0
+        return 0;
+    }
+    else if(right.is_p2()){ // L % 2 = L.LSB()
+        return (this->begin_ptr->var & mask001 ? 1 : 0);
+    }
+    else if(right.is_n2()){ // L % -2 = L.LSB()
+        return (this->begin_ptr->var & mask001 ? -1 : 0);
+    }
+    // Extra exceptions
+    ALi abs_l(this->absoluteValue());
+    ALi abs_r(right.absoluteValue());
+
+    if(abs_l.smallerThan(abs_r.absoluteValue())){ // |L| < |R| => L % R = L
+        if(this->sign() != right.sign())
+            return right.addition_ext(*this);
+        return *this;
+    }
+    else if(abs_l.equal(abs_r)){
+        return 0;
+    }
+    else if(right.sign()){
+        return this->modulo2(right.absoluteValue());
+    }
+
+    // (A mod B) = A - (A div B) * B
+    // return this->subtraction_ext(this->division(right).multiplication(right));
+    ALi slider;
+    ALi ndivisor(right);
+    ndivisor.invert();
+
+    if(!this->sign()){
+        // Left positive
+        const Cell* hdl = this->begin_ptr->R;
+        do{
+            CELL_TYPE mask = mask100;
+            while(mask > 0){
+                slider.PLSB(hdl->var & mask ? 1 : 0);
+                mask >>= 1;
+                if(!slider.smallerThan(right))
+                    slider.additionAssign_(ndivisor);
+            }
+            hdl = hdl->R;
+        }while(hdl != this->begin_ptr->R);
         
-//     }
-//     else{
-//         // Left negative
-//         slider.begin_ptr->var = mask111;
-//         const Cell* hdl = this->begin_ptr->R;
-//         do{
-//             CELL_TYPE mask = mask100;
-//             while(mask > 0){
-//                 slider.PLSB(hdl->var & mask ? 1 : 0);
-//                 mask >>= 1;
-//                 if(slider.smallerThan(ndivisor))
-//                     slider.additionAssign_(right);
-//             }
-//             hdl = hdl->R;
-//         }while(hdl != this->begin_ptr->R);
-//     }
-//     return slider;
+    }
+    else{
+        // Left negative
+        slider.begin_ptr->var = mask111;
+        const Cell* hdl = this->begin_ptr->R;
+        do{
+            CELL_TYPE mask = mask100;
+            while(mask > 0){
+                slider.PLSB(hdl->var & mask ? 1 : 0);
+                mask >>= 1;
+                if(slider.smallerThan(ndivisor))
+                    slider.additionAssign_(right);
+            }
+            hdl = hdl->R;
+        }while(hdl != this->begin_ptr->R);
+    }
+    return slider;
+    
 }
 /**
  * @brief 
@@ -2270,7 +2317,19 @@ void ALi::exponentiationAssign(const ALi& right){
     }
     this->multiplicationAssign(notEvenOut);
 }
+    // #
     
+    // # Rooting
+
+    // #
+ALi ALi::squareRootAlternative(const ALi& right) const{
+    ALi result(*this);
+    while(result.exponentiation(right).greaterThan(*this))
+        result.shr_ext();
+    result.shl_ext();
+    result.increment_ext();
+    return result;
+}   
     // #
     
     // #
@@ -2483,11 +2542,12 @@ bool ALi::isPrime() const{
 
     if(this->begin_ptr->var & mask001){ // odd
         ALi divider(3);
-        ALi half(this->division(2));
-        while(divider.smallerThan(half)){
+        ALi possibleDividersLimit(this->squareRootAlternative(2));
+        while(divider.smallerThan(possibleDividersLimit)){
+            // printf("x\n");
             if(this->modulo(divider).is_0()){
                 // this->modulo(divider) >> "d\n";
-                divider >> "d\n";
+                // divider >> "d\n";
                 return false;
             }
             divider.increment_ext();

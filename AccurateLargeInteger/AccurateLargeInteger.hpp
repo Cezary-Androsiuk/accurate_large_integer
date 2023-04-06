@@ -129,6 +129,7 @@ protected: public:
 
     // Modulo
     ALi modulo(const ALi& right) const;
+    ALi modulo2(const ALi& right) const;
     void moduloAssign(const ALi& right);
 
     // Exponentiation

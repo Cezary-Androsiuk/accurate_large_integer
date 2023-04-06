@@ -80,91 +80,25 @@ int main(){
     z2.setSeparator(' ');
     int xi, yi;
 
-    
-    xi = 7;
-    yi = 3;
-    printf("%d / %d = \t", xi, yi);
-    x = xi;
-    y = yi;
-    z = x.division(y);
-    z >> "d \tr";
-    z = x.modulo(y);
-    z >> "d\t";
-    printf("expected 2 r1\n");
-    
-    xi = -7;
-    yi = 3;
-    printf("%d / %d = \t", xi, yi);
-    x = xi;
-    y = yi;
-    z = x.division(y);
-    z >> "d \tr";
-    z = x.modulo(y);
-    z >> "d\t";
-    printf("expected -3 r2\n");
-    
-    xi = 7;
-    yi = -3;
-    printf("%d / %d = \t", xi, yi);
-    x = xi;
-    y = yi;
-    z = x.division(y);
-    z >> "d \tr";
-    z = x.modulo(y);
-    z >> "d\t";
-    printf("expected -3 r-2\n");
-    
-    xi = -7;
-    yi = -3;
-    printf("%d / %d = \t", xi, yi);
-    x = xi;
-    y = yi;
-    z = x.division(y);
-    z >> "d \tr";
-    z = x.modulo(y);
-    z >> "d\t";
-    printf("expected 2 r-1\n");
+    // for(int i=-10; i<=10; i++){
+    //     for(int j=-10; j<=10; j++){
+    //         if(j != 0){
+    //             z = ALi(i).modulo(ALi(j));
+    //             if(!z.sign()) printf(" ");
+    //             if((i>0 ? i : -i) == (j>0 ? j : -j) ||
+    //             (j>0 ? j : -j) == 1 || i == 0) printf("  ");
+    //             else z >> "d ";
+    //         }
+    //         else
+    //             printf(" ## ");
+    //     }
+    //     printf("\n");
+    // }
 
-
-
-
-
+    // for(int i=0; i<1000; i++)
+    //     printf("%d - %s\n",i,(ALi(i).isPrime() ? "true" : "false"));
 
         
-    // xi = 7;
-    // yi = 3;
-    // printf("%d / %d = %d = ", xi, yi, xi/yi);
-    // x = xi;
-    // y = yi;
-    // x.divisionAssign(y);
-    // x >> "d\n";
-    
-    // xi = -7;
-    // yi = 3;
-    // printf("%d / %d = %d = ", xi, yi, xi/yi);
-    // x = xi;
-    // y = yi;
-    // x.divisionAssign(y);
-    // x >> "d\n";
-    
-    // xi = 7;
-    // yi = -3;
-    // printf("%d / %d = %d = ", xi, yi, xi/yi);
-    // x = xi;
-    // y = yi;
-    // x.divisionAssign(y);
-    // x >> "d\n";
-    
-    // xi = -7;
-    // yi = -3;
-    // printf("%d / %d = %d = ", xi, yi, xi/yi);
-    // x = xi;
-    // y = yi;
-    // x.divisionAssign(y);
-    // x >> "d\n";
-
-
-
 
     // x = -7;
     // y = -3;
@@ -173,17 +107,29 @@ int main(){
 
     // -7 --2*3 = 
 
-    // x.file("rb.dvfiles/1024.bit");
+    // x.file("rb.dvfiles/128.bit");
     // x.assignmentString("d59915276166009814580099137019372690938324757901441206345557740088899790995780839944713502945016725739051048472084628544921343630140719254274111760036026524306065026899308731153011333661693598215134675642777519447624342143356345389393359931607215655489651407770117803040714202354949305170598044946132849604059");
     // x.assignmentString("d987643212341111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111");
-    // if(x.isPrime()) x >> "d\n";
-    // x = 9876;
-    // y = 12345;
 
-    // x >> "d\n";
-    // y >> "d\n";
-    // z = x ^ y;
-    // z >> "d\n";
+
+    // for(int i=0; i<101; i++){
+    //     ALi x(i);
+    //     x >> "d - ";
+    //     x.squareRootAlternative(2) >> "d\n";
+    // }
+
+    // for(int i=0; i<100; i++){
+    //     if(x.isPrime()) x >> "d\n";
+    //     else printf("not %d\n",i);
+    //     --x;
+    // }
+    x = 9876;
+    y = 12345;
+
+    x >> "d\n";
+    y >> "d\n";
+    z = x ^ y;
+    z >> "d\n";
 
     return 0;
 }
